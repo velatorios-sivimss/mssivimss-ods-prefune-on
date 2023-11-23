@@ -4,7 +4,7 @@ server:
     contextPath: /${spring.application.name}/v1
 spring: 
   application:
-    name: mssivimss-ods-prefune-on
+    name: mssivimss-arquetipo
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
@@ -92,4 +92,4 @@ resilience4j.timelimiter:
         timeout-duration: 3s
 
 ruta-log: 'C:/Users/opimentel/Documents/logs/Arquetipo/'
-
+enviroment: Develop
