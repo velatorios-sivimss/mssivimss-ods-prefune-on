@@ -65,7 +65,7 @@ public class ConsultaMiConvenio {
 		
 		
 		query=selectQueryUtil.build();
-		log.info("consulta: {}",query);
+		log.info("consultarDatosGeneales: {}",query);
 		return query;
 	}
 	
@@ -97,7 +97,16 @@ public class ConsultaMiConvenio {
 			.innerJoin("SVC_PERSONA SP", "SCB.ID_PERSONA = SP.ID_PERSONA ")
 			.where("SCP.ID_CONVENIO_PF =".concat(idConvenio.toString()).concat(" AND SCB.IND_ACTIVO =1 "));
 		query=selectQueryUtil.build();
-		log.info("consulta: {}",query);
+		log.info("consultarBeneficiariosConvenio: {}",query);
+		return query;
+	}
+	
+	public String consultaRenovacionConvenio(Integer idConvenio) {
+		SelectQueryUtil selectQueryUtil= new SelectQueryUtil();
+		
+		
+		query= selectQueryUtil.build();
+		log.info("consultaRenovacionConvenio: {}",query);
 		return query;
 	}
 
