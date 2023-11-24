@@ -7,13 +7,13 @@ import java.util.logging.Level;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
@@ -38,18 +38,28 @@ public class ConvenioPfController {
 	
 	private final ProviderServiceRestTemplate providerRestTemplate;
 	
+	
 	private static final String CONSULTA = "consulta";
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
 	
 	@GetMapping("/mis-convenios")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object>consultaMiConvenio(@Validated @RequestBody Paginado paginado, Authentication authentication){
+		Response<Object>response=convenioPfService.consultaMiConvenio(paginado,121);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+
+	}
+	
+	@GetMapping("/detalle-convenio/{idConvenio}")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultaMiConvenio(Authentication authentication){
-		Response<Object>response=convenioPfService.consultaMiConvenio(121);
-		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
-
+	public CompletableFuture<Object>consultaDetalleConvenio(@PathVariable(required = true) Integer idConvenio,Authentication authentication){
+		Response<Object>response=convenioPfService.consultaDetalleConvenio(idConvenio);
+		return CompletableFuture.supplyAsync(()-> new ResponseEntity<>(response,HttpStatus.valueOf(response.getCodigo())));
 	}
 	
 	/*
