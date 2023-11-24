@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
+import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
 import com.imss.sivimss.ods.prefune.on.utils.AppConstantes;
@@ -50,10 +51,10 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 
 	@Override
 	public Response<Object> consultaDetalleConvenio(Integer idConvenio) {
-		List<Object>detalleConvenio= new ArrayList<>();
+		
 		List<Map<String, Object>> resultDatosGenerales = new ArrayList<>();
 		List<Map<String, Object>> resultDatosBeneficios = new ArrayList<>();
-		
+		MiConvenioResponse convenioResponse= new MiConvenioResponse();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		
 		try(SqlSession session = sqlSessionFactory.openSession()) {
@@ -65,9 +66,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 			log.info("error: {}",e.getCause().getMessage());
 			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
 		}
-		detalleConvenio.add(resultDatosGenerales);
-		detalleConvenio.add(resultDatosBeneficios);
-		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, detalleConvenio);
+		convenioResponse.setDatosGenerales(resultDatosGenerales);
+		convenioResponse.setBeneficios(resultDatosBeneficios);
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioResponse);
 	}
 
 }
