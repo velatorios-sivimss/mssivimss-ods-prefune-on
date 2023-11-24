@@ -67,7 +67,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
 		}
 		convenioResponse.setDatosGenerales(resultDatosGenerales);
-		convenioResponse.setBeneficios(resultDatosBeneficios);
+		convenioResponse.setBeneficiarios(resultDatosBeneficios);
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioResponse);
 	}
 
