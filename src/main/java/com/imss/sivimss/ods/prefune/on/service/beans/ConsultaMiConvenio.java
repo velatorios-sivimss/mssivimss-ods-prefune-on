@@ -100,12 +100,33 @@ public class ConsultaMiConvenio {
 		log.info("consultarBeneficiariosConvenio: {}",query);
 		return query;
 	}
-	
-	public String consultaRenovacionConvenio(Integer idConvenio) {
-		SelectQueryUtil selectQueryUtil= new SelectQueryUtil();
-		
-		
-		query= selectQueryUtil.build();
+
+	public String consultarRenovacion(Integer idConvenio) {
+		SelectQueryUtil queryUtil= new SelectQueryUtil();
+		SelectQueryUtil subQueryUtil= new SelectQueryUtil();
+		subQueryUtil.select("TRUE")
+		.from("SVC_FINADO SF")
+		.join("SVT_NOTA_REMISION nota", "SF.ID_ORDEN_SERVICIO = nota.ID_ORDEN_SERVICIO AND nota.IND_ESTATUS = 2")
+		.join("SVC_PERSONA SP", "SF.ID_PERSONA = SP.ID_PERSONA")
+		.join("SVT_CONVENIO_PF PF", "SF.ID_CONTRATO_PREVISION = PF.ID_CONVENIO_PF")
+		.join("SVT_CONTRA_PAQ_CONVENIO_PF spaq", "PF.ID_CONVENIO_PF = spaq.ID_CONVENIO_PF")
+		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE  AND SF.ID_PERSONA = SC.ID_PERSONA")
+		.where("SF.ID_TIPO_ORDEN = 2").and("PF.ID_CONVENIO_PF = SCP.ID_CONVENIO_PF");
+		String subQuery = subQueryUtil.build();
+		log.info("subquery ->"+subQuery);
+		queryUtil.select("IF(SCP.IND_TIPO_CONTRATACION=1, 'Por persona', 'Por grupo o empresa') AS tipoPrevision",
+				"DATE_FORMAT(SCP.FEC_ALTA , '%d-%m-%Y') AS fecAlta",
+				"IF(SCP.IND_RENOVACION=false, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d-%m-%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d-%m-%Y')) AS fecVigencia",
+				"PAQ.MON_PRECIO AS cuotaRecuperacion",
+				"PAQ.REF_PAQUETE_NOMBRE AS tipoPaquete",
+				"IF(SCP.IND_RENOVACION=false, ' ', DATE_FORMAT(RPF.FEC_ALTA, '%d-%m-%Y')) AS fecRenovacion",
+				"IFNULL(("+subQuery+"), FALSE) AS titularFallecido")
+				.from("SVT_CONVENIO_PF SCP ")
+				.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2  ")
+				.join("SVT_CONTRA_PAQ_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+				.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
+				.where("SCP.ID_CONVENIO_PF ="+idConvenio);
+		query= queryUtil.build();
 		log.info("consultaRenovacionConvenio: {}",query);
 		return query;
 	}

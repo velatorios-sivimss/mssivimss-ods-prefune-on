@@ -53,6 +53,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 		List<Object>detalleConvenio= new ArrayList<>();
 		List<Map<String, Object>> resultDatosGenerales = new ArrayList<>();
 		List<Map<String, Object>> resultDatosBeneficios = new ArrayList<>();
+		List<Map<String, Object>> resultDatosRenovacion = new ArrayList<>();
 		
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		
@@ -60,13 +61,14 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 			Consultas consultas = session.getMapper(Consultas.class);
 			resultDatosGenerales = consultas.selectNativeQuery(miConvenio.consultarDatosGeneales(idConvenio));
 			resultDatosBeneficios=consultas.selectNativeQuery(miConvenio.consultarBeneficiariosConvenio(idConvenio));
-		
+		    resultDatosRenovacion = consultas.selectNativeQuery(miConvenio.consultarRenovacion(idConvenio));
 		}catch (Exception e) {
 			log.info("error: {}",e.getCause().getMessage());
 			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
 		}
 		detalleConvenio.add(resultDatosGenerales);
 		detalleConvenio.add(resultDatosBeneficios);
+		detalleConvenio.add(resultDatosRenovacion);
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, detalleConvenio);
 	}
 
