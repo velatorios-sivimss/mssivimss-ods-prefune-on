@@ -42,12 +42,12 @@ public class ConvenioPfController {
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
 	
-	@GetMapping("/mis-convenios/{idContratante}")
+	@GetMapping("/mis-convenios")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultaMiConvenio(@PathVariable(required = true) Integer idContratante,Authentication authentication){
-		Response<Object>response=convenioPfService.consultaMiConvenio(idContratante);
+	public CompletableFuture<Object>consultaMiConvenio(Authentication authentication){
+		Response<Object>response=convenioPfService.consultaMiConvenio(121);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 
 	}
