@@ -12,5 +12,5 @@ import lombok.Setter;
 public class MiConvenioResponse {
 
 	List<Map<String, Object>> datosGenerales = new ArrayList<>();
-	List<Map<String, Object>> Beneficios = new ArrayList<>();
+	List<Map<String, Object>> beneficios = new ArrayList<>();
 }
