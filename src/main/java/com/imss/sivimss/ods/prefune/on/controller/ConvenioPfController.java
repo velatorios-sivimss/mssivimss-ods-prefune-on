@@ -44,7 +44,7 @@ public class ConvenioPfController {
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
 	
-	@GetMapping("/mis-convenios")
+	@PostMapping("/mis-convenios")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@TimeLimiter(name = "msflujo")
@@ -54,7 +54,7 @@ public class ConvenioPfController {
 
 	}
 	
-	@PostMapping("/detalle-convenio/{idConvenio}")
+	@GetMapping("/detalle-convenio/{idConvenio}")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@TimeLimiter(name = "msflujo")
