@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
+import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
 import com.imss.sivimss.ods.prefune.on.utils.AppConstantes;
@@ -54,8 +55,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 		List<Map<String, Object>> resultDatosGenerales = new ArrayList<>();
 		List<Map<String, Object>> resultDatosBeneficios = new ArrayList<>();
 		List<Map<String, Object>> resultDatosRenovacion = new ArrayList<>();
-		
+		MiConvenioResponse convenioResponse= new MiConvenioResponse();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		
 		
 		try(SqlSession session = sqlSessionFactory.openSession()) {
 			Consultas consultas = session.getMapper(Consultas.class);
