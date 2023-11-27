@@ -114,6 +114,7 @@ public class ConsultaMiConvenio {
 		.where("SF.ID_TIPO_ORDEN = 2").and("PF.ID_CONVENIO_PF = SCP.ID_CONVENIO_PF");
 		String subQuery = subQueryUtil.build();
 		queryUtil.select("SCP.ID_ESTATUS_CONVENIO AS idEstatus",
+				"RPF.ID_ESTATUS AS estatusRenovacion",
 				"IF(SCP.IND_TIPO_CONTRATACION=1, 'Por persona', 'Por grupo o empresa') AS tipoPrevision",
 				"DATE_FORMAT(SCP.FEC_ALTA , '%d-%m-%Y') AS fecAlta",
 				"IF(SCP.IND_RENOVACION=false, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d-%m-%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d-%m-%Y')) AS fecVigencia",
@@ -124,7 +125,7 @@ public class ConsultaMiConvenio {
 				"DATE_FORMAT(CURDATE(), '%d-%m-%Y') AS fecActual",
 				"TIMESTAMPDIFF(DAY,IF(SCP.IND_RENOVACION=false, DATE_FORMAT(SCP.FEC_VIGENCIA, '%Y-%m-%01'), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y-%m-%01')), CURDATE()) AS diferenciaDias")
 				.from("SVT_CONVENIO_PF SCP ")
-				.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2  ")
+				.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS IN (1,2)  ")
 				.join("SVT_CONTRA_PAQ_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 				.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
 				.where("SCP.ID_CONVENIO_PF ="+idConvenio);
