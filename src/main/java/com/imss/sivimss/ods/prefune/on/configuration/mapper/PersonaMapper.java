@@ -69,4 +69,11 @@ public interface PersonaMapper {
 			+ "	NOM_SEGUNDO_APELLIDO=#{in.segundoApellido} "
 			+ "WHERE ID_PERSONA=#{in.idPersona}")
 	public int actualizarRegistroObj(@Param("in")PersonaEntityMyBatis persona);
+	
+	@Update(value = ""
+			+ "UPDATE SVT_CONVENIO_PF  "
+			+ "SET  "
+			+ "	ID_ESTATUS_CONVENIO= 4 "
+			+ "WHERE ID_CONVENIO_PF=#{in}")
+	public int actualizarConvenio(@Param("in")Integer idConvenio);
 }
