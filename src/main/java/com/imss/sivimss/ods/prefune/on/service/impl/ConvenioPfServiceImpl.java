@@ -90,10 +90,10 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 			log.info("error: {}",e.getCause().getMessage());
 			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
 		}
-		detalleConvenio.add(resultDatosGenerales);
-		detalleConvenio.add(resultDatosBeneficios);
-		detalleConvenio.add(resultDatosRenovacion);
-		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, detalleConvenio);
+		convenioResponse.setDatosGenerales(resultDatosGenerales);
+        convenioResponse.setBeneficiarios(resultDatosBeneficios);
+        convenioResponse.setDatosRenovacion(resultDatosRenovacion);
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioResponse);
 	}
 
 }

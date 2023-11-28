@@ -13,4 +13,5 @@ public class MiConvenioResponse {
 
 	List<Map<String, Object>> datosGenerales = new ArrayList<>();
 	List<Map<String, Object>> beneficiarios = new ArrayList<>();
+	List<Map<String, Object>> datosRenovacion = new ArrayList<>();
 }
