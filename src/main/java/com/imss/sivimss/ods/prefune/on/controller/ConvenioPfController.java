@@ -52,11 +52,9 @@ public class ConvenioPfController {
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> consultaMiConvenio(@Validated @RequestBody Paginado paginado,
-			Authentication authentication) {
-		Response<Object> response = convenioPfService.consultaMiConvenio(paginado, 121);
-		return CompletableFuture
-				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	public CompletableFuture<Object>consultaMiConvenio(@Validated @RequestBody Paginado paginado, Authentication authentication) throws IOException{
+		Response<Object>response=convenioPfService.consultaMiConvenio(paginado,121,authentication);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 
 	}
 
@@ -64,11 +62,9 @@ public class ConvenioPfController {
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> consultaDetalleConvenio(@PathVariable(required = true) Integer idConvenio,
-			Authentication authentication) {
-		Response<Object> response = convenioPfService.consultaDetalleConvenio(idConvenio);
-		return CompletableFuture
-				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	public CompletableFuture<Object>consultaDetalleConvenio(@PathVariable(required = true) Integer idConvenio,Authentication authentication) throws IOException{
+		Response<Object>response=convenioPfService.consultaDetalleConvenio(idConvenio,authentication);
+		return CompletableFuture.supplyAsync(()-> new ResponseEntity<>(response,HttpStatus.valueOf(response.getCodigo())));
 	}
 	
 	@PostMapping("/{idFuncionalidad}/{servicio}/generarDocumento/{tipoReporte}")
