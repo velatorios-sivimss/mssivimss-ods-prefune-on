@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.imss.sivimss.ods.prefune.on.utils.SelectQueryUtil;
 
+
 @Service
 public class ConsultaMiConvenio {
 	
@@ -17,8 +18,16 @@ public class ConsultaMiConvenio {
 		SelectQueryUtil selectQueryUtil= new SelectQueryUtil();
 		selectQueryUtil.select( "SCP.ID_CONVENIO_PF AS idConvenio", "SCP.DES_FOLIO AS folioConvenio", 
 				"SP.CVE_CURP AS curp, CONCAT(SP.NOM_PERSONA,' ',SP.NOM_PRIMER_APELLIDO,' ',SP.NOM_SEGUNDO_APELLIDO) AS nombreAfiliado","SCP.ID_ESTATUS_CONVENIO AS idEstatus", "SECP.DES_ESTATUS AS estatus",
+				"DATE_FORMAT(SCP.FEC_ALTA,'%d/%m/%Y') AS fechaExpedicion",
+				"CASE WHEN SCP.IND_TIPO_CONTRATACION = 0"+
+				" then SV.DES_VELATORIO "+
+				" else  '' "+
+				" end AS ciudadExpedicion",
+				"CASE when SCP.IND_TIPO_CONTRATACION = 0"+
+				" then 0 else 1 end "+ " AS tipoContrato",
 				"SCP.ID_TIPO_PREVISION AS tipoPrevision")
 		.from("SVT_CONVENIO_PF SCP ")
+		.innerJoin("SVC_VELATORIO SV ", "SCP.ID_VELATORIO=SV.ID_VELATORIO ")
 		.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF")
 		.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPA", "SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF")
 		.innerJoin("SVC_CONTRATANTE SC", "SCPA.ID_CONTRATANTE = SC.ID_CONTRATANTE")
@@ -132,6 +141,30 @@ public class ConsultaMiConvenio {
 		query= queryUtil.build();
 		log.info("consultaRenovacionConvenio: {}",query);
 		return query;
+	}
+	
+	public String busquedaFolioParaReporte(String idConvenio) {
+        SelectQueryUtil querySelect = new SelectQueryUtil();
+        querySelect
+                        .select("SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss",
+                                        "SP.NOM_PERSONA AS nombrePersona",
+                                        "SP.NOM_PRIMER_APELLIDO AS primerApellido",
+                                        "SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
+                                        "SP.NUM_INE AS numIne", "SCP.DES_FOLIO AS folio",
+                                        "CPF.ID_PAQUETE AS idPaquete",
+                                        "PAQ.REF_PAQUETE_NOMBRE AS nombrePaquete",
+                                        "PAQ.REF_PAQUETE_DESCRIPCION AS desPaquete",
+                                        "PAQ.MON_PRECIO AS monPrecio")
+                        .from("SVT_CONVENIO_PF SCP")
+                        .leftJoin("SVT_CONTRA_PAQ_CONVENIO_PF CPF", "SCP.ID_CONVENIO_PF = CPF.ID_CONVENIO_PF")
+                        .leftJoin("SVT_PAQUETE PAQ", "CPF.ID_PAQUETE = PAQ.ID_PAQUETE")
+                        .leftJoin("SVC_CONTRATANTE SC", "CPF.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+                        .leftJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
+                        .where("SCP.ID_CONVENIO_PF = '" + idConvenio + "'")
+                        .groupBy("SCP.DES_FOLIO");
+        query = querySelect.build();
+        log.info("consulta busquedaFolioParaReporte convenio nuevo pf: {} ",query);
+        return query;
 	}
 
 	public String consultarDatosConvenio(String idConvenio) {

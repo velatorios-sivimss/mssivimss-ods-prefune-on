@@ -2,9 +2,13 @@ package com.imss.sivimss.ods.prefune.on.controller;
 
 import java.io.IOException;
 import java.util.Map;
+
+import java.util.Base64;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
+import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
@@ -35,32 +40,31 @@ import lombok.AllArgsConstructor;
 public class ConvenioPfController {
 
 	private final ConvenioPfService convenioPfService;
-	
+
 	private final LogUtil logUtil;
-	
+
 	private final ProviderServiceRestTemplate providerRestTemplate;
-	
-	
+
 	private static final String CONSULTA = "consulta";
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
-	
-	@GetMapping("/mis-convenios")
+
+	@PostMapping("/mis-convenios")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultaMiConvenio(@Validated @RequestBody Paginado paginado, Authentication authentication){
-		Response<Object>response=convenioPfService.consultaMiConvenio(paginado,121);
+	public CompletableFuture<Object>consultaMiConvenio(@Validated @RequestBody Paginado paginado, Authentication authentication) throws IOException{
+		Response<Object>response=convenioPfService.consultaMiConvenio(paginado,121,authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 
 	}
-	
+
 	@GetMapping("/detalle-convenio/{idConvenio}")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultaDetalleConvenio(@PathVariable(required = true) Integer idConvenio,Authentication authentication){
-		Response<Object>response=convenioPfService.consultaDetalleConvenio(idConvenio);
+	public CompletableFuture<Object>consultaDetalleConvenio(@PathVariable(required = true) Integer idConvenio,Authentication authentication) throws IOException{
+		Response<Object>response=convenioPfService.consultaDetalleConvenio(idConvenio,authentication);
 		return CompletableFuture.supplyAsync(()-> new ResponseEntity<>(response,HttpStatus.valueOf(response.getCodigo())));
 	}
 	
@@ -74,38 +78,66 @@ public class ConvenioPfController {
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 
 	}
+	@PostMapping("/generarDocumentoNuevoPlan")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> generarDocumentosNuevoPlan(@RequestBody PdfDto pdfDto, Authentication authentication)
+			throws IOException {
+		String tipoReporte;
+		if (Objects.nonNull(pdfDto.getTipoReporte()) && pdfDto.getTipoReporte().equalsIgnoreCase("xls")) {
+			tipoReporte = "xlsx";
+		}else {
+			tipoReporte="pdf";
+		}
+		Response<?> response = convenioPfService.generarPDF(pdfDto, authentication);
+
+		
+		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
+				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + tipoReporte)
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=formato-prueba." + tipoReporte)
+						.body(Base64.getDecoder().decode(response.getDatos().toString()))
+				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
 	
 	/*
 	 * 
 	 * FallBack
 	 * 
 	 */
-	
+
 	@SuppressWarnings("unused")
-	private CompletableFuture<Object> fallbackConsultaPaginada(@RequestBody Paginado paginado,Authentication authentication,
+	private CompletableFuture<Object> fallbackConsultaPaginada(@RequestBody Paginado paginado,
+			Authentication authentication,
 			CallNotPermittedException e) throws Throwable {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
-		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),CONSULTA,authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
-	
+
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsulta(Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
-		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),CONSULTA,authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 
 	@SuppressWarnings("unused")
-	private CompletableFuture<Object> fallbackConsulta(@PathVariable Integer idContratante,Authentication authentication,
+	private CompletableFuture<Object> fallbackConsulta(@PathVariable Integer idContratante,
+			Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
-		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),CONSULTA,authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
@@ -115,7 +147,8 @@ public class ConvenioPfController {
 	private CompletableFuture<Object> fallbackInsert(@RequestBody Map<String, Object> datos, Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
-		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),INSERT,authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), INSERT, authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
@@ -126,7 +159,17 @@ public class ConvenioPfController {
 			@PathVariable int id, Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
-		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),UPDATE,authentication);
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), UPDATE, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	private CompletableFuture<Object> fallbackDescargarArchivos(@RequestBody PdfDto datos,
+			Authentication authentication, CallNotPermittedException e) throws IOException {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),CONSULTA+" generar reporte",authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));

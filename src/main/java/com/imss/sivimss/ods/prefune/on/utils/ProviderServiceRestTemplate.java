@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.gson.Gson;
 import com.imss.sivimss.ods.prefune.on.security.jwt.JwtTokenProvider;
 
+
 @Service
 public class ProviderServiceRestTemplate {
 
@@ -27,6 +28,9 @@ public class ProviderServiceRestTemplate {
 	private JwtTokenProvider jwtTokenProvider;
 
 	private static final Logger log = LoggerFactory.getLogger(ProviderServiceRestTemplate.class);
+	
+	private static final String ERROR_RECUPERAR_INFORMACION = "Ha ocurrido un error al recuperar la informacion";
+
 
 	@SuppressWarnings("unchecked")
 	public Response<Object> consumirServicio(Map<String, Object> dato, String url, Authentication authentication)
@@ -54,6 +58,19 @@ public class ProviderServiceRestTemplate {
 		}
 	}
 
+	public Response<Object> consumirServicioReportes(Map<String, Object> dato, String url,
+			Authentication authentication) throws IOException {
+		try {
+			// esto es hasta que se tenga la parte de token
+			return (Response<Object>) restTemplateUtil.sendPostRequestByteArrayReportesToken(url,
+					//new DatosReporteDTO(dato), jwtTokenProvider.createToken((String) authentication.getPrincipal()),
+					new DatosReporteDTO(dato), jwtTokenProvider.createToken(""),
+					Response.class);
+		} catch (IOException exception) {
+			log.error(ERROR_RECUPERAR_INFORMACION);
+			throw exception;
+		}
+	}
 	
 
 	@SuppressWarnings("unchecked")

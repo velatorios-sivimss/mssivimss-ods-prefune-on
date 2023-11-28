@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.loader.plan.exec.process.internal.AbstractRowReader;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -194,6 +193,39 @@ public class RestTemplateUtil {
 			throw ioException;
 		} catch (Exception e) {
 			throw e;
+		}
+
+		return responseBody;
+	}
+	
+	/**
+	 * Enviar una peticion con Body para reportes.
+	 *
+	 * @param url
+	 * @param clazz
+	 * @return
+	 */
+	public Response<?> sendPostRequestByteArrayReportesToken(String url, DatosReporteDTO body, String subject,
+			Class<?> clazz) throws IOException {
+		Response<?> responseBody = new Response<>();
+		HttpHeaders headers = RestTemplateUtil.createHttpHeadersToken(subject);
+
+		HttpEntity<Object> request = new HttpEntity<>(body, headers);
+		ResponseEntity<?> responseEntity = null;
+		try {
+			responseEntity = restTemplate.postForEntity(url, request, clazz);
+			if (responseEntity.getStatusCode() == HttpStatus.OK && responseEntity.getBody() != null) {
+				responseBody = (Response<List<String>>) responseEntity.getBody();
+			} else {
+				throw new IOException("Ha ocurrido un error al enviar");
+			}
+		} catch (IOException ioException) {
+			throw ioException;
+		} catch (Exception e) {
+			log.error("Fallo al consumir el servicio, {}", e.getMessage());
+			responseBody.setCodigo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+			responseBody.setError(true);
+			responseBody.setMensaje(e.getMessage());
 		}
 
 		return responseBody;

@@ -54,11 +54,14 @@ logging:
 
 
 endpoints:
-  ms-principal-endpoint: ""
+  ms-reportes: http://localhost:8088/mssivimss-reportes-jasp/v1/generales/generar-reporte
+
+reporte:
+  convenio-nuevo-pf: reportes/plantilla/ANEXO5_CONVENIO_PF_NUEVO.jrxml
 
 jwt:
-  login: funcionamuybienlogin
-  secretkey-flujo: funcionamuybien
+  login: ""
+  secretkey-dominios: funcionamuybiendominio
   expiration-milliseconds: 360
 
 management:
