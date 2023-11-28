@@ -1,9 +1,13 @@
 package com.imss.sivimss.ods.prefune.on.controller;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
@@ -65,7 +70,32 @@ public class ConvenioPfController {
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
+	
+	@PostMapping("/{idFuncionalidad}/{servicio}/generarDocumento/{tipoReporte}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<?> generarDocumentos(@PathVariable Integer idFuncionalidad, @PathVariable String servicio,
+			@RequestBody JsonNode datos, @PathVariable String tipoReporte, Authentication authentication)
+			throws IOException {
+		/*Map<String, Object> parametro = new HashMap<>();
+		parametro.put(DATOS, datos.toString());
+		if (tipoReporte.equalsIgnoreCase("xls")) {
+			tipoReporte = "xlsx";
+		}
+		Response<?> response = peticionesService.generarDocumento(idFuncionalidad, servicio, parametro, authentication);
+		*/
+		Response<?> response= new Response<>();
+		String finalTipoReporte = tipoReporte;
+		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
+				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + finalTipoReporte)
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=formato-prueba." + finalTipoReporte)
+						.body(Base64.getDecoder().decode(response.getDatos().toString()))
+				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
 
+	
 	/*
 	 * 
 	 * FallBack
