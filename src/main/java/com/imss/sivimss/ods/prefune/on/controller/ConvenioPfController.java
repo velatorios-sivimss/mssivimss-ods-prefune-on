@@ -2,8 +2,7 @@ package com.imss.sivimss.ods.prefune.on.controller;
 
 import java.io.IOException;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -19,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
+import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
@@ -67,26 +66,25 @@ public class ConvenioPfController {
 		return CompletableFuture.supplyAsync(()-> new ResponseEntity<>(response,HttpStatus.valueOf(response.getCodigo())));
 	}
 	
-	@PostMapping("/{idFuncionalidad}/{servicio}/generarDocumento/{tipoReporte}")
+	@PostMapping("/generarDocumentoNuevoPlan")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<?> generarDocumentos(@PathVariable Integer idFuncionalidad, @PathVariable String servicio,
-			@RequestBody JsonNode datos, @PathVariable String tipoReporte, Authentication authentication)
+	public CompletableFuture<Object> generarDocumentosNuevoPlan(@RequestBody PdfDto pdfDto, Authentication authentication)
 			throws IOException {
-		/*Map<String, Object> parametro = new HashMap<>();
-		parametro.put(DATOS, datos.toString());
-		if (tipoReporte.equalsIgnoreCase("xls")) {
+		String tipoReporte;
+		if (Objects.nonNull(pdfDto.getTipoReporte()) && pdfDto.getTipoReporte().equalsIgnoreCase("xls")) {
 			tipoReporte = "xlsx";
+		}else {
+			tipoReporte="pdf";
 		}
-		Response<?> response = peticionesService.generarDocumento(idFuncionalidad, servicio, parametro, authentication);
-		*/
-		Response<?> response= new Response<>();
-		String finalTipoReporte = tipoReporte;
+		Response<?> response = convenioPfService.generarPDF(pdfDto, authentication);
+
+		
 		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
-				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + finalTipoReporte)
+				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + tipoReporte)
 						.header(HttpHeaders.CONTENT_DISPOSITION,
-								"attachment; filename=formato-prueba." + finalTipoReporte)
+								"attachment; filename=formato-prueba." + tipoReporte)
 						.body(Base64.getDecoder().decode(response.getDatos().toString()))
 				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
@@ -151,6 +149,15 @@ public class ConvenioPfController {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
 				this.getClass().getPackage().toString(), e.getMessage(), UPDATE, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	private CompletableFuture<Object> fallbackDescargarArchivos(@RequestBody PdfDto datos,
+			Authentication authentication, CallNotPermittedException e) throws IOException {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),CONSULTA+" generar reporte",authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
