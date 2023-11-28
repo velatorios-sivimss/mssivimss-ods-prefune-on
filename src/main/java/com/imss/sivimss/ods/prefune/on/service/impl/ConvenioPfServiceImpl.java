@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -44,6 +45,11 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 	
 	@Autowired
 	private PaginadoUtil paginadoUtil;
+	
+
+	private static final String CONSULTA = "consulta";
+	private static final String INSERT = "insert";
+	private static final String UPDATE = "update";
 
 	
 	private static final Logger log = LoggerFactory.getLogger(ConvenioPfServiceImpl.class);
@@ -127,6 +133,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 				}else {
 					convenioMapper.actualizarEstatusRenovacion(idConvenio);
 				}
+			//	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA);
 			
 		}catch(Exception e) {
 			session.rollback();
