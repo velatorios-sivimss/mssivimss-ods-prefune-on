@@ -4,11 +4,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,10 @@ import org.springframework.stereotype.Service;
 
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
+import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.PersonaMapper;
+import com.imss.sivimss.ods.prefune.on.model.entity.ConvenioEntityMyBatis;
+import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
@@ -33,6 +38,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 
 	@Autowired
 	private LogUtil logUtil;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 	
 	@Autowired
 	private MyBatisConfig myBatisConfig;
@@ -94,6 +102,57 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 		detalleConvenio.add(resultDatosBeneficios);
 		detalleConvenio.add(resultDatosRenovacion);
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, detalleConvenio);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Response<Object> renovarConvenio(String idConvenio) {
+		List<Map<String, Object>> detalleConvenio = new ArrayList<>();
+		List<Map<String, Object>> mapping;
+		ConvenioEntityMyBatis convenioEntity = new ConvenioEntityMyBatis();
+		ConvenioRequest convenio ;
+		log.info("estoy aqui impl");
+		MiConvenioResponse convenioResponse= new MiConvenioResponse();
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		Response<Object> resp = new Response<>();
+		try (SqlSession session = sqlSessionFactory.openSession()){
+			Consultas consultas = session.getMapper(Consultas.class);
+			detalleConvenio = consultas.selectNativeQuery(miConvenio.consultarDatosConvenio(idConvenio));
+			mapping = Arrays.asList(modelMapper.map(detalleConvenio, HashMap[].class));
+			convenio =  new ConvenioRequest(mapping.get(0));
+			convenioEntity.setIdConvenio(Integer.parseInt(idConvenio));
+			convenioEntity.setFolio(convenio.getFolio());
+			convenioEntity.setCuotaRecuperacion(convenio.getCuotaRecuperacion());
+			convenioEntity.setFecVigencia(convenio.getFechaVigencia());
+			convenioEntity.setIdVelatorio(convenio.getIdVelatorio());
+			convenioEntity.setIdContratante(convenio.getIdContratante());
+			convenioEntity.setDatosBancarios(convenio.getDatosBancarios());
+		//	convenioEntity.setIndRenovacion(convenio.getIndRenovacion());
+			ConvenioMapper convenioMapper = session.getMapper(ConvenioMapper.class);
+			try {
+				convenioMapper.nuevoRegistroObj(convenioEntity);
+				//resp.setDatos(convenioEntity);
+				convenio.setIdRegistro(convenioMapper.nuevoRegistroObj(convenioEntity));
+				log.info(convenio.getIdRegistro().toString());
+				if(Boolean.FALSE.equals(convenio.getIndRenovacion())) {
+					convenioMapper.actualizarBanderaConvenio(idConvenio);
+				}else {
+					convenioMapper.actualizarEstatusRenovacion(idConvenio);
+				}
+			
+		}catch(Exception e) {
+			session.rollback();
+			session.close();
+			log.info("error: {}",e.getCause().getMessage());
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+		}
+			session.commit();
+			session.close();
+			//return resp;
+			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenio.getIdRegistro());
+		}
+		
+
 	}
 
 }

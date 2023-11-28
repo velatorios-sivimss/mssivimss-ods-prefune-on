@@ -1,6 +1,7 @@
 package com.imss.sivimss.ods.prefune.on.controller;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -10,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,6 +64,17 @@ public class ConvenioPfController {
 		return CompletableFuture.supplyAsync(()-> new ResponseEntity<>(response,HttpStatus.valueOf(response.getCodigo())));
 	}
 	
+	@PostMapping("/renovar-convenio")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackInsert")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackInsert")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object>renovarConvenioPF(@RequestBody Map<String, Object> datos, Authentication authentication) throws Throwable{
+		String idConvenio = datos.get("idConvenio").toString();
+		Response<Object>response=convenioPfService.renovarConvenio(idConvenio);
+		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+
+	}
+	
 	/*
 	 * 
 	 * FallBack
@@ -99,7 +112,7 @@ public class ConvenioPfController {
 	}
 
 	@SuppressWarnings("unused")
-	private CompletableFuture<Object> fallbackInsert(@RequestBody PersonaNombres persona, Authentication authentication,
+	private CompletableFuture<Object> fallbackInsert(@RequestBody Map<String, Object> datos, Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		 logUtil.crearArchivoLog(Level.INFO.toString(),this.getClass().getSimpleName(),this.getClass().getPackage().toString(),e.getMessage(),INSERT,authentication);
