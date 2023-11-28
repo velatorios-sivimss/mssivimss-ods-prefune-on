@@ -1,11 +1,13 @@
 package com.imss.sivimss.ods.prefune.on.service.impl;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -14,12 +16,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
-import com.imss.sivimss.ods.prefune.on.configuration.mapper.PersonaMapper;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
+import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
@@ -42,19 +45,27 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 	
 	@Autowired
 	private PaginadoUtil paginadoUtil;
-
-	
+		
 	private static final Logger log = LoggerFactory.getLogger(ConvenioPfServiceImpl.class);
 
 	@Override
-	public Response<Object> consultaMiConvenio(Paginado paginado,Integer idContratante) {
-		Page<Map<String, Object>> result = paginadoUtil.paginado(paginado.getPagina(), paginado.getTamanio(),miConvenio.consultaMiConvenio(idContratante));
+	public Response<Object> consultaMiConvenio(Paginado paginado,Integer idContratante, Authentication authentication) throws IOException {
+		Page<Map<String, Object>> result=null; 
+		try {
+			result = paginadoUtil.paginado(paginado.getPagina(), paginado.getTamanio(),miConvenio.consultaMiConvenio(idContratante));
+		} catch (Exception e) {
+			log.info("error: {}",e.getCause().getMessage());
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+		}
+		
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
 	}
 
 	@Override
-	public Response<Object> consultaDetalleConvenio(Integer idConvenio) {
-		List<Object>detalleConvenio= new ArrayList<>();
+	public Response<Object> consultaDetalleConvenio(Integer idConvenio, Authentication authentication) throws IOException {
 		List<Map<String, Object>> resultDatosGenerales = new ArrayList<>();
 		List<Map<String, Object>> resultDatosBeneficios = new ArrayList<>();
 		List<Map<String, Object>> resultDatosRenovacion = new ArrayList<>();
@@ -72,28 +83,38 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 		    String fechaHoy = resultDatosRenovacion.get(0).get("fecActual").toString();
 		    Date fecActual = formatter.parse(fechaHoy);
 		    Integer difDias = Integer.parseInt(resultDatosRenovacion.get(0).get("diferenciaDias").toString());
-		    if(difDias<0) {
+		    String periodoRenovacion = "periodoRenovacion";
+			if(difDias<0) {
 		    	 log.info("NO ESTA EN TEMPORADA DE RENOVACION");
-				   resultDatosRenovacion.get(0).put("periodoRenovacion", 0);
+				   resultDatosRenovacion.get(0).put(periodoRenovacion, 0);
 		    }else if(difDias>=0 && difDias<=19) {
-			   resultDatosRenovacion.get(0).put("periodoRenovacion", 1);
+			   resultDatosRenovacion.get(0).put(periodoRenovacion, 1);
 		   }else if(difDias>19 && (vigencia.after(fecActual) || vigencia.equals(fecActual))) {
-			   resultDatosRenovacion.get(0).put("periodoRenovacion", 1);
+			   resultDatosRenovacion.get(0).put(periodoRenovacion, 1);
 		   }else if(fecActual.after(vigencia)) {
-			   log.info("contrato cerrado" +idConvenio);
+			   log.info("contrato cerrado {}",idConvenio);
 			   consultas.actualizarConvenio(idConvenio);
 			   session.commit();
 			   resultDatosRenovacion.get(0).put("idEstatus", 4);
-			   resultDatosRenovacion.get(0).put("periodoRenovacion", 0);
+			   resultDatosRenovacion.get(0).put(periodoRenovacion, 0);
 		   }
 		}catch (Exception e) {
 			log.info("error: {}",e.getCause().getMessage());
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
 			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
 		}
 		convenioResponse.setDatosGenerales(resultDatosGenerales);
         convenioResponse.setBeneficiarios(resultDatosBeneficios);
         convenioResponse.setDatosRenovacion(resultDatosRenovacion);
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioResponse);
+	}
+
+	@Override
+	public Response<Object> generarPDF(PdfDto request, Authentication authentication) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
