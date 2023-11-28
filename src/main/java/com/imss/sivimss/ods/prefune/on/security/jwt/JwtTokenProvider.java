@@ -31,38 +31,30 @@ public class JwtTokenProvider {
 	@Value("${jwt.login}")
 	private String jwtSecret;
 
-	@Value("${jwt.secretkey-flujo}")
-	private String jwtSecretFlujo;
+	@Value("${jwt.secretkey-dominios}")
+	private String jwtSecretDominios;
 	
 	@Value("${jwt.expiration-milliseconds}")
 	private String expiration;
 
 
 	public String createToken(String subject) {
-		Gson gson= new Gson();
-		UsuarioDto usuario=gson.fromJson(subject, UsuarioDto.class);
-		validarUsuario(usuario);
+		// esto es hasta que se tenga la parte de token
+		UsuarioDto usuario= new UsuarioDto();
 		String datosUsuario = "{" + "\"idVelatorio\":" + usuario.getIdVelatorio() + "," 
 				+ "\"idRol\":"	+ usuario.getIdRol() + "," + "\"desRol\":'" + usuario.getDesRol() + "',"
 				+ "\"idOficina\":"	+ usuario.getIdOficina() + "," + "\"idUsuario\":" + usuario.getIdUsuario() + ","
 				+ "\"cveUsuario\":'"	+ usuario.getCveUsuario() + "'," + "\"cveMatricula\":'" + usuario.getCveMatricula() + "',"
 				+ "\"nombre\":'"	+ usuario.getNombre() + "'," + "\"curp\":'" + usuario.getCurp() + "',"
-				+ "\"idDelegacion\":" + usuario.getIdDelegacion()+ "}";			
-		
+				+ "\"idDelegacion\":" + usuario.getIdDelegacion()+ "}";	
+	
 		Map<String, Object> claims = Jwts.claims().setSubject(datosUsuario);
-		
+		//
+		//Map<String, Object> claims = Jwts.claims().setSubject(subject);
 		Date now = new Date();
 		Date exp = new Date(now.getTime() + Long.parseLong(expiration) * 1000);
 		return Jwts.builder().setHeaderParam("sistema", "sivimss").setClaims(claims).setIssuedAt(now).setExpiration(exp)
-				.signWith(SignatureAlgorithm.HS512, jwtSecretFlujo).compact();
-	}
-	
-	private void validarUsuario(UsuarioDto usuario) {
-		if (usuario.getIdDelegacion()== null) {
-			usuario.setIdDelegacion(-1);
-		}else if(usuario.getIdVelatorio()==null) {
-			usuario.setIdVelatorio(-1);
-		}
+				.signWith(SignatureAlgorithm.HS512, jwtSecretDominios).compact();
 	}
 	
 	public Long getUserIdFromJWT(String token) {
