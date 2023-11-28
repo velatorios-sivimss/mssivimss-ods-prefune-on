@@ -56,11 +56,6 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 	private PaginadoUtil paginadoUtil;
 	
 
-	private static final String CONSULTA = "consulta";
-	private static final String INSERT = "insert";
-	private static final String UPDATE = "update";
-
-
 	private static final Logger log = LoggerFactory.getLogger(ConvenioPfServiceImpl.class);
 	
 	@Autowired

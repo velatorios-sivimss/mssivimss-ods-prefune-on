@@ -58,6 +58,9 @@ endpoints:
 
 reporte:
   convenio-nuevo-pf: reportes/plantilla/ANEXO5_CONVENIO_PF_NUEVO.jrxml
+  ren-convenio-pf-nuevo: reportes/plantilla/Convenio_PF_Nuevo_AnexoB.jrxml
+  ren-convenio-pf-anterior: reportes/plantilla/Convenio_PF_Anterior.jrxml
+  hoja-afiliacion: reportes/plantilla/Anexo10_HojaAfiliacion.jrxml
 
 jwt:
   login: ""
