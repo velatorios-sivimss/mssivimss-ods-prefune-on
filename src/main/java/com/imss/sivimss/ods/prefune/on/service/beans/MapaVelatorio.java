@@ -40,7 +40,8 @@ public class MapaVelatorio {
 		.from("SVC_VELATORIO SE")
 		.innerJoin("SVC_VELATORIO_SERVICIO_ONLINE SSO ", "SE.ID_VELATORIO = SSO.ID_VELATORIO ")
 		.innerJoin("SVC_SERVICIO_ONLINE SO ", "SSO.ID_SERVICIO_ONLINE = SO.ID_SERVICIO_ONLINE ")
-		.where("SE.ID_VELATORIO = ".concat(idVelatorio.toString()));
+		.where("SE.ID_VELATORIO = ".concat(idVelatorio.toString()))
+		.and("SSO.IND_ACTIVO = 1");
 		
 		query=selectQueryUtil.build();
 		log.info("consultarServiciosVelatorios: {}",query);
