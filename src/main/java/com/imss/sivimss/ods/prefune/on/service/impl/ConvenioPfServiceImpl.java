@@ -181,7 +181,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 
 
 	@Override
-	public Response<Object> renovarConvenio(String idConvenio) {
+	public Response<Object> renovarConvenio(String idConvenio, Authentication authentication) {
 		List<Map<String, Object>> detalleConvenio = new ArrayList<>();
 	//	List<Map<String, Object>> mapping;
 		ConvenioEntityMyBatis convenioEntity = new ConvenioEntityMyBatis();

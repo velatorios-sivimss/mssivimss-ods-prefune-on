@@ -122,7 +122,8 @@ public class ConsultaMiConvenio {
 		.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE  AND SF.ID_PERSONA = SC.ID_PERSONA")
 		.where("SF.ID_TIPO_ORDEN = 2").and("PF.ID_CONVENIO_PF = SCP.ID_CONVENIO_PF");
 		String subQuery = subQueryUtil.build();
-		queryUtil.select("SCP.ID_ESTATUS_CONVENIO AS idEstatus",
+		queryUtil.select("SCP.ID_ESTATUS_CONVENIO AS idEstatusConvenio",
+				"SCP.ID_TIPO_PREVISION AS tipoPrevision",
 				"RPF.ID_ESTATUS AS estatusRenovacion",
 				"IF(SCP.IND_TIPO_CONTRATACION=1, 'Por persona', 'Por grupo o empresa') AS tipoPrevision",
 				"DATE_FORMAT(SCP.FEC_ALTA , '%d-%m-%Y') AS fecAlta",

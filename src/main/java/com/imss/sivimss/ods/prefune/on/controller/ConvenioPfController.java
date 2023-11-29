@@ -74,7 +74,7 @@ public class ConvenioPfController {
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object>renovarConvenioPF(@RequestBody Map<String, Object> datos, Authentication authentication) throws Throwable{
 		String idConvenio = datos.get("idConvenio").toString();
-		Response<Object>response=convenioPfService.renovarConvenio(idConvenio);
+		Response<Object>response=convenioPfService.renovarConvenio(idConvenio, authentication);
 		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 
 	}

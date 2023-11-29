@@ -21,6 +21,21 @@ public class ConsultaRenovacionConvenio {
 		log.info(query);
 		return query;
 	}
+
+	public String obtenerCostoRecuperacion(String idConvenio) {
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
+		queryUtil.select("PAQ.MON_PRECIO AS costoRecuperacion")
+		.from("SVT_CONVENIO_PF SCP")
+		.join("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF")
+		.join("SVT_CONTRA_PAQ_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+		.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE");
+		queryUtil.where("RPF.ID_ESTATUS=2");
+		queryUtil.where("SCP.ID_TIPO_PREVISION = 2");
+			queryUtil.where("SCP.ID_CONVENIO_PF = " +idConvenio);
+			query = queryUtil.build();
+			log.info(query);
+			return query;
+	}
 	
 	
 

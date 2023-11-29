@@ -13,7 +13,7 @@ public interface ConvenioPfService {
 
 	public Response<Object>consultaMiConvenio(Paginado paginado,Integer idContratante, Authentication authentication) throws IOException;
 
-	public Response<Object> renovarConvenio(String idConvenio);
+	public Response<Object> renovarConvenio(String idConvenio, Authentication authentication);
 	
 	public Response<Object>consultaDetalleConvenio(Integer idConvenio, Authentication authentication) throws IOException;
 	

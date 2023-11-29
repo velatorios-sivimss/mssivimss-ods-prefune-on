@@ -50,7 +50,7 @@ public class ReportesRenovacionController {
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> generarDocumentosNuevoPlan(@RequestBody PdfDto pdfDto, Authentication authentication)
+	public CompletableFuture<Object> generarDocumentoNuevoPlan(@RequestBody PdfDto pdfDto, Authentication authentication)
 			throws Throwable {
 		String tipoReporte;
 		if (Objects.nonNull(pdfDto.getTipoReporte()) && pdfDto.getTipoReporte().equalsIgnoreCase("xls")) {
@@ -59,6 +59,43 @@ public class ReportesRenovacionController {
 			tipoReporte="pdf";
 		}
 		Response<?> response = reporteService.generarDoc(pdfDto, authentication);
+		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
+				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + tipoReporte)
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=formato-prueba." + tipoReporte)
+						.body(Base64.getDecoder().decode(response.getDatos().toString()))
+				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@PostMapping("/generarDocumento/plan-anterior")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> generarDocumentoPlanAnterior(@RequestBody PdfDto pdfDto, Authentication authentication)
+			throws Throwable {
+		String tipoReporte="pdf";
+		Response<?> response = reporteService.generarDocPlanAnterior(pdfDto, authentication);
+		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
+				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + tipoReporte)
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=formato-prueba." + tipoReporte)
+						.body(Base64.getDecoder().decode(response.getDatos().toString()))
+				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@PostMapping("/generarDocumento/hoja-afiliacion")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> generarDocumentoHojaAfiliacion(@RequestBody PdfDto pdfDto, Authentication authentication)
+			throws Throwable {
+		String tipoReporte;
+		if (Objects.nonNull(pdfDto.getTipoReporte()) && pdfDto.getTipoReporte().equalsIgnoreCase("xls")) {
+			tipoReporte = "xlsx";
+		}else {
+			tipoReporte="pdf";
+		}
+		Response<?> response = reporteService.generarHojaAfilicion(pdfDto, authentication);
 		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
 				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + tipoReporte)
 						.header(HttpHeaders.CONTENT_DISPOSITION,
