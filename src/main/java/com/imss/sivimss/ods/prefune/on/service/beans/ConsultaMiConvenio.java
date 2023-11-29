@@ -25,7 +25,8 @@ public class ConsultaMiConvenio {
 				" end AS ciudadExpedicion",
 				"CASE when SCP.IND_TIPO_CONTRATACION = 0"+
 				" then 0 else 1 end "+ " AS tipoContrato",
-				"SCP.ID_TIPO_PREVISION AS tipoPrevision")
+				"SCP.ID_TIPO_PREVISION AS tipoPrevision",
+				"SCP.IND_RENOVACION AS renovado")
 		.from("SVT_CONVENIO_PF SCP ")
 		.innerJoin("SVC_VELATORIO SV ", "SCP.ID_VELATORIO=SV.ID_VELATORIO ")
 		.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF")
