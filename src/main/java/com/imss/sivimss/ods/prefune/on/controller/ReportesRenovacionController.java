@@ -1,9 +1,8 @@
 package com.imss.sivimss.ods.prefune.on.controller;
 
 import java.io.IOException;
-import java.util.Map;
-
 import java.util.Base64;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -12,8 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
-import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
+import com.imss.sivimss.ods.prefune.on.service.ReportesRenovacionService;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
@@ -36,63 +33,32 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/convenio-pf")
-public class ConvenioPfController {
+@RequestMapping("renovacion/convenio-pf")
+public class ReportesRenovacionController {
 
-	private final ConvenioPfService convenioPfService;
-
+	private final ReportesRenovacionService reporteService;
 	private final LogUtil logUtil;
 
 	private final ProviderServiceRestTemplate providerRestTemplate;
-
+	
 	private static final String CONSULTA = "consulta";
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
-
-	@PostMapping("/mis-convenios")
-	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
-	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
-	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultaMiConvenio(@Validated @RequestBody Paginado paginado, Authentication authentication) throws IOException{
-		Response<Object>response=convenioPfService.consultaMiConvenio(paginado,121,authentication);
-		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
-
-	}
-
-	@GetMapping("/detalle-convenio/{idConvenio}")
-	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
-	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
-	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultaDetalleConvenio(@PathVariable(required = true) Integer idConvenio,Authentication authentication) throws IOException{
-		Response<Object>response=convenioPfService.consultaDetalleConvenio(idConvenio,authentication);
-		return CompletableFuture.supplyAsync(()-> new ResponseEntity<>(response,HttpStatus.valueOf(response.getCodigo())));
-	}
 	
-	@PostMapping("/renovar-convenio")
-	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackInsert")
-	@Retry(name = "msflujo", fallbackMethod = "fallbackInsert")
-	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>renovarConvenioPF(@RequestBody Map<String, Object> datos, Authentication authentication) throws Throwable{
-		String idConvenio = datos.get("idConvenio").toString();
-		Response<Object>response=convenioPfService.renovarConvenio(idConvenio, authentication);
-		return CompletableFuture.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
-
-	}
-	@PostMapping("/generarDocumentoNuevoPlan")
+	
+	@PostMapping("/generarDocumento/plan-nuevo")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> generarDocumentosNuevoPlan(@RequestBody PdfDto pdfDto, Authentication authentication)
-			throws IOException {
+	public CompletableFuture<Object> generarDocumentoNuevoPlan(@RequestBody PdfDto pdfDto, Authentication authentication)
+			throws Throwable {
 		String tipoReporte;
 		if (Objects.nonNull(pdfDto.getTipoReporte()) && pdfDto.getTipoReporte().equalsIgnoreCase("xls")) {
 			tipoReporte = "xlsx";
 		}else {
 			tipoReporte="pdf";
 		}
-		Response<?> response = convenioPfService.generarPDF(pdfDto, authentication);
-
-		
+		Response<?> response = reporteService.generarDoc(pdfDto, authentication);
 		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
 				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + tipoReporte)
 						.header(HttpHeaders.CONTENT_DISPOSITION,
@@ -100,7 +66,43 @@ public class ConvenioPfController {
 						.body(Base64.getDecoder().decode(response.getDatos().toString()))
 				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
-
+	
+	@PostMapping("/generarDocumento/plan-anterior")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> generarDocumentoPlanAnterior(@RequestBody PdfDto pdfDto, Authentication authentication)
+			throws Throwable {
+		String tipoReporte="pdf";
+		Response<?> response = reporteService.generarDocPlanAnterior(pdfDto, authentication);
+		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
+				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + tipoReporte)
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=formato-prueba." + tipoReporte)
+						.body(Base64.getDecoder().decode(response.getDatos().toString()))
+				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@PostMapping("/generarDocumento/hoja-afiliacion")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackDescargarArchivos")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> generarDocumentoHojaAfiliacion(@RequestBody PdfDto pdfDto, Authentication authentication)
+			throws Throwable {
+		String tipoReporte;
+		if (Objects.nonNull(pdfDto.getTipoReporte()) && pdfDto.getTipoReporte().equalsIgnoreCase("xls")) {
+			tipoReporte = "xlsx";
+		}else {
+			tipoReporte="pdf";
+		}
+		Response<?> response = reporteService.generarHojaAfilicion(pdfDto, authentication);
+		return CompletableFuture.supplyAsync(() -> response.getCodigo() == HttpStatus.OK.value()
+				? ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "application/" + tipoReporte)
+						.header(HttpHeaders.CONTENT_DISPOSITION,
+								"attachment; filename=formato-prueba." + tipoReporte)
+						.body(Base64.getDecoder().decode(response.getDatos().toString()))
+				: new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
 	
 	/*
 	 * 
@@ -174,4 +176,5 @@ public class ConvenioPfController {
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
+	
 }

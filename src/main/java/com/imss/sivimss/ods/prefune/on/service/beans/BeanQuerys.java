@@ -2,6 +2,8 @@ package com.imss.sivimss.ods.prefune.on.service.beans;
 
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 
 @Service
