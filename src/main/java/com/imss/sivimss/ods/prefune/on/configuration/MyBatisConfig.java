@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
+import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.PersonaMapper;
 
 @Service
@@ -40,6 +41,7 @@ public class MyBatisConfig {
 	    Configuration configuration = new Configuration(environment);
 	    configuration.addMapper(Consultas.class);
 	    configuration.addMapper(PersonaMapper.class);
+	    configuration.addMapper(ConvenioMapper.class);
 
 	    
 	    SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();

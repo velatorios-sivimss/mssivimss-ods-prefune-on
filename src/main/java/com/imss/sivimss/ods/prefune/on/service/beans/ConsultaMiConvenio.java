@@ -126,7 +126,8 @@ public class ConsultaMiConvenio {
 						"SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE  AND SF.ID_PERSONA = SC.ID_PERSONA")
 				.where("SF.ID_TIPO_ORDEN = 2").and("PF.ID_CONVENIO_PF = SCP.ID_CONVENIO_PF");
 		String subQuery = subQueryUtil.build();
-		queryUtil.select("SCP.ID_ESTATUS_CONVENIO AS idEstatus",
+		queryUtil.select("SCP.ID_ESTATUS_CONVENIO AS idEstatusConvenio",
+				"SCP.ID_TIPO_PREVISION AS tipoPrevision",
 				"RPF.ID_ESTATUS AS estatusRenovacion",
 				"IF(SCP.IND_TIPO_CONTRATACION=1, 'Por persona', 'Por grupo o empresa') AS tipoPrevision",
 				"DATE_FORMAT(SCP.FEC_ALTA , '%d-%m-%Y') AS fecAlta",
@@ -169,6 +170,28 @@ public class ConsultaMiConvenio {
 				.groupBy("SCP.DES_FOLIO");
 		query = querySelect.build();
 		log.info("consulta busquedaFolioParaReporte convenio nuevo pf: {} ", query);
+		return query;
+	}
+
+	public String consultarDatosConvenio(String idConvenio) {
+		SelectQueryUtil queryUtil= new SelectQueryUtil();
+		queryUtil.select("SCP.DES_FOLIO AS folio",
+				"SCP.IND_RENOVACION AS indRenovacion",
+				"IF(SCP.IND_RENOVACION=false, SCP.FEC_VIGENCIA, RPF.FEC_VIGENCIA) AS fecVigencia",
+				"SCP.ID_VELATORIO AS idVelatorio",
+				"CONCAT(SP.NOM_PERSONA, ' ', SP.NOM_PRIMER_APELLIDO, ' ', SP.NOM_SEGUNDO_APELLIDO) as nomContratante",
+				"PAQ.MON_PRECIO AS cuotaRecuperacion",
+				"SC.ID_CONTRATANTE AS idContratante")
+				.from("SVT_CONVENIO_PF SCP ")
+				.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2  ")
+				.join("SVT_CONTRA_PAQ_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
+				.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+				.join("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
+				.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
+				.where("SCP.ID_CONVENIO_PF ="+idConvenio)
+				.limit(1);
+		query= queryUtil.build();
+		log.info("renovacion: {}",query);
 		return query;
 	}
 

@@ -24,6 +24,9 @@ import org.springframework.stereotype.Service;
 
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
+import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
+import com.imss.sivimss.ods.prefune.on.model.entity.ConvenioEntityMyBatis;
+import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.response.BusquedaInformacionReporteResponse;
@@ -51,7 +54,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 	
 	@Autowired
 	private PaginadoUtil paginadoUtil;
-		
+	
+
 	private static final Logger log = LoggerFactory.getLogger(ConvenioPfServiceImpl.class);
 	
 	@Autowired
@@ -173,6 +177,51 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 		}
 		
 		
+	}
+
+
+	@Override
+	public Response<Object> renovarConvenio(String idConvenio, Authentication authentication) {
+		List<Map<String, Object>> detalleConvenio = new ArrayList<>();
+	//	List<Map<String, Object>> mapping;
+		ConvenioEntityMyBatis convenioEntity = new ConvenioEntityMyBatis();
+		ConvenioRequest convenio ;
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		try (SqlSession session = sqlSessionFactory.openSession()){
+			Consultas consultas = session.getMapper(Consultas.class);
+			detalleConvenio = consultas.selectNativeQuery(miConvenio.consultarDatosConvenio(idConvenio));
+			//mapping = Arrays.asList(modelMapper.map(detalleConvenio, HashMap[].class));
+			convenio =  new ConvenioRequest(detalleConvenio.get(0));
+			convenioEntity.setIdConvenio(Integer.parseInt(idConvenio));
+			convenioEntity.setFolio(convenio.getFolio());
+			convenioEntity.setCuotaRecuperacion(convenio.getCuotaRecuperacion());
+			convenioEntity.setFecVigencia(convenio.getFechaVigencia());
+			convenioEntity.setIdVelatorio(convenio.getIdVelatorio());
+			convenioEntity.setIdContratante(convenio.getIdContratante());
+			convenioEntity.setDatosBancarios(convenio.getDatosBancarios());
+			ConvenioMapper convenioMapper = session.getMapper(ConvenioMapper.class);
+			try {
+				convenioMapper.nuevoRegistroObj(convenioEntity);
+				convenio.setIdRegistro(convenioEntity.getIdRegistro());
+				if(Boolean.FALSE.equals(convenio.getIndRenovacion())) {
+					convenioMapper.actualizarBanderaConvenio(idConvenio);
+				}else {
+					convenioMapper.actualizarEstatusRenovacion(idConvenio);
+				}
+			//	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA);
+			
+		}catch(Exception e) {
+			session.rollback();
+			session.close();
+			log.info("error: {}",e.getCause().getMessage());
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+		}
+			session.commit();
+			session.close();
+			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenio.getIdRegistro());
+		}
+		
+
 	}
 
 }
