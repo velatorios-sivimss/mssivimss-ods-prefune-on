@@ -29,6 +29,5 @@ public interface Consultas {
 			+ "	ID_ESTATUS_CONVENIO= 4 "
 			+ "WHERE ID_CONVENIO_PF=#{id}")
 	public void actualizarConvenio(@Param("id")Integer id);
-
-	
+		
 }
