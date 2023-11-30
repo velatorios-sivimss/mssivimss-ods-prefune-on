@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.imss.sivimss.ods.prefune.on.service.CatalogosService;
 import com.imss.sivimss.ods.prefune.on.service.VelatorioService;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
@@ -24,10 +25,13 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/mapa")
+@RequestMapping("/")
 public class VelatoriosController {
 
 	private final VelatorioService velatorioService;
+	
+	private final CatalogosService catalogosService;
+	
 	private final ProviderServiceRestTemplate providerRestTemplate;
 	
 	private final LogUtil logUtil;
@@ -36,12 +40,23 @@ public class VelatoriosController {
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
 	
-	@GetMapping("/velatorios")
+	@GetMapping("mapa/velatorios")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object>consultarVelatorios(Authentication authentication) throws IOException{
 		Response<Object>response=velatorioService.consultarServiciosVelatorios(authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+
+	}
+	
+	@GetMapping("catalogo/parentesco")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object>consultarCatalogoParentesco(Authentication authentication) throws IOException{
+		Response<Object>response=catalogosService.consultarCatalogo(authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 

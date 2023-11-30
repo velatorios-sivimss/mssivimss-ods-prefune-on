@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.model.response.MapaVelatoriosResponse;
+import com.imss.sivimss.ods.prefune.on.service.CatalogosService;
 import com.imss.sivimss.ods.prefune.on.service.VelatorioService;
+import com.imss.sivimss.ods.prefune.on.service.beans.Catalogos;
 import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
 import com.imss.sivimss.ods.prefune.on.service.beans.MapaVelatorio;
 import com.imss.sivimss.ods.prefune.on.utils.AppConstantes;
@@ -30,10 +32,13 @@ import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
 
 @Service
-public class VelatorioServiceImpl implements VelatorioService{
+public class VelatorioServiceImpl implements VelatorioService, CatalogosService{
 
 	@Autowired
 	private MapaVelatorio mapaVelatorio;
+	
+	@Autowired
+	private Catalogos catalogos;
 	
 	@Autowired
 	private LogUtil logUtil;
@@ -76,6 +81,27 @@ public class VelatorioServiceImpl implements VelatorioService{
 				
 			});
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, velatoriosResponses);
+		} catch (Exception e) {
+			log.info(ERROR,e.getCause().getMessage());
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+		}
+	}
+
+	/**
+	 * consulta catalogo de parentesco
+	 */
+	@Override
+	public Response<Object> consultarCatalogo(Authentication authentication) throws IOException {
+		List<Map<String, Object>> resultParentesco = new ArrayList<>();
+		SqlSessionFactory sqlSessionFactory= myBatisConfig.buildqlSessionFactory();
+		try(SqlSession sqlSession= sqlSessionFactory.openSession()) {
+			Consultas consultas= sqlSession.getMapper(Consultas.class);
+			resultServiciosVelatorios=consultas.selectNativeQuery(catalogos.consultarParentesco());
+			
+			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosVelatorios);
 		} catch (Exception e) {
 			log.info(ERROR,e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
