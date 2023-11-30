@@ -241,21 +241,23 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication) {
 
-		Response<Object> resp = new Response<>();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			BeneficiariosMapper maperBe = session.getMapper(BeneficiariosMapper.class);
+			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 			try {
-				maperBe.actualizarPersona(request);
-				resp.setDatos(request);
+				if (request.isActualizaArchivo())
+					mapperQuery.actualizarContratante(request);
+
+				mapperQuery.actualizarContratanteDocumento(request);
+				mapperQuery.actualizarPersona(request);
+
 			} catch (Exception e) {
 				session.rollback();
-				session.close();
+
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
 
 			session.commit();
-			session.close();
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, null);
