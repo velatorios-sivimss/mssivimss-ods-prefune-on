@@ -99,7 +99,7 @@ public class ConsultaMiConvenio {
 				"TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE())  AS edad",
 				"SP.REF_CORREO AS correo",
 				"SP.REF_TELEFONO AS telefono",
-				"IFNULL(SCB.REF_UBICACION_INE_BENEFICIARIO,'') AS actaNacimiento",
+				"IFNULL(SCB.REF_UBICACION_ACTA_NACIMIENTO,'') AS actaNacimiento",
 				"IFNULL(SCB.REF_UBICACION_INE_BENEFICIARIO,'') AS ine")
 				.from("SVT_CONVENIO_PF SCP ")
 				.innerJoin("SVC_VELATORIO SV", "SCP.ID_VELATORIO = SV.ID_VELATORIO ")
