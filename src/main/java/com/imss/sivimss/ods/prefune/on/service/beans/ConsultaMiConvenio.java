@@ -19,27 +19,28 @@ public class ConsultaMiConvenio {
 				"SP.CVE_CURP AS curp, CONCAT(SP.NOM_PERSONA,' ',SP.NOM_PRIMER_APELLIDO,' ',SP.NOM_SEGUNDO_APELLIDO) AS nombreAfiliado",
 				"SCP.ID_ESTATUS_CONVENIO AS idEstatus", "SECP.DES_ESTATUS AS estatus",
 				"DATE_FORMAT(SCP.FEC_ALTA,'%d/%m/%Y') AS fechaExpedicion",
-				"CASE WHEN SCP.IND_TIPO_CONTRATACION = 0"+
-				" then SV.DES_VELATORIO "+
-				" else  '' "+
-				" end AS ciudadExpedicion",
-				"CASE when SCP.IND_TIPO_CONTRATACION = 0"+
-				" then 0 else 1 end "+ " AS tipoContrato",
+				"CASE WHEN SCP.IND_TIPO_CONTRATACION = 0" +
+						" then SV.DES_VELATORIO " +
+						" else  '' " +
+						" end AS ciudadExpedicion",
+				"CASE when SCP.IND_TIPO_CONTRATACION = 0" +
+						" then 0 else 1 end " + " AS tipoContrato",
 				"SCP.ID_TIPO_PREVISION AS tipoPrevision",
 				"IF(RENO.ID_ESTATUS=2, TRUE, FALSE) AS banderaDocumentos")
-		.from("SVT_CONVENIO_PF SCP ")
-		.innerJoin("SVC_VELATORIO SV ", "SCP.ID_VELATORIO=SV.ID_VELATORIO ")
-		.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF")
-		.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPA", "SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF")
-		.innerJoin("SVC_CONTRATANTE SC", "SCPA.ID_CONTRATANTE = SC.ID_CONTRATANTE")
-		.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA =SP.ID_PERSONA")
-		.leftJoin("SVT_RENOVACION_CONVENIO_PF RENO", "SCP.ID_CONVENIO_PF = RENO.ID_CONVENIO_PF AND RENO.ID_ESTATUS = 2 ")
-		.where("SCP.IND_TIPO_CONTRATACION =1")
-		.and("SC.ID_CONTRATANTE = "+idContratante)
-		.orderBy("SECP.DES_ESTATUS DESC");
-		query=selectQueryUtil.build();
-		log.info("consultaMiConvenio: {}",query);
-    
+				.from("SVT_CONVENIO_PF SCP ")
+				.innerJoin("SVC_VELATORIO SV ", "SCP.ID_VELATORIO=SV.ID_VELATORIO ")
+				.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF")
+				.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPA", "SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF")
+				.innerJoin("SVC_CONTRATANTE SC", "SCPA.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA =SP.ID_PERSONA")
+				.leftJoin("SVT_RENOVACION_CONVENIO_PF RENO",
+						"SCP.ID_CONVENIO_PF = RENO.ID_CONVENIO_PF AND RENO.ID_ESTATUS = 2 ")
+				.where("SCP.IND_TIPO_CONTRATACION =1")
+				.and("SC.ID_CONTRATANTE = " + idContratante)
+				.orderBy("SECP.DES_ESTATUS DESC");
+		query = selectQueryUtil.build();
+		log.info("consultaMiConvenio: {}", query);
+
 		return query;
 	}
 
@@ -54,6 +55,8 @@ public class ConsultaMiConvenio {
 				.where("SCPAC.ID_CONVENIO_PF = ".concat(idConvenio.toString()).concat(" AND SCBE.IND_ACTIVO =1 "));
 
 		selectQueryUtil.select("SCP.ID_CONVENIO_PF AS idConvenio", "SP.CVE_CURP AS curp",
+				"SCP.ID_VELATORIO AS idVelatorio",
+				"V.DES_VELATORIO AS velatorio",
 				"SECP.DES_ESTATUS AS estatus",
 				"SCP.DES_FOLIO AS folioConvenio",
 				"SP.NOM_PERSONA AS nombreAfiliado",
@@ -74,7 +77,8 @@ public class ConsultaMiConvenio {
 				.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPA", "SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF ")
 				.innerJoin("SVC_CONTRATANTE SC ", "SCPA.ID_CONTRATANTE = SC.ID_CONTRATANTE ")
 				.innerJoin("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
-				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA =SP.ID_PERSONA")
+				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
+				.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = SCP.ID_VELATORIO")
 				.where("SCP.ID_CONVENIO_PF = " + idConvenio);
 
 		query = selectQueryUtil.build();
@@ -176,7 +180,7 @@ public class ConsultaMiConvenio {
 	}
 
 	public String consultarDatosConvenio(String idConvenio) {
-		SelectQueryUtil queryUtil= new SelectQueryUtil();
+		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("SCP.DES_FOLIO AS folio",
 				"SCP.IND_RENOVACION AS indRenovacion",
 				"IF(SCP.IND_RENOVACION=false, SCP.FEC_VIGENCIA, RPF.FEC_VIGENCIA) AS fecVigencia",
@@ -185,15 +189,16 @@ public class ConsultaMiConvenio {
 				"PAQ.MON_PRECIO AS cuotaRecuperacion",
 				"SC.ID_CONTRATANTE AS idContratante")
 				.from("SVT_CONVENIO_PF SCP ")
-				.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2  ")
+				.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF",
+						"SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS=2  ")
 				.join("SVT_CONTRA_PAQ_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 				.join("SVC_CONTRATANTE SC", "SCPC.ID_CONTRATANTE = SC.ID_CONTRATANTE")
 				.join("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
 				.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
-				.where("SCP.ID_CONVENIO_PF ="+idConvenio)
+				.where("SCP.ID_CONVENIO_PF =" + idConvenio)
 				.limit(1);
-		query= queryUtil.build();
-		log.info("renovacion: {}",query);
+		query = queryUtil.build();
+		log.info("renovacion: {}", query);
 		return query;
 	}
 

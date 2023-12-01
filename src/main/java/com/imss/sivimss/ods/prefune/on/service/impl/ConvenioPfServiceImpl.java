@@ -26,7 +26,6 @@ import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.BeneficiariosMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
-import com.imss.sivimss.ods.prefune.on.configuration.mapper.PersonaMapper;
 import com.imss.sivimss.ods.prefune.on.model.entity.ConvenioEntityMyBatis;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
@@ -37,15 +36,10 @@ import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
 import com.imss.sivimss.ods.prefune.on.utils.AppConstantes;
-import com.imss.sivimss.ods.prefune.on.utils.DatosRequest;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.PaginadoUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ConvenioPfServiceImpl implements ConvenioPfService {
@@ -227,13 +221,13 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 			} catch (Exception e) {
 				session.rollback();
-				session.close();
+
 				log.info("error: {}", e.getCause().getMessage());
 				return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(),
 						AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
 			}
 			session.commit();
-			session.close();
+
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenio.getIdRegistro());
 		}
 
