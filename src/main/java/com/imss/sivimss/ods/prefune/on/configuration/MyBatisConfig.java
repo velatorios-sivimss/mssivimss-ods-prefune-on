@@ -11,42 +11,42 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.imss.sivimss.ods.prefune.on.configuration.mapper.BeneficiariosMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.PersonaMapper;
 
 @Service
 public class MyBatisConfig {
-	
-	@Value("${spring.datasource.driverClassName}") 
+
+	@Value("${spring.datasource.driverClassName}")
 	private String DRIVER;
-	
+
 	@Value("${spring.datasource.url}")
 	private String URL;
-	
+
 	@Value("${spring.datasource.username}")
 	private String USERNAME;
-	
+
 	@Value("${spring.datasource.password}")
 	private String PASSWORD;
-	
+
 	@Value("${enviroment}")
 	private String ENVIROMENT;
-	
+
 	public SqlSessionFactory buildqlSessionFactory() {
-	    DataSource dataSource = new PooledDataSource(DRIVER, URL, USERNAME, PASSWORD);
+		DataSource dataSource = new PooledDataSource(DRIVER, URL, USERNAME, PASSWORD);
 
-	    Environment environment = new Environment(ENVIROMENT, new JdbcTransactionFactory(), dataSource);
-	        
-	    Configuration configuration = new Configuration(environment);
-	    configuration.addMapper(Consultas.class);
-	    configuration.addMapper(PersonaMapper.class);
-	    configuration.addMapper(ConvenioMapper.class);
+		Environment environment = new Environment(ENVIROMENT, new JdbcTransactionFactory(), dataSource);
 
-	    
-	    SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-	    
-	    
-	    return builder.build(configuration);
+		Configuration configuration = new Configuration(environment);
+		configuration.addMapper(Consultas.class);
+		configuration.addMapper(PersonaMapper.class);
+		configuration.addMapper(ConvenioMapper.class);
+		configuration.addMapper(BeneficiariosMapper.class);
+
+		SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+
+		return builder.build(configuration);
 	}
 }
