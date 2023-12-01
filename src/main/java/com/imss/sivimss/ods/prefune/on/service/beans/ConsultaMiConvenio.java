@@ -136,7 +136,7 @@ public class ConsultaMiConvenio {
 				"IF(SCP.IND_RENOVACION=false, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d-%m-%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d-%m-%Y')) AS fecVigencia",
 				"PAQ.MON_PRECIO AS cuotaRecuperacion",
 				"PAQ.REF_PAQUETE_NOMBRE AS tipoPaquete",
-				"IF(SCP.IND_RENOVACION=false, ' ', DATE_FORMAT(RPF.FEC_ALTA, '%d-%m-%Y')) AS fecRenovacion",
+				//"IF(SCP.IND_RENOVACION=false, ' ', DATE_FORMAT(RPF.FEC_ALTA, '%d-%m-%Y')) AS fecRenovacion",
 				"IFNULL((".concat(subQuery) + "), FALSE) AS titularFallecido",
 				"DATE_FORMAT(CURDATE(), '%d-%m-%Y') AS fecActual",
 				"TIMESTAMPDIFF(DAY,IF(SCP.IND_RENOVACION=false, DATE_FORMAT(SCP.FEC_VIGENCIA, '%Y-%m-%01'), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y-%m-%01')), CURDATE()) AS diferenciaDias")
