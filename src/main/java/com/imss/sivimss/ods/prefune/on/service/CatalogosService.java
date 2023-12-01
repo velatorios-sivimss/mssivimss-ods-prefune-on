@@ -8,5 +8,9 @@ import com.imss.sivimss.ods.prefune.on.utils.Response;
 
 public interface CatalogosService {
 
-	public Response<Object>consultarCatalogo(Authentication authentication) throws IOException;
+	Response<Object>consultarCatalogoParentesco(Authentication authentication) throws IOException;
+	
+	Response<Object>consultarCatalogoPromotores(Authentication authentication) throws IOException;
+
+	Response<Object>consultarCatalogoPaquete(Integer idVelatorio,Authentication authentication) throws IOException;
 }
