@@ -74,6 +74,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 	
 	private final String ERROR = "error: {}";
 	private static final String PERIODO_RENOVACION = "periodoRenovacion";
+	private static final String PATTERN = "dd-MM-yyyy";
 
 	@Override
 	public Response<Object> consultaMiConvenio(Paginado paginado,Integer idContratante, Authentication authentication) throws IOException {
@@ -106,7 +107,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 			resultDatosBeneficios=consultas.selectNativeQuery(miConvenio.consultarBeneficiariosConvenio(idConvenio));
 		    resultDatosRenovacion = consultas.selectNativeQuery(miConvenio.consultarRenovacion(idConvenio));
 		   String vigenciaFin = resultDatosRenovacion.get(0).get("fecVigencia").toString();
-		   SimpleDateFormat formatter =  new SimpleDateFormat("dd-MM-yyyy");
+		   SimpleDateFormat formatter =  new SimpleDateFormat(PATTERN);
 		    Date vigencia = formatter.parse(vigenciaFin);
 		    String fechaHoy = resultDatosRenovacion.get(0).get("fecActual").toString();
 		    Date fecActual = formatter.parse(fechaHoy);
@@ -145,13 +146,13 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 	}
 
 	private Integer obtenerDia(String vigenciaFin) throws ParseException {
-		Date dia =  new SimpleDateFormat("dd-MM-yyyy").parse(vigenciaFin);
+		Date dia =  new SimpleDateFormat(PATTERN).parse(vigenciaFin);
 	   	  DateFormat format = new SimpleDateFormat("dd");
 		return Integer.parseInt(format.format(dia));
 	}
 
 	private String formatearFecha(String vigenciaFin) throws ParseException {
-		 Date mesAnio =  new SimpleDateFormat("dd-MM-yyyy").parse(vigenciaFin);
+		 Date mesAnio =  new SimpleDateFormat(PATTERN).parse(vigenciaFin);
    	  DateFormat format = new SimpleDateFormat("MM-yyyy");
 		    return  format.format(mesAnio);
 	}
