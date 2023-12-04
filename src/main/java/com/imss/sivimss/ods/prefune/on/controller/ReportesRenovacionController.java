@@ -168,6 +168,7 @@ public class ReportesRenovacionController {
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 	
+	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackDescargarArchivos(@RequestBody PdfDto datos,
 			Authentication authentication, CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
