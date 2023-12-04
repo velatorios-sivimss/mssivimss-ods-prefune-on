@@ -22,5 +22,8 @@ public interface ConvenioPfService {
 	public Response<Object> generarPDF(PdfDto request, Authentication authentication) throws IOException;
 
 	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication);
+	
+	public Response<Object>consultarCatalogoRfcEmpresa(String rfc,Authentication authentication) throws IOException;
+
 
 }

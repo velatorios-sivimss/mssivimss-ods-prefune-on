@@ -71,6 +71,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	private String convenioNuevoPlan;
 
 	private final String ERROR = "error: {}";
+	
+	private List<Map<String, Object>> resultServiciosCatalogo = new ArrayList<>();
+
 
 	@Override
 	public Response<Object> consultaMiConvenio(Paginado paginado, Integer idContratante, Authentication authentication)
@@ -256,6 +259,22 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, null);
 
+	}
+
+	@Override
+	public Response<Object> consultarCatalogoRfcEmpresa(String rfc, Authentication authentication) throws IOException {
+		SqlSessionFactory sqlSessionFactory=myBatisConfig.buildqlSessionFactory();
+		try(SqlSession sqlSession=sqlSessionFactory.openSession()) {
+			Consultas consultas=sqlSession.getMapper(Consultas.class);
+			resultServiciosCatalogo=consultas.selectNativeQuery(miConvenio.busquedaRfcEmpresa(rfc));
+			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
+		} catch (Exception e) {
+			log.info(ERROR,e.getCause().getMessage());
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+		}
 	}
 
 }

@@ -201,5 +201,24 @@ public class ConsultaMiConvenio {
 		log.info("renovacion: {}", query);
 		return query;
 	}
+	
+	public String busquedaRfcEmpresa(String rfc) {
+		SelectQueryUtil querySelect = new SelectQueryUtil();
+		querySelect
+				.select("EC.REF_NOMBRE AS nombreEmpresa", "EC.REF_RAZON_SOCIAL AS razonSocial", "EC.CVE_RFC AS rfc",
+						"EC.ID_PAIS AS idPais", "SP.DES_PAIS AS desPais", "EC.ID_DOMICILIO AS idDomicilio",
+						"SD.REF_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior", "SD.NUM_INTERIOR AS numInterior",
+						"SD.REF_CP AS cp", "SD.REF_COLONIA AS desColonia", "SD.REF_MUNICIPIO AS desMunicipio",
+						"SD.REF_ESTADO AS desEstado", "EC.REF_TELEFONO AS telefono", "EC.REF_CORREO AS correo")
+				.from("SVT_EMPRESA_CONVENIO_PF EC").leftJoin("SVC_PAIS SP", "EC.ID_PAIS = SP.ID_PAIS")
+				.leftJoin("SVT_DOMICILIO SD", "EC.ID_DOMICILIO = SD.ID_DOMICILIO").where("EC.CVE_RFC = '" + rfc+"'");
+		query = querySelect.build();
+		log.info("busquedaRfcEmpresa: {}", query);
+		return query;
+	}
+	
+	
+	
+
 
 }
