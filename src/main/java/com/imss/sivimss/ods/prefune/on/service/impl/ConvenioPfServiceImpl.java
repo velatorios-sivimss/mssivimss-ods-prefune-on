@@ -25,9 +25,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
+import com.imss.sivimss.ods.prefune.on.configuration.mapper.BeneficiariosMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
 import com.imss.sivimss.ods.prefune.on.model.entity.ConvenioEntityMyBatis;
+import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
@@ -41,69 +43,73 @@ import com.imss.sivimss.ods.prefune.on.utils.PaginadoUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
 
-
 @Service
-public class ConvenioPfServiceImpl implements ConvenioPfService{
+public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	@Autowired
 	private LogUtil logUtil;
-	
+
 	@Autowired
 	private MyBatisConfig myBatisConfig;
-	
+
 	@Autowired
 	private ConsultaMiConvenio miConvenio;
-	
+
 	@Autowired
 	private PaginadoUtil paginadoUtil;
-	
 
 	private static final Logger log = LoggerFactory.getLogger(ConvenioPfServiceImpl.class);
-	
+
 	@Autowired
 	private ModelMapper mapper;
-	
+
 	@Autowired
-    private ProviderServiceRestTemplate providerRestTemplate;
-	
+	private ProviderServiceRestTemplate providerRestTemplate;
+
 	@Value("${endpoints.ms-reportes}")
 	private String urlReportes;
-	
+
 	@Value("${reporte.convenio-nuevo-pf}")
 	private String convenioNuevoPlan;
-	
+
 	private final String ERROR = "error: {}";
 	private static final String PERIODO_RENOVACION = "periodoRenovacion";
 	private static final String PATTERN = "dd-MM-yyyy";
 
 	@Override
-	public Response<Object> consultaMiConvenio(Paginado paginado,Integer idContratante, Authentication authentication) throws IOException {
-		Page<Map<String, Object>> result=null; 
+	public Response<Object> consultaMiConvenio(Paginado paginado, Integer idContratante, Authentication authentication)
+			throws IOException {
+		Page<Map<String, Object>> result = null;
 		try {
-			result = paginadoUtil.paginado(paginado.getPagina(), paginado.getTamanio(),miConvenio.consultaMiConvenio(idContratante));
+			result = paginadoUtil.paginado(paginado.getPagina(), paginado.getTamanio(),
+					miConvenio.consultaMiConvenio(idContratante));
 		} catch (Exception e) {
-			
-			log.info(ERROR,e.getCause().getMessage());
+
+			log.info(ERROR, e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
-					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
-			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+					authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO,
+					Arrays.asList());
 		}
-		
+
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, result);
 	}
 
 	@Override
-	public Response<Object> consultaDetalleConvenio(Integer idConvenio, Authentication authentication) throws IOException {
+	public Response<Object> consultaDetalleConvenio(Integer idConvenio, Authentication authentication)
+			throws IOException {
 		List<Map<String, Object>> resultDatosGenerales = new ArrayList<>();
 		List<Map<String, Object>> resultDatosBeneficios = new ArrayList<>();
 		List<Map<String, Object>> resultDatosRenovacion = new ArrayList<>();
-		MiConvenioResponse convenioResponse= new MiConvenioResponse();
+		MiConvenioResponse convenioResponse = new MiConvenioResponse();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		
-		try(SqlSession session = sqlSessionFactory.openSession()) {
+
+		try (SqlSession session = sqlSessionFactory.openSession()) {
 			Consultas consultas = session.getMapper(Consultas.class);
 			resultDatosGenerales = consultas.selectNativeQuery(miConvenio.consultarDatosGeneales(idConvenio));
+
 			resultDatosBeneficios=consultas.selectNativeQuery(miConvenio.consultarBeneficiariosConvenio(idConvenio));
 		    resultDatosRenovacion = consultas.selectNativeQuery(miConvenio.consultarRenovacion(idConvenio));
 		   String vigenciaFin = resultDatosRenovacion.get(0).get("fecVigencia").toString();
@@ -134,14 +140,17 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 		   }
 		}catch (Exception e) {
 			log.info(ERROR,e.getCause().getMessage());
+ 
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
-					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
-			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+					authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO,
+					Arrays.asList());
 		}
 		convenioResponse.setDatosGenerales(resultDatosGenerales);
-        convenioResponse.setBeneficiarios(resultDatosBeneficios);
-        convenioResponse.setDatosRenovacion(resultDatosRenovacion);
+		convenioResponse.setBeneficiarios(resultDatosBeneficios);
+		convenioResponse.setDatosRenovacion(resultDatosRenovacion);
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioResponse);
 	}
 
@@ -159,59 +168,60 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 
 	@Override
 	public Response<Object> generarPDF(PdfDto pdfDto, Authentication authentication) throws IOException {
-		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory(); 
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		Map<String, Object> datosPdf = new HashMap<>();
-		try (SqlSession sqlSession=sqlSessionFactory.openSession()){
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			List<Map<String, Object>> resultDatosReporte = new ArrayList<>();
-			List<BusquedaInformacionReporteResponse>infoReporte= new ArrayList<>();
-			Consultas consultas= sqlSession.getMapper(Consultas.class);
-			resultDatosReporte=consultas.selectNativeQuery(miConvenio.busquedaFolioParaReporte(pdfDto.getIdConvenio()));
-			infoReporte=Arrays.asList(mapper.map(resultDatosReporte, BusquedaInformacionReporteResponse[].class));
-			
-			
-            datosPdf.put("rutaNombreReporte", convenioNuevoPlan);
-            datosPdf.put("tipoReporte", "pdf");
-            datosPdf.put("nombreAfiliado",
-                             infoReporte.get(0).getNombrePersona() + " " + infoReporte.get(0).getPrimerApellido() + " "
-                                             + infoReporte.get(0).getSegundoApellido());
-            datosPdf.put("numeroINE", infoReporte.get(0).getNumIne());
-            datosPdf.put("paqueteContratado", infoReporte.get(0).getNombrePaquete());
-            datosPdf.put("serviciosIncluidos", infoReporte.get(0).getDesPaquete());
-            datosPdf.put("costoPaquete", infoReporte.get(0).getMonPrecio());
-            datosPdf.put("nombreTitular",
-                             infoReporte.get(0).getNombrePersona() + " " + infoReporte.get(0).getPrimerApellido() + " "
-                                             + infoReporte.get(0).getSegundoApellido());
-            datosPdf.put("rfc", infoReporte.get(0).getRfc());
-            datosPdf.put("idConvenio", pdfDto.getIdConvenio());
-            datosPdf.put("ciudadExpedicion", pdfDto.getCiudadExpedicion());
-            datosPdf.put("fechaExpedicion", pdfDto.getFechaExpedicion());
-            datosPdf.put("folioConvenio", infoReporte.get(0).getFolio());
-			
+			List<BusquedaInformacionReporteResponse> infoReporte = new ArrayList<>();
+			Consultas consultas = sqlSession.getMapper(Consultas.class);
+			resultDatosReporte = consultas
+					.selectNativeQuery(miConvenio.busquedaFolioParaReporte(pdfDto.getIdConvenio()));
+			infoReporte = Arrays.asList(mapper.map(resultDatosReporte, BusquedaInformacionReporteResponse[].class));
+
+			datosPdf.put("rutaNombreReporte", convenioNuevoPlan);
+			datosPdf.put("tipoReporte", "pdf");
+			datosPdf.put("nombreAfiliado",
+					infoReporte.get(0).getNombrePersona() + " " + infoReporte.get(0).getPrimerApellido() + " "
+							+ infoReporte.get(0).getSegundoApellido());
+			datosPdf.put("numeroINE", infoReporte.get(0).getNumIne());
+			datosPdf.put("paqueteContratado", infoReporte.get(0).getNombrePaquete());
+			datosPdf.put("serviciosIncluidos", infoReporte.get(0).getDesPaquete());
+			datosPdf.put("costoPaquete", infoReporte.get(0).getMonPrecio());
+			datosPdf.put("nombreTitular",
+					infoReporte.get(0).getNombrePersona() + " " + infoReporte.get(0).getPrimerApellido() + " "
+							+ infoReporte.get(0).getSegundoApellido());
+			datosPdf.put("rfc", infoReporte.get(0).getRfc());
+			datosPdf.put("idConvenio", pdfDto.getIdConvenio());
+			datosPdf.put("ciudadExpedicion", pdfDto.getCiudadExpedicion());
+			datosPdf.put("fechaExpedicion", pdfDto.getFechaExpedicion());
+			datosPdf.put("folioConvenio", infoReporte.get(0).getFolio());
+
 			return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
-	                authentication);
+					authentication);
 		} catch (Exception e) {
-			log.info(ERROR,e.getCause().getMessage());
+			log.info(ERROR, e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
-					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
-			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+					authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO,
+					Arrays.asList());
 		}
-		
-		
-	}
 
+	}
 
 	@Override
 	public Response<Object> renovarConvenio(String idConvenio, Authentication authentication) {
 		List<Map<String, Object>> detalleConvenio = new ArrayList<>();
+ 
 		ConvenioEntityMyBatis convenioEntity = new ConvenioEntityMyBatis();
-		ConvenioRequest convenio ;
+		ConvenioRequest convenio;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		try (SqlSession session = sqlSessionFactory.openSession()){
+		try (SqlSession session = sqlSessionFactory.openSession()) {
 			Consultas consultas = session.getMapper(Consultas.class);
 			detalleConvenio = consultas.selectNativeQuery(miConvenio.consultarDatosConvenio(idConvenio));
-			convenio =  new ConvenioRequest(detalleConvenio.get(0));
-			convenioEntity.setIdConvenio(Integer.parseInt(idConvenio));
+ 			convenio = new ConvenioRequest(detalleConvenio.get(0));
+ 			convenioEntity.setIdConvenio(Integer.parseInt(idConvenio));
 			convenioEntity.setFolio(convenio.getFolio());
 			convenioEntity.setCuotaRecuperacion(convenio.getCuotaRecuperacion());
 			convenioEntity.setFecVigencia(convenio.getFechaVigencia());
@@ -222,24 +232,51 @@ public class ConvenioPfServiceImpl implements ConvenioPfService{
 			try {
 				convenioMapper.nuevoRegistroObj(convenioEntity);
 				convenio.setIdRegistro(convenioEntity.getIdRegistro());
-				if(Boolean.FALSE.equals(convenio.getIndRenovacion())) {
+				if (Boolean.FALSE.equals(convenio.getIndRenovacion())) {
 					convenioMapper.actualizarBanderaConvenio(idConvenio);
-				}else {
+				} else {
 					convenioMapper.actualizarEstatusRenovacion(idConvenio);
 				}
-			//	logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA);
-			
-		}catch(Exception e) {
-			session.rollback();
-			session.close();
-			log.info("error: {}",e.getCause().getMessage());
-			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
-		}
+				// logUtil.crearArchivoLog(Level.INFO.toString(),
+				// this.getClass().getSimpleName(),this.getClass().getPackage().toString(),"NO
+				// HAY INFORMACION RELACIONADA A TU BUSQUEDA", CONSULTA);
+
+			} catch (Exception e) {
+				session.rollback();
+
+				log.info("error: {}", e.getCause().getMessage());
+				return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(),
+						AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+			}
 			session.commit();
-			session.close();
+
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenio.getIdRegistro());
 		}
-		
+
+	}
+
+	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication) {
+
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
+			try {
+				if (request.isActualizaArchivo())
+					mapperQuery.actualizarContratante(request);
+
+				mapperQuery.actualizarContratanteDocumento(request);
+				mapperQuery.actualizarPersona(request);
+
+			} catch (Exception e) {
+				session.rollback();
+
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+			}
+
+			session.commit();
+		}
+
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, null);
 
 	}
 

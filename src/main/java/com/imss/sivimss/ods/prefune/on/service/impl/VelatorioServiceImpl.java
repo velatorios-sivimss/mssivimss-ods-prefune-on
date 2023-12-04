@@ -55,6 +55,8 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService{
 	
 	private List<Map<String, Object>> resultServiciosVelatorios = new ArrayList<>();
 	
+	private List<Map<String, Object>> resultServiciosCatalogo = new ArrayList<>();
+	
 	private int i;
 	
 	@Override
@@ -94,14 +96,50 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService{
 	 * consulta catalogo de parentesco
 	 */
 	@Override
-	public Response<Object> consultarCatalogo(Authentication authentication) throws IOException {
-		List<Map<String, Object>> resultParentesco = new ArrayList<>();
+	public Response<Object> consultarCatalogoParentesco(Authentication authentication) throws IOException {
+		
 		SqlSessionFactory sqlSessionFactory= myBatisConfig.buildqlSessionFactory();
 		try(SqlSession sqlSession= sqlSessionFactory.openSession()) {
 			Consultas consultas= sqlSession.getMapper(Consultas.class);
-			resultServiciosVelatorios=consultas.selectNativeQuery(catalogos.consultarParentesco());
+			resultServiciosCatalogo=consultas.selectNativeQuery(catalogos.consultarParentesco());
 			
-			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosVelatorios);
+			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
+		} catch (Exception e) {
+			log.info(ERROR,e.getCause().getMessage());
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+		}
+	}
+	/**
+	 * consulta catalogo de parentesco
+	 */
+	@Override
+	public Response<Object> consultarCatalogoPaquete(Integer idVelatorio,Authentication authentication) throws IOException {
+		
+		SqlSessionFactory sqlSessionFactory= myBatisConfig.buildqlSessionFactory();
+		try(SqlSession sqlSession= sqlSessionFactory.openSession()) {
+			Consultas consultas= sqlSession.getMapper(Consultas.class);
+			resultServiciosCatalogo=consultas.selectNativeQuery(catalogos.obtenerPaquetes(idVelatorio));
+			
+			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
+		} catch (Exception e) {
+			log.info(ERROR,e.getCause().getMessage());
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+		}
+	}
+
+	@Override
+	public Response<Object> consultarCatalogoPromotores(Authentication authentication) throws IOException {
+		SqlSessionFactory sessionFactory=myBatisConfig.buildqlSessionFactory();
+		try(SqlSession session=sessionFactory.openSession()) {
+			Consultas consultas= session.getMapper(Consultas.class);
+			resultServiciosCatalogo=consultas.selectNativeQuery(catalogos.consultarPromotores());
+			return new Response<>(false,HttpStatus.OK.value(),AppConstantes.EXITO,resultServiciosCatalogo);
 		} catch (Exception e) {
 			log.info(ERROR,e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
