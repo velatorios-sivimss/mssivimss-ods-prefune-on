@@ -85,6 +85,7 @@ public class VelatoriosController {
 
 	}
 	
+	
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsulta(Authentication authentication,
 			CallNotPermittedException e) throws IOException {

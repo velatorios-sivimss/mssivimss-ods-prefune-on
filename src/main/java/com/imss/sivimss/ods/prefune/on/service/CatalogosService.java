@@ -13,4 +13,5 @@ public interface CatalogosService {
 	Response<Object>consultarCatalogoPromotores(Authentication authentication) throws IOException;
 
 	Response<Object>consultarCatalogoPaquete(Integer idVelatorio,Authentication authentication) throws IOException;
+	
 }

@@ -1,6 +1,8 @@
 package com.imss.sivimss.ods.prefune.on.service.impl;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +74,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	private final String ERROR = "error: {}";
 
+	private List<Map<String, Object>> resultServiciosCatalogo = new ArrayList<>();
+
+
+	private static final String PERIODO_RENOVACION = "periodoRenovacion";
+	private static final String PATTERN = "dd-MM-yyyy";
+
 	@Override
 	public Response<Object> consultaMiConvenio(Paginado paginado, Integer idContratante, Authentication authentication)
 			throws IOException {
@@ -105,31 +113,38 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			Consultas consultas = session.getMapper(Consultas.class);
 			resultDatosGenerales = consultas.selectNativeQuery(miConvenio.consultarDatosGeneales(idConvenio));
-			resultDatosBeneficios = consultas.selectNativeQuery(miConvenio.consultarBeneficiariosConvenio(idConvenio));
-			resultDatosRenovacion = consultas.selectNativeQuery(miConvenio.consultarRenovacion(idConvenio));
-			String vigenciaFin = resultDatosRenovacion.get(0).get("fecVigencia").toString();
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-			Date vigencia = formatter.parse(vigenciaFin);
-			String fechaHoy = resultDatosRenovacion.get(0).get("fecActual").toString();
-			Date fecActual = formatter.parse(fechaHoy);
-			Integer difDias = Integer.parseInt(resultDatosRenovacion.get(0).get("diferenciaDias").toString());
-			String periodoRenovacion = "periodoRenovacion";
-			if (difDias < 0) {
-				log.info("NO ESTA EN TEMPORADA DE RENOVACION");
-				resultDatosRenovacion.get(0).put(periodoRenovacion, 0);
-			} else if (difDias >= 0 && difDias <= 19) {
-				resultDatosRenovacion.get(0).put(periodoRenovacion, 1);
-			} else if (difDias > 19 && (vigencia.after(fecActual) || vigencia.equals(fecActual))) {
-				resultDatosRenovacion.get(0).put(periodoRenovacion, 1);
-			} else if (fecActual.after(vigencia)) {
-				log.info("contrato cerrado {}", idConvenio);
-				consultas.actualizarConvenio(idConvenio);
-				session.commit();
-				resultDatosRenovacion.get(0).put("idEstatus", 4);
-				resultDatosRenovacion.get(0).put(periodoRenovacion, 0);
-			}
-		} catch (Exception e) {
-			log.info(ERROR, e.getCause().getMessage());
+
+			resultDatosBeneficios=consultas.selectNativeQuery(miConvenio.consultarBeneficiariosConvenio(idConvenio));
+		    resultDatosRenovacion = consultas.selectNativeQuery(miConvenio.consultarRenovacion(idConvenio));
+		   String vigenciaFin = resultDatosRenovacion.get(0).get("fecVigencia").toString();
+		   SimpleDateFormat formatter =  new SimpleDateFormat(PATTERN);
+		    Date vigencia = formatter.parse(vigenciaFin);
+		    String fechaHoy = resultDatosRenovacion.get(0).get("fecActual").toString();
+		    Date fecActual = formatter.parse(fechaHoy);
+		    Integer difDias = Integer.parseInt(resultDatosRenovacion.get(0).get("diferenciaDias").toString());
+		    String periodo =  formatearFecha(vigenciaFin);
+		    Integer dia = obtenerDia(vigenciaFin);
+		    resultDatosRenovacion.get(0).put("fecRenovacion", "Del 01-"+periodo+" Al 20-"+periodo);
+		    if(dia>20) {
+	    		 resultDatosRenovacion.get(0).put("fecRenovacion", "Del 01-"+periodo+" Al "+vigenciaFin);
+		    }
+			if(difDias<0) {
+		    	 log.info("NO ESTA EN TEMPORADA DE RENOVACION");
+				   resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 0);
+		    }else if(difDias>=0 && difDias<=19) {
+			      resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 1);
+		   }else if(difDias>19 && (vigencia.after(fecActual) || vigencia.equals(fecActual))) {
+			   resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 1);
+		   }else if(fecActual.after(vigencia)) {
+			   log.info("contrato cerrado {}",idConvenio);
+			   consultas.actualizarConvenio(idConvenio);
+			   session.commit();
+			   resultDatosRenovacion.get(0).put("idEstatus", 4);
+			   resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 0);
+		   }
+		}catch (Exception e) {
+			log.info(ERROR,e.getCause().getMessage());
+ 
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
 					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
@@ -141,6 +156,18 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		convenioResponse.setBeneficiarios(resultDatosBeneficios);
 		convenioResponse.setDatosRenovacion(resultDatosRenovacion);
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioResponse);
+	}
+
+	private Integer obtenerDia(String vigenciaFin) throws ParseException {
+		Date dia =  new SimpleDateFormat(PATTERN).parse(vigenciaFin);
+	   	  DateFormat format = new SimpleDateFormat("dd");
+		return Integer.parseInt(format.format(dia));
+	}
+
+	private String formatearFecha(String vigenciaFin) throws ParseException {
+		 Date mesAnio =  new SimpleDateFormat(PATTERN).parse(vigenciaFin);
+   	  DateFormat format = new SimpleDateFormat("MM-yyyy");
+		    return  format.format(mesAnio);
 	}
 
 	@Override
@@ -190,16 +217,15 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	@Override
 	public Response<Object> renovarConvenio(String idConvenio, Authentication authentication) {
 		List<Map<String, Object>> detalleConvenio = new ArrayList<>();
-		// List<Map<String, Object>> mapping;
+ 
 		ConvenioEntityMyBatis convenioEntity = new ConvenioEntityMyBatis();
 		ConvenioRequest convenio;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			Consultas consultas = session.getMapper(Consultas.class);
 			detalleConvenio = consultas.selectNativeQuery(miConvenio.consultarDatosConvenio(idConvenio));
-			// mapping = Arrays.asList(modelMapper.map(detalleConvenio, HashMap[].class));
-			convenio = new ConvenioRequest(detalleConvenio.get(0));
-			convenioEntity.setIdConvenio(Integer.parseInt(idConvenio));
+ 			convenio = new ConvenioRequest(detalleConvenio.get(0));
+ 			convenioEntity.setIdConvenio(Integer.parseInt(idConvenio));
 			convenioEntity.setFolio(convenio.getFolio());
 			convenioEntity.setCuotaRecuperacion(convenio.getCuotaRecuperacion());
 			convenioEntity.setFecVigencia(convenio.getFechaVigencia());
@@ -256,6 +282,22 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, null);
 
+	}
+
+	@Override
+	public Response<Object> consultarCatalogoRfcEmpresa(String rfc, Authentication authentication) throws IOException {
+		SqlSessionFactory sqlSessionFactory=myBatisConfig.buildqlSessionFactory();
+		try(SqlSession sqlSession=sqlSessionFactory.openSession()) {
+			Consultas consultas=sqlSession.getMapper(Consultas.class);
+			resultServiciosCatalogo=consultas.selectNativeQuery(miConvenio.busquedaRfcEmpresa(rfc));
+			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
+		} catch (Exception e) {
+			log.info(ERROR,e.getCause().getMessage());
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+		}
 	}
 
 }

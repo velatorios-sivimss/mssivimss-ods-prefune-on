@@ -134,13 +134,13 @@ public class ConsultaMiConvenio {
 				.where("SF.ID_TIPO_ORDEN = 2").and("PF.ID_CONVENIO_PF = SCP.ID_CONVENIO_PF");
 		String subQuery = subQueryUtil.build();
 		queryUtil.select("SCP.ID_ESTATUS_CONVENIO AS idEstatusConvenio",
-				"RPF.ID_ESTATUS AS estatusRenovacion",
+				//"RPF.ID_ESTATUS AS estatusRenovacion",
 				"IF(SCP.ID_TIPO_PREVISION=1, 'Plan Nuevo', 'Plan Anterior') AS previsionFuneraria",
 				"DATE_FORMAT(SCP.FEC_ALTA , '%d-%m-%Y') AS fecContratacion",
 				"IF(SCP.IND_RENOVACION=false, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d-%m-%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d-%m-%Y')) AS fecVigencia",
 				"PAQ.MON_PRECIO AS cuotaRecuperacion",
 				"PAQ.REF_PAQUETE_NOMBRE AS tipoPaquete",
-				"IF(SCP.IND_RENOVACION=false, ' ', DATE_FORMAT(RPF.FEC_ALTA, '%d-%m-%Y')) AS fecRenovacion",
+				//"IF(SCP.IND_RENOVACION=false, ' ', DATE_FORMAT(RPF.FEC_ALTA, '%d-%m-%Y')) AS fecRenovacion",
 				"IFNULL((".concat(subQuery) + "), FALSE) AS titularFallecido",
 				"DATE_FORMAT(CURDATE(), '%d-%m-%Y') AS fecActual",
 				"TIMESTAMPDIFF(DAY,IF(SCP.IND_RENOVACION=false, DATE_FORMAT(SCP.FEC_VIGENCIA, '%Y-%m-%01'), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y-%m-%01')), CURDATE()) AS diferenciaDias")
@@ -201,5 +201,24 @@ public class ConsultaMiConvenio {
 		log.info("renovacion: {}", query);
 		return query;
 	}
+	
+	public String busquedaRfcEmpresa(String rfc) {
+		SelectQueryUtil querySelect = new SelectQueryUtil();
+		querySelect
+				.select("EC.REF_NOMBRE AS nombreEmpresa", "EC.REF_RAZON_SOCIAL AS razonSocial", "EC.CVE_RFC AS rfc",
+						"EC.ID_PAIS AS idPais", "SP.DES_PAIS AS desPais", "EC.ID_DOMICILIO AS idDomicilio",
+						"SD.REF_CALLE AS calle", "SD.NUM_EXTERIOR AS numExterior", "SD.NUM_INTERIOR AS numInterior",
+						"SD.REF_CP AS cp", "SD.REF_COLONIA AS desColonia", "SD.REF_MUNICIPIO AS desMunicipio",
+						"SD.REF_ESTADO AS desEstado", "EC.REF_TELEFONO AS telefono", "EC.REF_CORREO AS correo")
+				.from("SVT_EMPRESA_CONVENIO_PF EC").leftJoin("SVC_PAIS SP", "EC.ID_PAIS = SP.ID_PAIS")
+				.leftJoin("SVT_DOMICILIO SD", "EC.ID_DOMICILIO = SD.ID_DOMICILIO").where("EC.CVE_RFC = '" + rfc+"'");
+		query = querySelect.build();
+		log.info("busquedaRfcEmpresa: {}", query);
+		return query;
+	}
+	
+	
+	
+
 
 }

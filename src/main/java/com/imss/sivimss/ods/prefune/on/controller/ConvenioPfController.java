@@ -123,6 +123,18 @@ public class ConvenioPfController {
 				.supplyAsync(() -> new ResponseEntity<>(response,
 						HttpStatus.valueOf(response.getCodigo())));
 	}
+	
+	
+	@GetMapping("/buscar/empresa/{rfc}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaEmpresaRfc")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaEmpresaRfc")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object>consultarCatalogoEmpresa(@PathVariable(required = true) String rfc, Authentication authentication) throws IOException{
+		Response<Object>response=convenioPfService.consultarCatalogoRfcEmpresa(rfc, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+
+	}
 
 	/*
 	 * 
@@ -210,4 +222,17 @@ public class ConvenioPfController {
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
+	
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackConsultaEmpresaRfc(@PathVariable(required = true) String rfc,
+			Authentication authentication,
+			CallNotPermittedException e) throws Throwable {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
 }

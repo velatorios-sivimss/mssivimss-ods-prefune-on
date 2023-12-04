@@ -149,4 +149,5 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService{
 		}
 	}
 
+
 }
