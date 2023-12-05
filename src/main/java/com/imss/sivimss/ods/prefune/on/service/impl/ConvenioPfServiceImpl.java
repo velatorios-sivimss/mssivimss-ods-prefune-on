@@ -308,12 +308,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 		Object salida;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		ObjectMapper mapper = new ObjectMapper();
+
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 
 			try {
-
+				ObjectMapper mapper = new ObjectMapper();
 				salida = mapperQuery.beneficiarioExiste(request);
 				String json = new ObjectMapper().writeValueAsString(salida);
 				JsonNode datos = mapper.readTree(json);
@@ -321,6 +321,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 				if (validaExistencia > 0) {
 					// se hace una actualizacion
+
 				} else {
 					// se inserta el registro
 				}

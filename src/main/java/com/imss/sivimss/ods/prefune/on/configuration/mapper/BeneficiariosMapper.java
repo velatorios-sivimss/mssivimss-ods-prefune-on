@@ -50,7 +50,7 @@ public interface BeneficiariosMapper {
 			" JOIN svt_contra_paq_convenio_pf p " +
 			"	ON p.ID_CONTRA_PAQ_CONVENIO_PF= b.ID_CONTRA_PAQ_CONVENIO_PF" +
 			"	WHERE b.IND_ACTIVO = 1 " +
-			" AND p.ID_CONVENIO_PF = 11" +
+			" AND p.ID_CONVENIO_PF = #{in.idConvenio}" +
 			" AND sp.CVE_CURP = #{in.curp} ")
 	public Map<String, Object> beneficiarioExiste(@Param("in") AgregarBeneficiarioDTO persona);
 
