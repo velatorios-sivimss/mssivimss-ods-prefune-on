@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import com.google.gson.Gson;
 import com.imss.sivimss.ods.prefune.on.security.jwt.JwtTokenProvider;
 
@@ -56,6 +55,11 @@ public class ProviderServiceRestTemplate {
 			log.error("Ha ocurrido un error al recuperar la informacion");
 			throw exception;
 		}
+	}
+	
+	public Response<Object> consumirServicioExternoGet(String url)
+			throws IOException {
+		return restTemplateUtil.sendGetRequest(url);
 	}
 
 	public Response<Object> consumirServicioReportes(Map<String, Object> dato, String url,

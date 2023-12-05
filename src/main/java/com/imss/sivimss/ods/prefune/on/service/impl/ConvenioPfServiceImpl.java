@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import org.apache.ibatis.session.SqlSession;
@@ -23,7 +24,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.BeneficiariosMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
@@ -35,6 +39,7 @@ import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.response.BusquedaInformacionReporteResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
+import com.imss.sivimss.ods.prefune.on.model.response.RenapoResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
 import com.imss.sivimss.ods.prefune.on.utils.AppConstantes;
@@ -71,6 +76,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	@Value("${reporte.convenio-nuevo-pf}")
 	private String convenioNuevoPlan;
+	
+	@Value("${endpoints.renapo}")
+	private String urlRenapo;
 
 	private final String ERROR = "error: {}";
 
@@ -285,19 +293,67 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	}
 
 	@Override
-	public Response<Object> consultarCatalogoRfcEmpresa(String rfc, Authentication authentication) throws IOException {
+	public Response<Object> consultarCurpRfc(@RequestBody JsonNode curpRfc, Authentication authentication) throws IOException {
+		
 		SqlSessionFactory sqlSessionFactory=myBatisConfig.buildqlSessionFactory();
 		try(SqlSession sqlSession=sqlSessionFactory.openSession()) {
+            String curp = curpRfc.get("curp").asText();
+            String rfc = curpRfc.get("rfc").asText();
 			Consultas consultas=sqlSession.getMapper(Consultas.class);
-			resultServiciosCatalogo=consultas.selectNativeQuery(miConvenio.busquedaRfcEmpresa(rfc));
+			resultServiciosCatalogo=consultas.selectNativeQuery(miConvenio.consultarCurpRfc(curp,rfc));
+            RenapoResponse rp=null;
+
+			if (resultServiciosCatalogo.isEmpty()) {
+				if (curp.isEmpty()) {
+					return new Response<>(true, 200, "33");
+
+				}
+				return consultarCurp(curp);
+			}
+			
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
 		} catch (Exception e) {
 			log.info(ERROR,e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
 					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
+			
 			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
 		}
 	}
+	
+	private Response<Object>consultarCurp(String curp){
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			Response<Object> respuestaRenapo = providerRestTemplate
+					.consumirServicioExternoGet(urlRenapo + "/" + curp.replace("\"", ""));
+			JsonNode jsonRespuesta = objectMapper.readTree(respuestaRenapo.getDatos().toString());
+			RenapoResponse rp = null;
+			rp = RenapoResponse.builder().curp(jsonRespuesta.get("curp").asText()).rfc("").nss("").idPais("")
+					.idEstado("").desEstado(jsonRespuesta.get("desEntidadNac").asText())
+					.fechaNacimiento(jsonRespuesta.get("fechNac").asText())
+					.sexo(tipoSexo(jsonRespuesta.get("sexo").asText())).nomPersona(jsonRespuesta.get("nombre").asText())
+					.primerApellido(jsonRespuesta.get("apellido1").asText())
+					.segundoApellido(jsonRespuesta.get("apellido2").asText()).correo(jsonRespuesta.get("").asText())
+					.build();
+			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, Arrays.asList(rp));
+		} catch (Exception e) {
+			return new Response<>(true, 200, AppConstantes.ERROR_CONSULTAR_RENAPO, e.getMessage());
+
+		}
+	}
+	
+    private String tipoSexo(String tipo) {
+		String sexo = "";
+        if (Objects.nonNull(tipo)) {
+            sexo = String.valueOf(sexo.equals("HOMBRE") ? '2' : '1');
+        }else {
+        	sexo=tipo;
+        }
+        return sexo;
+	}
+	
+	
 
 }
