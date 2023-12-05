@@ -1,9 +1,13 @@
 package com.imss.sivimss.ods.prefune.on.configuration.mapper;
 
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
 
 public interface BeneficiariosMapper {
 
@@ -39,5 +43,15 @@ public interface BeneficiariosMapper {
 			+ " WHERE ID_CONTRATANTE_BENEFICIARIOS = #{in.idContratante}"
 			+ " AND ID_PERSONA = #{in.idPersona}")
 	public int actualizarContratante(@Param("in") ActualizarBeneficiarioDTO persona);
+
+	@Select(value = "SELECT COUNT(b.ID_CONTRATANTE_BENEFICIARIOS	) AS existe " +
+			" FROM svt_contratante_beneficiarios b" +
+			" JOIN svc_persona sp ON sp.ID_PERSONA= b.ID_PERSONA" +
+			" JOIN svt_contra_paq_convenio_pf p " +
+			"	ON p.ID_CONTRA_PAQ_CONVENIO_PF= b.ID_CONTRA_PAQ_CONVENIO_PF" +
+			"	WHERE b.IND_ACTIVO = 1 " +
+			" AND p.ID_CONVENIO_PF = 11" +
+			" AND sp.CVE_CURP = #{in.curp} ")
+	public Map<String, Object> beneficiarioExiste(@Param("in") AgregarBeneficiarioDTO persona);
 
 }

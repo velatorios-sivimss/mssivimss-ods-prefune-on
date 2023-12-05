@@ -15,9 +15,9 @@ spring:
   datasource:
     platform: mariadb
     driverClassName: org.mariadb.jdbc.Driver
-    url: jdbc:mysql://10.102.44.18:3306/SIVIBDDS
-    username: SIVI_USER
-    password: 51V1_US3R
+    url: jdbc:mysql://localhost:3306/localds
+    username: root
+    password: root
     timeBetweenEvictionRunsMillis: 1000
     testWhileIdle: true
     validationQuery: SELECT 1
