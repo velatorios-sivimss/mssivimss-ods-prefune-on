@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
@@ -123,17 +124,30 @@ public class ConvenioPfController {
 				.supplyAsync(() -> new ResponseEntity<>(response,
 						HttpStatus.valueOf(response.getCodigo())));
 	}
-	
-	
+
 	@GetMapping("/buscar/empresa/{rfc}")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaEmpresaRfc")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaEmpresaRfc")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultarCatalogoEmpresa(@PathVariable(required = true) String rfc, Authentication authentication) throws IOException{
-		Response<Object>response=convenioPfService.consultarCatalogoRfcEmpresa(rfc, authentication);
+	public CompletableFuture<Object> consultarCatalogoEmpresa(@PathVariable(required = true) String rfc,
+			Authentication authentication) throws IOException {
+		Response<Object> response = convenioPfService.consultarCatalogoRfcEmpresa(rfc, authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 
+	}
+
+	@PostMapping("/alta-beneficiario")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackAltaBeneficiario")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackAltaBeneficiario")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> altaBeneficiario(@RequestBody AgregarBeneficiarioDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.altaBeneficiario(request, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
 	}
 
 	/*
@@ -222,7 +236,19 @@ public class ConvenioPfController {
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
-	
+
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackAltaBeneficiario(@RequestBody AgregarBeneficiarioDTO request,
+			Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<Object> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), UPDATE, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsultaEmpresaRfc(@PathVariable(required = true) String rfc,
 			Authentication authentication,
@@ -234,5 +260,5 @@ public class ConvenioPfController {
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
-	
+
 }

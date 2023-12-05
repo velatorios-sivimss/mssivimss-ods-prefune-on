@@ -24,12 +24,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.BeneficiariosMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
 import com.imss.sivimss.ods.prefune.on.model.entity.ConvenioEntityMyBatis;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
@@ -76,7 +79,6 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	private List<Map<String, Object>> resultServiciosCatalogo = new ArrayList<>();
 
-
 	private static final String PERIODO_RENOVACION = "periodoRenovacion";
 	private static final String PATTERN = "dd-MM-yyyy";
 
@@ -114,37 +116,37 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			Consultas consultas = session.getMapper(Consultas.class);
 			resultDatosGenerales = consultas.selectNativeQuery(miConvenio.consultarDatosGeneales(idConvenio));
 
-			resultDatosBeneficios=consultas.selectNativeQuery(miConvenio.consultarBeneficiariosConvenio(idConvenio));
-		    resultDatosRenovacion = consultas.selectNativeQuery(miConvenio.consultarRenovacion(idConvenio));
-		   String vigenciaFin = resultDatosRenovacion.get(0).get("fecVigencia").toString();
-		   SimpleDateFormat formatter =  new SimpleDateFormat(PATTERN);
-		    Date vigencia = formatter.parse(vigenciaFin);
-		    String fechaHoy = resultDatosRenovacion.get(0).get("fecActual").toString();
-		    Date fecActual = formatter.parse(fechaHoy);
-		    Integer difDias = Integer.parseInt(resultDatosRenovacion.get(0).get("diferenciaDias").toString());
-		    String periodo =  formatearFecha(vigenciaFin);
-		    Integer dia = obtenerDia(vigenciaFin);
-		    resultDatosRenovacion.get(0).put("fecRenovacion", "Del 01-"+periodo+" Al 20-"+periodo);
-		    if(dia>20) {
-	    		 resultDatosRenovacion.get(0).put("fecRenovacion", "Del 01-"+periodo+" Al "+vigenciaFin);
-		    }
-			if(difDias<0) {
-		    	 log.info("NO ESTA EN TEMPORADA DE RENOVACION");
-				   resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 0);
-		    }else if(difDias>=0 && difDias<=19) {
-			      resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 1);
-		   }else if(difDias>19 && (vigencia.after(fecActual) || vigencia.equals(fecActual))) {
-			   resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 1);
-		   }else if(fecActual.after(vigencia)) {
-			   log.info("contrato cerrado {}",idConvenio);
-			   consultas.actualizarConvenio(idConvenio);
-			   session.commit();
-			   resultDatosRenovacion.get(0).put("idEstatus", 4);
-			   resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 0);
-		   }
-		}catch (Exception e) {
-			log.info(ERROR,e.getCause().getMessage());
- 
+			resultDatosBeneficios = consultas.selectNativeQuery(miConvenio.consultarBeneficiariosConvenio(idConvenio));
+			resultDatosRenovacion = consultas.selectNativeQuery(miConvenio.consultarRenovacion(idConvenio));
+			String vigenciaFin = resultDatosRenovacion.get(0).get("fecVigencia").toString();
+			SimpleDateFormat formatter = new SimpleDateFormat(PATTERN);
+			Date vigencia = formatter.parse(vigenciaFin);
+			String fechaHoy = resultDatosRenovacion.get(0).get("fecActual").toString();
+			Date fecActual = formatter.parse(fechaHoy);
+			Integer difDias = Integer.parseInt(resultDatosRenovacion.get(0).get("diferenciaDias").toString());
+			String periodo = formatearFecha(vigenciaFin);
+			Integer dia = obtenerDia(vigenciaFin);
+			resultDatosRenovacion.get(0).put("fecRenovacion", "Del 01-" + periodo + " Al 20-" + periodo);
+			if (dia > 20) {
+				resultDatosRenovacion.get(0).put("fecRenovacion", "Del 01-" + periodo + " Al " + vigenciaFin);
+			}
+			if (difDias < 0) {
+				log.info("NO ESTA EN TEMPORADA DE RENOVACION");
+				resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 0);
+			} else if (difDias >= 0 && difDias <= 19) {
+				resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 1);
+			} else if (difDias > 19 && (vigencia.after(fecActual) || vigencia.equals(fecActual))) {
+				resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 1);
+			} else if (fecActual.after(vigencia)) {
+				log.info("contrato cerrado {}", idConvenio);
+				consultas.actualizarConvenio(idConvenio);
+				session.commit();
+				resultDatosRenovacion.get(0).put("idEstatus", 4);
+				resultDatosRenovacion.get(0).put(PERIODO_RENOVACION, 0);
+			}
+		} catch (Exception e) {
+			log.info(ERROR, e.getCause().getMessage());
+
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
 					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
@@ -159,15 +161,15 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	}
 
 	private Integer obtenerDia(String vigenciaFin) throws ParseException {
-		Date dia =  new SimpleDateFormat(PATTERN).parse(vigenciaFin);
-	   	  DateFormat format = new SimpleDateFormat("dd");
+		Date dia = new SimpleDateFormat(PATTERN).parse(vigenciaFin);
+		DateFormat format = new SimpleDateFormat("dd");
 		return Integer.parseInt(format.format(dia));
 	}
 
 	private String formatearFecha(String vigenciaFin) throws ParseException {
-		 Date mesAnio =  new SimpleDateFormat(PATTERN).parse(vigenciaFin);
-   	  DateFormat format = new SimpleDateFormat("MM-yyyy");
-		    return  format.format(mesAnio);
+		Date mesAnio = new SimpleDateFormat(PATTERN).parse(vigenciaFin);
+		DateFormat format = new SimpleDateFormat("MM-yyyy");
+		return format.format(mesAnio);
 	}
 
 	@Override
@@ -217,15 +219,15 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	@Override
 	public Response<Object> renovarConvenio(String idConvenio, Authentication authentication) {
 		List<Map<String, Object>> detalleConvenio = new ArrayList<>();
- 
+
 		ConvenioEntityMyBatis convenioEntity = new ConvenioEntityMyBatis();
 		ConvenioRequest convenio;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			Consultas consultas = session.getMapper(Consultas.class);
 			detalleConvenio = consultas.selectNativeQuery(miConvenio.consultarDatosConvenio(idConvenio));
- 			convenio = new ConvenioRequest(detalleConvenio.get(0));
- 			convenioEntity.setIdConvenio(Integer.parseInt(idConvenio));
+			convenio = new ConvenioRequest(detalleConvenio.get(0));
+			convenioEntity.setIdConvenio(Integer.parseInt(idConvenio));
 			convenioEntity.setFolio(convenio.getFolio());
 			convenioEntity.setCuotaRecuperacion(convenio.getCuotaRecuperacion());
 			convenioEntity.setFecVigencia(convenio.getFechaVigencia());
@@ -286,18 +288,63 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	@Override
 	public Response<Object> consultarCatalogoRfcEmpresa(String rfc, Authentication authentication) throws IOException {
-		SqlSessionFactory sqlSessionFactory=myBatisConfig.buildqlSessionFactory();
-		try(SqlSession sqlSession=sqlSessionFactory.openSession()) {
-			Consultas consultas=sqlSession.getMapper(Consultas.class);
-			resultServiciosCatalogo=consultas.selectNativeQuery(miConvenio.busquedaRfcEmpresa(rfc));
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			Consultas consultas = sqlSession.getMapper(Consultas.class);
+			resultServiciosCatalogo = consultas.selectNativeQuery(miConvenio.busquedaRfcEmpresa(rfc));
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
 		} catch (Exception e) {
-			log.info(ERROR,e.getCause().getMessage());
+			log.info(ERROR, e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
-					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
-			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+					authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO,
+					Arrays.asList());
 		}
+	}
+
+	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO request, Authentication authentication)
+			throws IOException {
+		Object salida;
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		ObjectMapper mapper = new ObjectMapper();
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
+
+			try {
+
+				salida = mapperQuery.beneficiarioExiste(request);
+				String json = new ObjectMapper().writeValueAsString(salida);
+				JsonNode datos = mapper.readTree(json);
+				Integer validaExistencia = datos.get("existe").asInt();
+
+				if (validaExistencia > 0) {
+					// se hace una actualizacion
+				} else {
+					// se inserta el registro
+				}
+
+				System.out.println(validaExistencia);
+				/*
+				 * if (request.isActualizaArchivo())
+				 * mapperQuery.actualizarContratante(request);
+				 * 
+				 * mapperQuery.actualizarContratanteDocumento(request);
+				 * mapperQuery.actualizarPersona(request);
+				 */
+
+			} catch (Exception e) {
+				session.rollback();
+
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+			}
+
+		}
+
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
+				salida);
+
 	}
 
 }

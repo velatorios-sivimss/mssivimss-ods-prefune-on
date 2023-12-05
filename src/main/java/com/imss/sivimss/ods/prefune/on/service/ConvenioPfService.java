@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.springframework.security.core.Authentication;
 
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
@@ -22,8 +23,10 @@ public interface ConvenioPfService {
 	public Response<Object> generarPDF(PdfDto request, Authentication authentication) throws IOException;
 
 	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication);
-	
-	public Response<Object>consultarCatalogoRfcEmpresa(String rfc,Authentication authentication) throws IOException;
 
+	public Response<Object> consultarCatalogoRfcEmpresa(String rfc, Authentication authentication) throws IOException;
+
+	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO request, Authentication authentication)
+			throws IOException;
 
 }
