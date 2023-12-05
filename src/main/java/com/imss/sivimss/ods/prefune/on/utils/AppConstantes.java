@@ -35,6 +35,7 @@ public class AppConstantes {
 	public static final String ERROR_LOG_QUERY = "Fallo al ejecutar el query:  ";
 	public static final String ERROR_CONSULTAR = "52";//Error al consultar la información.
 	public static final String ERROR_GUARDAR = "5";//Error al guardar la información. Intenta nuevamente.
+	public static final String ERROR_CONSULTAR_RENAPO = "184";// El servicio de RENAPO  no esta disponible.
 
 	private AppConstantes() {
 
