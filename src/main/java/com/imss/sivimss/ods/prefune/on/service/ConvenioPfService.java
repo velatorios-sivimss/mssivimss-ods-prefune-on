@@ -3,7 +3,9 @@ package com.imss.sivimss.ods.prefune.on.service;
 import java.io.IOException;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
@@ -24,7 +26,8 @@ public interface ConvenioPfService {
 
 	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication);
 
-	public Response<Object> consultarCatalogoRfcEmpresa(String rfc, Authentication authentication) throws IOException;
+	public Response<Object>consultarCurpRfc(@RequestBody JsonNode datos,Authentication authentication) throws IOException;
+
 
 	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO request, Authentication authentication)
 			throws IOException;
