@@ -24,10 +24,11 @@ public interface ConvenioPfService {
 
 	public Response<Object> generarPDF(PdfDto request, Authentication authentication) throws IOException;
 
-	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication);
+	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication)
+			throws IOException;
 
-	public Response<Object>consultarCurpRfc(@RequestBody JsonNode datos,Authentication authentication) throws IOException;
-
+	public Response<Object> consultarCurpRfc(@RequestBody JsonNode datos, Authentication authentication)
+			throws IOException;
 
 	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO request, Authentication authentication)
 			throws IOException;
