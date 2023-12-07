@@ -15,6 +15,7 @@ public class AppConstantes {
 	public static final String EXITO = "Exito";
 	public static final String OCURRIO_ERROR_GENERICO = "187";// Ocurrio un error al procesar tu solicitud.
 	public static final String BAD_REQUEST_MENSAJE = "Datos incorrectos.";
+	public static final String HISTORIAL_ORDENES_MENSAJE = "116";//MSG116 	Aún no cuentas con una Orden de servicio (ODS) generada. Puedes acudir a tu Velatorio más cercano para contratar algún servicio funerario.
 
 	public static final String STATUSEXCEPTION = "status";
 	public static final String EXPIREDJWTEXCEPTION = "expired";
