@@ -2,7 +2,7 @@ package com.imss.sivimss.ods.prefune.on.utils;
 
 public class AppConstantes {
 	public static final String CONSULTA = "0";
-	
+
 	public static final String NUMERO_DE_PAGINA = "0";
 	public static final String TAMANIO_PAGINA = "10";
 	public static final String ORDER_BY = "id";
@@ -31,12 +31,14 @@ public class AppConstantes {
 	public static final String ILLEGALARGUMENTEXCEPTION_MENSAJE = "Token vacío.";
 	public static final String SIGNATUREEXCEPTION_MENSAJE = "Fallo la firma.";
 	public static final String FORBIDDENEXCEPTION_MENSAJE = "No tiene autorización para realizar la solicitud.";
-	
+
 	public static final String ERROR_QUERY = "Error al ejecutar el query ";
 	public static final String ERROR_LOG_QUERY = "Fallo al ejecutar el query:  ";
-	public static final String ERROR_CONSULTAR = "52";//Error al consultar la información.
-	public static final String ERROR_GUARDAR = "5";//Error al guardar la información. Intenta nuevamente.
+	public static final String ERROR_CONSULTAR = "52";// Error al consultar la información.
+	public static final String ERROR_GUARDAR = "5";// Error al guardar la información. Intenta nuevamente.
 	public static final String ERROR_CONSULTAR_RENAPO = "184";// El servicio de RENAPO  no esta disponible.
+	public static final String BENEFICIARIO_REGISTRADO = "802";// El beneficiario ya fue registrado con anterioridad,
+																// ingrese un beneficiario diferente
 
 	private AppConstantes() {
 

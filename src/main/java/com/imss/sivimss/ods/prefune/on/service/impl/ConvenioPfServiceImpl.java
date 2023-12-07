@@ -77,7 +77,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	@Value("${reporte.convenio-nuevo-pf}")
 	private String convenioNuevoPlan;
-	
+
 	@Value("${endpoints.renapo}")
 	private String urlRenapo;
 
@@ -267,7 +267,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	}
 
-	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication) {
+	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication) throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -281,7 +281,11 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 			} catch (Exception e) {
 				session.rollback();
-
+				log.info("{}", e.getMessage());
+				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+						this.getClass().getPackage().toString(),
+						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+						authentication);
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
 
@@ -293,14 +297,15 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	}
 
 	@Override
-	public Response<Object> consultarCurpRfc(@RequestBody JsonNode curpRfc, Authentication authentication) throws IOException {
-		SqlSessionFactory sqlSessionFactory=myBatisConfig.buildqlSessionFactory();
-		try(SqlSession sqlSession=sqlSessionFactory.openSession()) {
-            String curp = curpRfc.get("curp").asText();
-            String rfc = curpRfc.get("rfc").asText();
-			Consultas consultas=sqlSession.getMapper(Consultas.class);
-			resultServiciosCatalogo=consultas.selectNativeQuery(miConvenio.consultarCurpRfc(curp,rfc));
-            RenapoResponse rp=null;
+	public Response<Object> consultarCurpRfc(@RequestBody JsonNode curpRfc, Authentication authentication)
+			throws IOException {
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			String curp = curpRfc.get("curp").asText();
+			String rfc = curpRfc.get("rfc").asText();
+			Consultas consultas = sqlSession.getMapper(Consultas.class);
+			resultServiciosCatalogo = consultas.selectNativeQuery(miConvenio.consultarCurpRfc(curp, rfc));
+			RenapoResponse rp = null;
 
 			if (resultServiciosCatalogo.isEmpty()) {
 				if (curp.isEmpty()) {
@@ -310,61 +315,107 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				return consultarCurp(curp);
 			}
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
-		 } catch (Exception e) {
-			log.info(ERROR,e.getCause().getMessage());
+		} catch (Exception e) {
+			log.info(ERROR, e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
-					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+					authentication);
 
-			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO,
+					Arrays.asList());
 		}
 	}
 
 	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO request, Authentication authentication)
 			throws IOException {
-		Object salida;
-		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		Integer idUsuario = 1;
+		request.setIdUsuario(idUsuario);
+		Boolean validaBeneficiarioAsociado = true;
+		ActualizarBeneficiarioDTO actualizarBeneficiarioDTO = new ActualizarBeneficiarioDTO();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 
 			try {
-				ObjectMapper mapper = new ObjectMapper();
-				salida = mapperQuery.beneficiarioExiste(request);
-				String json = new ObjectMapper().writeValueAsString(salida);
-				JsonNode datos = mapper.readTree(json);
-				Integer validaExistencia = datos.get("existe").asInt();
+				// Object personaExiste;
+				ObjectMapper objMapper = new ObjectMapper();
+				Object personaAsociada;
+				String json;
+				JsonNode datos;
 
-				if (validaExistencia > 0) {
-					// se hace una actualizacion
+				if ((request.getIdPersona() == null ? 0 : request.getIdPersona()) > 0) {
+					personaAsociada = mapperQuery.beneficiarioAsociado(request);
+					json = new ObjectMapper().writeValueAsString(personaAsociada);
+					datos = objMapper.readTree(json);
+					Integer validaExistencia = datos.get("noPersona").asInt();
+					Integer estatusBeneficiario = datos.get("estatus").asInt();
+					if (validaExistencia > 0 && estatusBeneficiario == 1)
+						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.BENEFICIARIO_REGISTRADO,
+								null);
+					else if (validaExistencia > 0 && estatusBeneficiario == 0) {
+						actualizarBeneficiarioDTO.setCorreo(request.getCorreo());
+						actualizarBeneficiarioDTO.setTelefono(request.getTelefono());
+						actualizarBeneficiarioDTO.setIdPersona(request.getIdPersona());
+						validaBeneficiarioAsociado = false;
+					}
+
+				}
+
+				/*
+				 * personaExiste = mapperQuery.personaExiste(request);
+				 * json = new ObjectMapper().writeValueAsString(personaExiste);
+				 * datos = objMapper.readTree(json);
+				 * Integer validaExistencia = datos.get("existe").asInt();
+				 */
+
+				if ((request.getIdPersona() == null ? 0 : request.getIdPersona()) > 0) {
+					// se hace una actualizacion decorreo y telefono de la persona
+					log.info("actualizando persona");
+					mapperQuery.actualizarPersona(actualizarBeneficiarioDTO);
+					log.info("correo y telefono de persona actualizado");
 
 				} else {
 					// se inserta el registro
+					log.info("insertando persona");
+					Integer idPersona = mapperQuery.insertaPersona(request);
+					request.setIdPersona(idPersona);
+					log.info("se agrega persona");
+
 				}
 
-				System.out.println(validaExistencia);
-				/*
-				 * if (request.isActualizaArchivo())
-				 * mapperQuery.actualizarContratante(request);
-				 * 
-				 * mapperQuery.actualizarContratanteDocumento(request);
-				 * mapperQuery.actualizarPersona(request);
-				 */
+				if (Boolean.TRUE.equals(validaBeneficiarioAsociado)) {
+					// se agregar nuevo registro en contratante beneficiario
+					log.info("insertando beneficiario");
+					mapperQuery.insertaBeneficiarioContratante(request);
+					log.info("se agrega beneficiario");
+
+				} else {
+					// se actualzia el registro si estaba inactivo
+					log.info("actualizando beneficiario");
+					mapperQuery.actualizarContratanteDocumento2(request);
+					log.info("se actuliza beneficiario");
+				}
 
 			} catch (Exception e) {
 				session.rollback();
-
+				log.info("{}", e.getMessage());
+				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+						this.getClass().getPackage().toString(),
+						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+						authentication);
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
 
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
-				salida);
+				null);
 
 	}
-	
-	private Response<Object>consultarCurp(String curp){
+
+	private Response<Object> consultarCurp(String curp) {
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 
@@ -385,17 +436,15 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 		}
 	}
-	
-    private String tipoSexo(String tipo) {
+
+	private String tipoSexo(String tipo) {
 		String sexo = "";
-        if (Objects.nonNull(tipo)) {
-            sexo = String.valueOf(sexo.equals("HOMBRE") ? '2' : '1');
-        }else {
-        	sexo=tipo;
-        }
-        return sexo;
+		if (Objects.nonNull(tipo)) {
+			sexo = String.valueOf(sexo.equals("HOMBRE") ? '2' : '1');
+		} else {
+			sexo = tipo;
+		}
+		return sexo;
 	}
-	
-	
 
 }

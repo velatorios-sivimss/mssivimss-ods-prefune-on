@@ -27,7 +27,6 @@ import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
-import com.imss.sivimss.ods.prefune.on.utils.DatosRequest;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
@@ -117,7 +116,7 @@ public class ConvenioPfController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackActualizarBeneficiario")
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object> actualizarBeneficiario(@RequestBody ActualizarBeneficiarioDTO request,
-			Authentication authentication) {
+			Authentication authentication) throws IOException {
 
 		Response<Object> response = convenioPfService.actualizarBeneficiario(request, authentication);
 
@@ -125,14 +124,15 @@ public class ConvenioPfController {
 				.supplyAsync(() -> new ResponseEntity<>(response,
 						HttpStatus.valueOf(response.getCodigo())));
 	}
-	
+
 	@PostMapping("/validar-curp-rfc")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaCurpRfc")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaCurpRfc")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultarCatalogoEmpresa(@RequestBody JsonNode curpRfc, Authentication authentication) throws IOException{
-		
-		Response<Object>response=convenioPfService.consultarCurpRfc(curpRfc, authentication);
+	public CompletableFuture<Object> consultarCatalogoEmpresa(@RequestBody JsonNode curpRfc,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.consultarCurpRfc(curpRfc, authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 
