@@ -29,6 +29,7 @@ public interface BeneficiariosMapper {
 			+ "REF_UBICACION_INE_BENEFICIARIO = #{in.nombreIne}, "
 			+ "IND_ACTA_NACIMIENTO  = #{in.validaActa},"
 			+ "REF_UBICACION_ACTA_NACIMIENTO=#{in.nombreActa},"
+			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ,"
 			+ "REF_DOCUMENTO_BENEFICIARIO=#{in.documento} "
 			+ "WHERE ID_CONTRATANTE_BENEFICIARIOS = #{in.idContratante} "
 			+ " AND ID_PERSONA = #{in.idPersona}")
@@ -41,15 +42,16 @@ public interface BeneficiariosMapper {
 			+ "IND_INE_BENEFICIARIO = #{in.validaIne} ,"
 			+ "REF_UBICACION_INE_BENEFICIARIO = #{in.nombreIne}, "
 			+ "IND_ACTA_NACIMIENTO  = #{in.validaActa}, "
+			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ,"
 			+ "REF_UBICACION_ACTA_NACIMIENTO=#{in.nombreActa} "
 			+ "WHERE ID_CONTRATANTE_BENEFICIARIOS = #{in.idContratante} "
 			+ "AND ID_PERSONA = #{in.idPersona} ")
 	public int actualizarContratante(@Param("in") ActualizarBeneficiarioDTO persona);
 
 	@Select(value = "SELECT COUNT(b.ID_CONTRATANTE_BENEFICIARIOS) AS existe " +
-			" FROM svt_contratante_beneficiarios b " +
-			" JOIN svc_persona sp ON sp.ID_PERSONA= b.ID_PERSONA" +
-			" JOIN svt_contra_paq_convenio_pf p " +
+			" FROM SVT_CONTRATANTE_BENEFICIARIOS b " +
+			" JOIN SVC_PERSONA sp ON sp.ID_PERSONA= b.ID_PERSONA" +
+			" JOIN SVT_CONTRA_PAQ_CONVENIO_PF p " +
 			"ON p.ID_CONTRA_PAQ_CONVENIO_PF= b.ID_CONTRA_PAQ_CONVENIO_PF " +
 			"WHERE b.IND_ACTIVO = 1 " +
 			" AND p.ID_CONVENIO_PF = #{in.idConvenio}" +
@@ -57,11 +59,11 @@ public interface BeneficiariosMapper {
 	public Map<String, Object> personaExiste(@Param("in") AgregarBeneficiarioDTO persona);
 
 	@Select(value = "SELECT  COUNT(*) AS  noPersona ,ifnull(IND_ACTIVO,-1) AS estatus " +
-			" FROM svt_contratante_beneficiarios " +
+			" FROM SVT_CONTRATANTE_BENEFICIARIOS " +
 			" WHERE ID_PERSONA= #{in.idPersona} " +
 			" AND ID_CONTRA_PAQ_CONVENIO_PF in " +
 			"(SELECT ID_CONTRA_PAQ_CONVENIO_PF " +
-			"FROM  svt_contra_paq_convenio_pf  where ID_CONVENIO_PF = #{in.idConvenio}   )")
+			"FROM  SVT_CONTRA_PAQ_CONVENIO_PF  where ID_CONVENIO_PF = #{in.idConvenio}   )")
 	public Map<String, Object> beneficiarioAsociado(@Param("in") AgregarBeneficiarioDTO persona);
 
 	@Insert(value = "INSERT INTO SVC_PERSONA  " +
@@ -98,6 +100,7 @@ public interface BeneficiariosMapper {
 			+ "SET  "
 			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
 			+ "IND_ACTIVO = 1, "
+			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ,"
 			+ "IND_INE_BENEFICIARIO = #{in.validaIne} ,"
 			+ "REF_UBICACION_INE_BENEFICIARIO = #{in.nombreIne}, "
 			+ "IND_ACTA_NACIMIENTO  = #{in.validaActa},"
@@ -121,7 +124,7 @@ public interface BeneficiariosMapper {
 			" REF_DOCUMENTO_BENEFICIARIO) " +
 			" VALUES " +
 			"( (SELECT DISTINCT ID_CONTRA_PAQ_CONVENIO_PF" +
-			" FROM  svt_contra_paq_convenio_pf  where ID_CONVENIO_PF = #{out.idConvenio}  limit 1 )," +
+			" FROM  SVT_CONTRA_PAQ_CONVENIO_PF  where ID_CONVENIO_PF = #{out.idConvenio}  limit 1 )," +
 			"#{out.idParentesco}, " +
 			"#{out.idPersona}, " +
 			"#{out.idUsuario}, " +
@@ -135,5 +138,15 @@ public interface BeneficiariosMapper {
 			")")
 	@Options(useGeneratedKeys = true, keyProperty = "out.idContratante", keyColumn = "ID_CONTRATANTE_BENEFICIARIOS")
 	public int insertaBeneficiarioContratante(@Param("out") AgregarBeneficiarioDTO persona);
+
+	@Update(value = ""
+			+ "UPDATE SVT_CONTRATANTE_BENEFICIARIOS  "
+			+ "SET  "
+			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ,"
+			+ "IND_ACTIVO = 0 "
+			+ "WHERE ID_CONTRATANTE_BENEFICIARIOS = #{in.idContratante} "
+			+ " AND ID_PERSONA = #{in.idPersona}")
+	public int desactivarBeneficiario(@Param("in") ActualizarBeneficiarioDTO persona);
 
 }

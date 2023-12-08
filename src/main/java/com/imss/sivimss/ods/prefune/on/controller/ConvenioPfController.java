@@ -151,6 +151,20 @@ public class ConvenioPfController {
 						HttpStatus.valueOf(response.getCodigo())));
 	}
 
+	@PostMapping("/desactivar-beneficiario")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackActualizarBeneficiario")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackActualizarBeneficiario")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> desactivarBeneficiario(@RequestBody ActualizarBeneficiarioDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.desactivarBeneficiario(request, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
+	}
+
 	/*
 	 * 
 	 * FallBack
