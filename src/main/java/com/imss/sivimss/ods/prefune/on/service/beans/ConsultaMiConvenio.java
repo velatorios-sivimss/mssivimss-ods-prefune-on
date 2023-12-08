@@ -210,7 +210,7 @@ public class ConsultaMiConvenio {
 
 	public String consultarCurpRfc(String curp) {
 
-		log.info("rfc vacio");
+		
 		SelectQueryUtil selectQueryUtilCurp = new SelectQueryUtil();
 		selectQueryUtilCurp
 				.select("SP.ID_PERSONA as idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss",
