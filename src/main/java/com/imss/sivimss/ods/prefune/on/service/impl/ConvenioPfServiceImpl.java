@@ -302,9 +302,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			String curp = curpRfc.get("curp").asText();
-			String rfc = curpRfc.get("rfc").asText();
+			
 			Consultas consultas = sqlSession.getMapper(Consultas.class);
-			resultServiciosCatalogo = consultas.selectNativeQuery(miConvenio.consultarCurpRfc(curp, rfc));
+			resultServiciosCatalogo = consultas.selectNativeQuery(miConvenio.consultarCurpRfc(curp));
 			RenapoResponse rp = null;
 
 			if (resultServiciosCatalogo.isEmpty()) {
