@@ -52,7 +52,7 @@ public class HistorialOrdenes {
 		.innerJoin("SVC_ESTATUS_ORDEN_SERVICIO E ", "SO.ID_ESTATUS_ORDEN_SERVICIO = E.ID_ESTATUS_ORDEN_SERVICIO")
 		.innerJoin("SVC_FINADO SFA", "SFA.ID_ORDEN_SERVICIO = SO.ID_ORDEN_SERVICIO")
 		.leftJoin("SVC_PERSONA SP2", "SFA.ID_PERSONA = SP2.ID_PERSONA")
-		.where("SO.ID_ESTATUS_ORDEN_SERVICIO IN (1, 2, 0, 4, 3, 6) ")
+		.where("SO.ID_ESTATUS_ORDEN_SERVICIO IN (2, 3, 4, 5, 6) ")
 		.and("SO.ID_ORDEN_SERVICIO="+idOrden);
 		
 		query=selectQueryUtil.build();
