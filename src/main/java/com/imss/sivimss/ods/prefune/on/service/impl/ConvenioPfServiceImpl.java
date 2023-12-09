@@ -402,7 +402,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						authentication);
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
-			// session.commit();
+			session.commit();
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
@@ -463,7 +463,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
 
-			// session.commit();
+			session.commit();
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, null);
