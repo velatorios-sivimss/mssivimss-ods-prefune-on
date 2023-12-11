@@ -165,6 +165,17 @@ public class ConvenioPfController {
 						HttpStatus.valueOf(response.getCodigo())));
 	}
 
+	@GetMapping("/datos-generales-contratante")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDatosGeneralesUsuario")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackDatosGeneralesUsuario")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> datosGeneralesUsuario(
+			Authentication authentication) throws IOException {
+		Response<Object> response = convenioPfService.consultaDetalleConvenio(authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
 	/*
 	 * 
 	 * FallBack
@@ -266,6 +277,18 @@ public class ConvenioPfController {
 
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsultaCurpRfc(@RequestBody JsonNode curpRfc,
+			Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackDatosGeneralesUsuario(
 			Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
