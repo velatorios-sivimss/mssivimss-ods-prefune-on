@@ -39,7 +39,6 @@ import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.response.BusquedaInformacionReporteResponse;
-import com.imss.sivimss.ods.prefune.on.model.response.ContratanteResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.RenapoResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
@@ -474,7 +473,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	public Response<Object> consultaDetalleConvenio(Authentication authentication)
 			throws IOException {
 		Integer idContratante = 111;
-		ContratanteResponse contratanteResponse = new ContratanteResponse();
+		Map<String, Object> datosGenerales = new HashMap<>();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
@@ -483,10 +482,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				AgregarBeneficiarioDTO contratante = new AgregarBeneficiarioDTO();
 				contratante.setIdContratante(idContratante);
 
-				Map<String, Object> datosGenerales = new HashMap<>();
-
 				datosGenerales = mapperQuery.datosPersonalesContratante(contratante);
-				contratanteResponse.setDatosGenerales(datosGenerales);
 
 			} catch (Exception e) {
 				session.rollback();
@@ -500,7 +496,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 		}
 
-		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, contratanteResponse);
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, datosGenerales);
 
 	}
 
