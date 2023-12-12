@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
@@ -176,6 +177,19 @@ public class ConvenioPfController {
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
 
+	@PostMapping("/alta-plan-pf/persona")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackAltaPlanPersona")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackAltaPlanPersona")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> altaPlanPFPersona(@RequestBody AgregarConvenioPersonaDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.altaPlanPFPersona(request, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
+	}
+
 	/*
 	 * 
 	 * FallBack
@@ -294,6 +308,18 @@ public class ConvenioPfController {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
 				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackAltaPlanPersona(@RequestBody AgregarConvenioPersonaDTO request,
+			Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<Object> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), UPDATE, authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));

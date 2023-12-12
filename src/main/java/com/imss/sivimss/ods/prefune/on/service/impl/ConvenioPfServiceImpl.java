@@ -32,9 +32,11 @@ import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.BeneficiariosMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
+import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioPFMapper;
 import com.imss.sivimss.ods.prefune.on.model.entity.ConvenioEntityMyBatis;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
@@ -267,19 +269,19 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	}
 
-	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication)
+	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
 		Integer idUsuario = 1;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 			try {
-				request.setIdUsuario(idUsuario);
-				if (request.isActualizaArchivo())
-					mapperQuery.actualizarContratante(request);
+				datos.setIdUsuario(idUsuario);
+				if (datos.isActualizaArchivo())
+					mapperQuery.actualizarContratante(datos);
 
-				mapperQuery.actualizarContratanteDocumento(request);
-				mapperQuery.actualizarPersona(request);
+				mapperQuery.actualizarContratanteDocumento(datos);
+				mapperQuery.actualizarPersona(datos);
 
 			} catch (Exception e) {
 				session.rollback();
@@ -329,12 +331,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		}
 	}
 
-	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO request, Authentication authentication)
+	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		Integer idUsuario = 1;
-		request.setIdUsuario(idUsuario);
+		datos.setIdUsuario(idUsuario);
 		Boolean validaBeneficiarioAsociado = true;
 		ActualizarBeneficiarioDTO actualizarBeneficiarioDTO = new ActualizarBeneficiarioDTO();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -345,27 +347,27 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				ObjectMapper objMapper = new ObjectMapper();
 				Object personaAsociada;
 				String json;
-				JsonNode datos;
+				JsonNode datosJson;
 
-				if ((request.getIdPersona() == null ? 0 : request.getIdPersona()) > 0) {
-					personaAsociada = mapperQuery.beneficiarioAsociado(request);
+				if ((datos.getIdPersona() == null ? 0 : datos.getIdPersona()) > 0) {
+					personaAsociada = mapperQuery.beneficiarioAsociado(datos);
 					json = new ObjectMapper().writeValueAsString(personaAsociada);
-					datos = objMapper.readTree(json);
-					Integer validaExistencia = datos.get("noPersona").asInt();
-					Integer estatusBeneficiario = datos.get("estatus").asInt();
+					datosJson = objMapper.readTree(json);
+					Integer validaExistencia = datosJson.get("noPersona").asInt();
+					Integer estatusBeneficiario = datosJson.get("estatus").asInt();
 					if (validaExistencia > 0 && estatusBeneficiario == 1)
 						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.BENEFICIARIO_REGISTRADO,
 								null);
 					else if (validaExistencia > 0 && estatusBeneficiario == 0) {
-						actualizarBeneficiarioDTO.setCorreo(request.getCorreo());
-						actualizarBeneficiarioDTO.setTelefono(request.getTelefono());
-						actualizarBeneficiarioDTO.setIdPersona(request.getIdPersona());
+						actualizarBeneficiarioDTO.setCorreo(datos.getCorreo());
+						actualizarBeneficiarioDTO.setTelefono(datos.getTelefono());
+						actualizarBeneficiarioDTO.setIdPersona(datos.getIdPersona());
 						validaBeneficiarioAsociado = false;
 					}
 
 				}
 
-				if ((request.getIdPersona() == null ? 0 : request.getIdPersona()) > 0) {
+				if ((datos.getIdPersona() == null ? 0 : datos.getIdPersona()) > 0) {
 					// se hace una actualizacion decorreo y telefono de la persona
 					log.info("actualizando persona");
 					mapperQuery.actualizarPersona(actualizarBeneficiarioDTO);
@@ -374,8 +376,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				} else {
 					// se inserta el registro
 					log.info("insertando persona");
-					Integer idPersona = mapperQuery.insertaPersona(request);
-					request.setIdPersona(idPersona);
+					mapperQuery.insertaPersona(datos);
 					log.info("se agrega persona");
 
 				}
@@ -383,13 +384,13 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				if (Boolean.TRUE.equals(validaBeneficiarioAsociado)) {
 					// se agregar nuevo registro en contratante beneficiario
 					log.info("insertando beneficiario");
-					mapperQuery.insertaBeneficiarioContratante(request);
+					mapperQuery.insertaBeneficiarioContratante(datos);
 					log.info("se agrega beneficiario");
 
 				} else {
 					// se actualzia el registro si estaba inactivo
 					log.info("actualizando beneficiario");
-					mapperQuery.actualizarContratanteDocumento2(request);
+					mapperQuery.actualizarContratanteDocumento2(datos);
 					log.info("se actuliza beneficiario");
 				}
 
@@ -442,7 +443,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		return sexo;
 	}
 
-	public Response<Object> desactivarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication)
+	public Response<Object> desactivarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
 		Integer idUsuario = 1;
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
@@ -450,8 +451,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 			try {
 
-				request.setIdUsuario(idUsuario);
-				mapperQuery.desactivarBeneficiario(request);
+				datos.setIdUsuario(idUsuario);
+				mapperQuery.desactivarBeneficiario(datos);
 
 			} catch (Exception e) {
 				session.rollback();
@@ -497,6 +498,41 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, datosGenerales);
+
+	}
+
+	public Response<Object> altaPlanPFPersona(AgregarConvenioPersonaDTO datos, Authentication authentication)
+			throws IOException {
+
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		Integer idUsuario = 1;
+		datos.setIdUsuario(idUsuario);
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
+
+			try {
+				convenio.agregarConvenioPF(datos);
+				/*
+				 * convenio.agregarDomicilio(datos);
+				 * convenio.agregarContratante(datos);
+				 * convenio.agregarContratoConvenioPaquete(datos);
+				 * convenio.agregaDocumentacion(datos);
+				 */
+
+			} catch (Exception e) {
+				session.rollback();
+				log.info("{}", e.getMessage());
+				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+						this.getClass().getPackage().toString(),
+						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+						authentication);
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+			}
+			// session.commit();
+		}
+
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
+				datos);
 
 	}
 

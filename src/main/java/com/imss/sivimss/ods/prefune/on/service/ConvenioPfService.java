@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
@@ -37,5 +38,8 @@ public interface ConvenioPfService {
 			throws IOException;
 
 	public Response<Object> consultaDetalleConvenio(Authentication authentication) throws IOException;
+
+	public Response<Object> altaPlanPFPersona(AgregarConvenioPersonaDTO request, Authentication authentication)
+			throws IOException;
 
 }
