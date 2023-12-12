@@ -150,21 +150,21 @@ public interface BeneficiariosMapper {
 	public int desactivarBeneficiario(@Param("in") ActualizarBeneficiarioDTO persona);
 
 	@Select(value = "SELECT c.ID_CONTRATANTE AS idContratante,  " +
-			"c.ID_PERSONA AS idPersona, c.ID_DOMICILIO AS idDomicilio, " +
-			"p.CVE_RFC AS rfc, p.CVE_CURP AS curp, p.CVE_NSS AS nss,  " +
-			"p.NOM_PERSONA AS nombre, p.NOM_PRIMER_APELLIDO AS primerApellido, " +
+			" c.ID_PERSONA AS idPersona, c.ID_DOMICILIO AS idDomicilio, " +
+			" p.CVE_RFC AS rfc, p.CVE_CURP AS curp, p.CVE_NSS AS nss,  " +
+			" p.NOM_PERSONA AS nombre, p.NOM_PRIMER_APELLIDO AS primerApellido, " +
 			" p.NOM_SEGUNDO_APELLIDO AS segundoApellido, " +
-			"p.NUM_SEXO AS idSexo,  " +
-			"case when p.NUM_SEXO =1 then 'Hombre' " +
-			"when p.NUM_SEXO =2 then 'Mujer' " +
-			"ELSE 'Otro' END sexo, " +
-			"p.REF_OTRO_SEXO AS otroSexo,  " +
-			"p.FEC_NAC AS fechaNacimiento, " +
-			"p.ID_ESTADO AS idEstado, " +
-			"p.REF_TELEFONO AS telefono, " +
-			"p.REF_CORREO AS correo, " +
-			"p.TIP_PERSONA AS tipoPersona, " +
-			"e.DES_ESTADO AS estado " +
+			" p.NUM_SEXO AS idSexo,  " +
+			" case when p.NUM_SEXO = 1 then 'Mujer' " +
+			" when p.NUM_SEXO = 2 then 'Hombre' " +
+			" ELSE 'Otro' END sexo, " +
+			" p.REF_OTRO_SEXO AS otroSexo,  " +
+			" p.FEC_NAC AS fechaNacimiento, " +
+			" p.ID_ESTADO AS idEstado, " +
+			" p.REF_TELEFONO AS telefono, " +
+			" p.REF_CORREO AS correo, " +
+			" p.TIP_PERSONA AS tipoPersona, " +
+			" e.DES_ESTADO AS estado " +
 			" FROM svc_contratante c " +
 			" JOIN svc_persona p ON p.ID_PERSONA = c.ID_PERSONA " +
 			" LEFT JOIN svc_estado e ON e.ID_ESTADO= p.ID_ESTADO " +
