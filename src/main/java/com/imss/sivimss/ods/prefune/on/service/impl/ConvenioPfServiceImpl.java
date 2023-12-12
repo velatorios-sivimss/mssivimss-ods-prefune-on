@@ -512,12 +512,13 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 			try {
 				convenio.agregarConvenioPF(datos);
-				/*
-				 * convenio.agregarDomicilio(datos);
-				 * convenio.agregarContratante(datos);
-				 * convenio.agregarContratoConvenioPaquete(datos);
-				 * convenio.agregaDocumentacion(datos);
-				 */
+
+				convenio.agregarDomicilio(datos);
+
+				convenio.agregarContratante(datos);
+
+				convenio.agregarContratoConvenioPaquete(datos);
+				convenio.agregaDocumentacion(datos);
 
 			} catch (Exception e) {
 				session.rollback();

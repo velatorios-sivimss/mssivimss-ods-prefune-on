@@ -28,5 +28,14 @@ public class AgregarConvenioPersonaDTO {
     private String municipio;
     private String estado;
     private Integer idValidaDocumento;
+    private boolean validaIne;
+    private String nombreIne;
+    private boolean validaCurp;
+    private String nombreCurp;
+    private boolean validaRfc;
+    private String nombreRfc;
+    private String archivoIne;
+    private String archivoCurp;
+    private String archivoRfc;
 
 }

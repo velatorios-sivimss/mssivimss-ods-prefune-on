@@ -61,7 +61,7 @@ public interface ConvenioPFMapper {
 			" #{datos.cp}, " +
 			" #{datos.colonia}, " +
 			" #{datos.municipio}, " +
-			" estado}, " +
+			" #{datos.estado}, " +
 			" #{datos.idUsuario}, " +
 			" CURRENT_DATE() " +
 			" )  ")
