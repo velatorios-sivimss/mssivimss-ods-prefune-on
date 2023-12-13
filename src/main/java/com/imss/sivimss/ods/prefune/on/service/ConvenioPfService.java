@@ -37,7 +37,8 @@ public interface ConvenioPfService {
 	public Response<Object> desactivarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication)
 			throws IOException;
 
-	public Response<Object> consultaDetalleConvenio(Authentication authentication) throws IOException;
+	public Response<Object> consultaGeneralConvenio(Integer idVelatorio, Authentication authentication)
+			throws IOException;
 
 	public Response<Object> altaPlanPFPersona(AgregarConvenioPersonaDTO request, Authentication authentication)
 			throws IOException;

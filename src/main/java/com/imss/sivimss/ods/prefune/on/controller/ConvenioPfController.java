@@ -166,13 +166,13 @@ public class ConvenioPfController {
 						HttpStatus.valueOf(response.getCodigo())));
 	}
 
-	@GetMapping("/datos-generales-contratante")
+	@GetMapping("/datos-generales-contratante/{idVelatorio}")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDatosGeneralesUsuario")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackDatosGeneralesUsuario")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object> datosGeneralesUsuario(
+	public CompletableFuture<Object> datosGeneralesUsuario(@PathVariable(required = true) Integer idVelatorio,
 			Authentication authentication) throws IOException {
-		Response<Object> response = convenioPfService.consultaDetalleConvenio(authentication);
+		Response<Object> response = convenioPfService.consultaGeneralConvenio(idVelatorio, authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
@@ -302,7 +302,7 @@ public class ConvenioPfController {
 	}
 
 	@SuppressWarnings("unused")
-	private CompletableFuture<Object> fallbackDatosGeneralesUsuario(
+	private CompletableFuture<Object> fallbackDatosGeneralesUsuario(Integer idVelatorio,
 			Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());

@@ -26,5 +26,6 @@ public class AgregarBeneficiarioDTO {
     private Integer idContratante;
     private boolean actualizaArchivo;
     private Integer idUsuario;
+    private Integer idVelatorio;
 
 }

@@ -159,12 +159,16 @@ public interface BeneficiariosMapper {
 			" when p.NUM_SEXO = 2 then 'Hombre' " +
 			" ELSE 'Otro' END sexo, " +
 			" p.REF_OTRO_SEXO AS otroSexo,  " +
-			" p.FEC_NAC AS fechaNacimiento, " +
+			" DATE_FORMAT(p.FEC_NAC,'%d-%m-%Y') AS fechaNacimiento, " +
 			" p.ID_ESTADO AS idEstado, " +
 			" p.REF_TELEFONO AS telefono, " +
 			" p.REF_CORREO AS correo, " +
 			" p.TIP_PERSONA AS tipoPersona, " +
-			" e.DES_ESTADO AS estado " +
+			" e.DES_ESTADO AS estado ," +
+			"(SELECT d.DES_DELEGACION FROM SVC_VELATORIO v " +
+			"JOIN SVC_DELEGACION d ON d.ID_DELEGACION= v.ID_DELEGACION " +
+			"WHERE v.ID_VELATORIO = #{in.idVelatorio}) AS delegacion ," +
+			" DATE_FORMAT(DATE_ADD( CURDATE(), INTERVAL 1 DAY),'%d-%m-%Y') AS fecha " +
 			" FROM SVC_CONTRATANTE c " +
 			" JOIN SVC_PERSONA p ON p.ID_PERSONA = c.ID_PERSONA " +
 			" LEFT JOIN svc_estado e ON e.ID_ESTADO= p.ID_ESTADO " +

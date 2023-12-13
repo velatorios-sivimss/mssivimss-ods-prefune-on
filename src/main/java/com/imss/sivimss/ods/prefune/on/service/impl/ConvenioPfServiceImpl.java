@@ -471,7 +471,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	}
 
-	public Response<Object> consultaDetalleConvenio(Authentication authentication)
+	public Response<Object> consultaGeneralConvenio(Integer idVelatorio, Authentication authentication)
 			throws IOException {
 		Integer idContratante = 111;
 		Map<String, Object> datosGenerales = new HashMap<>();
@@ -482,7 +482,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 				AgregarBeneficiarioDTO contratante = new AgregarBeneficiarioDTO();
 				contratante.setIdContratante(idContratante);
-
+				contratante.setIdVelatorio(idVelatorio);
+				System.out.println(idVelatorio);
 				datosGenerales = mapperQuery.datosPersonalesContratante(contratante);
 
 			} catch (Exception e) {
