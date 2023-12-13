@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.model.response.MapaVelatoriosResponse;
+import com.imss.sivimss.ods.prefune.on.model.response.PaqueteResponse;
 import com.imss.sivimss.ods.prefune.on.service.CatalogosService;
 import com.imss.sivimss.ods.prefune.on.service.VelatorioService;
 import com.imss.sivimss.ods.prefune.on.service.beans.Catalogos;
@@ -128,12 +129,28 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService{
 	@Override
 	public Response<Object> consultarCatalogoPaquete(Integer idVelatorio,Authentication authentication) throws IOException {
 		
-		SqlSessionFactory sqlSessionFactory= myBatisConfig.buildqlSessionFactory();
+		List<PaqueteResponse>paqueteResponses= new ArrayList<>();	
+		List<Map<String, Object>> resultPaquetes = new ArrayList<>();
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		
 		try(SqlSession sqlSession= sqlSessionFactory.openSession()) {
 			Consultas consultas= sqlSession.getMapper(Consultas.class);
-			resultServiciosCatalogo=consultas.selectNativeQuery(catalogos.obtenerPaquetes(idVelatorio));
-			
-			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
+			resultPaquetes=consultas.selectNativeQuery(catalogos.obtenerPaquetes(idVelatorio));
+			paqueteResponses=Arrays.asList(mapper.map(resultPaquetes, PaqueteResponse[].class));
+			paqueteResponses.stream().forEach(registro->{
+				resultServiciosVelatorios=consultas.selectNativeQuery(catalogos.obtenerCaracteristicasPaquete(registro.getIdPaquete()));
+				
+				Object [] arreglo= new Object[resultServiciosVelatorios.size()];
+				i=0;
+				resultServiciosVelatorios.forEach(r->{
+					arreglo[i]= r.get("concepto");
+					i++;
+					registro.setServiciosPaquetes(arreglo);
+				});
+				
+				
+			});
+			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, paqueteResponses);
 		} catch (Exception e) {
 			log.info(ERROR,e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
