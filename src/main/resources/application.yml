@@ -15,9 +15,9 @@ spring:
   datasource:
     platform: mariadb
     driverClassName: org.mariadb.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/localds
-    username: root
-    password: root
+    url: jdbc:mysql://10.102.44.18:3306/SIVIBDDS?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=America/Mexico_City #jdbc:mysql://10.102.44.18:3306/SIVIBDDS
+    username: SIVI_USER #root #SIVI_USER #pmsoluciones
+    password: 51V1_US3R #Maria2023 #51V1_US3R #Tr1357.* 
     timeBetweenEvictionRunsMillis: 1000
     testWhileIdle: true
     validationQuery: SELECT 1
@@ -56,6 +56,7 @@ logging:
 endpoints:
   ms-reportes: http://localhost:8088/mssivimss-reportes-jasp/v1/generales/generar-reporte
   renapo: "http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/externos/renapo/curp"
+  sepomex: "http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/domicilios/asentamientos/codigoPostal"
 
 reporte:
   convenio-nuevo-pf: reportes/plantilla/ANEXO5_CONVENIO_PF_NUEVO.jrxml
