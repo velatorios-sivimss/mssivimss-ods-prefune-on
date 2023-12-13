@@ -93,7 +93,37 @@ public class Catalogos {
          log.info("obtenerPaquetes: {}",query);
          
          return query;
-         
- }
+      }
+    
+    public String obtenerCaracteristicasPaquete(Integer idPaquete) {
+		SelectQueryUtil selectQueryUtilServicio= new SelectQueryUtil();
+		selectQueryUtilServicio.select(
+				"SS.DES_SERVICIO AS concepto");
+		selectQueryUtilServicio.from("SVT_PAQUETE SP")
+		.innerJoin("SVT_PAQUETE_SERVICIO SPS", "SPS.ID_PAQUETE = SP.ID_PAQUETE")
+		.leftJoin("SVT_SERVICIO SS", "SS.ID_SERVICIO =SPS.ID_SERVICIO")
+		.innerJoin("SVC_TIPO_SERVICIO STPS", "SS.ID_TIPO_SERVICIO = STPS.ID_TIPO_SERVICIO")
+		.where("SP.ID_PAQUETE = :idPaquete")
+		.and("SPS.IND_ACTIVO = 1")
+		.setParameter("idPaquete", idPaquete);
+		
+		SelectQueryUtil selectQueryUtilArticulo= new SelectQueryUtil();
+		selectQueryUtilArticulo.select("SCA.DES_CATEGORIA_ARTICULO AS concepto");
+		
+		selectQueryUtilArticulo.from("SVT_PAQUETE SP")
+		.innerJoin("SVT_PAQUETE_ARTICULO SPA", "SP.ID_PAQUETE= SPA.ID_PAQUETE ")
+		.leftJoin("SVC_CATEGORIA_ARTICULO SCA", "SCA.ID_CATEGORIA_ARTICULO = SPA.ID_CATEGORIA_ARTICULO")
+		.where("SP.ID_PAQUETE = :idPaquete")
+		.and("SPA.IND_ACTIVO = 1")
+		.setParameter("idPaquete", idPaquete);
+		
+		query=selectQueryUtilServicio.union(selectQueryUtilArticulo);
+		log.info(query);
+
+		
+		return query;
+	}
+    
+    
 
 }
