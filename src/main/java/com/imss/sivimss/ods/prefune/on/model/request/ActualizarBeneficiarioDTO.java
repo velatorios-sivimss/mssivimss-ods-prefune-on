@@ -16,5 +16,6 @@ public class ActualizarBeneficiarioDTO {
     private Integer validaActa;
     private Integer idContratante;
     private boolean actualizaArchivo;
+    private Integer idUsuario;
 
 }

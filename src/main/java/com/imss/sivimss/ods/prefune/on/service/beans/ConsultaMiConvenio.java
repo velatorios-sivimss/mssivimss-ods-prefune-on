@@ -58,7 +58,7 @@ public class ConsultaMiConvenio {
 
 		selectQueryUtil.select("SCP.ID_CONVENIO_PF AS idConvenio",
 				"SC.ID_CONTRATANTE AS idContratante",
-				"SP.CVE_CURP AS curp",
+				"SP.CVE_CURP AS curp ",
 				"SCP.ID_VELATORIO AS idVelatorio",
 				"V.DES_VELATORIO AS velatorio",
 				"SECP.DES_ESTATUS AS estatus",
@@ -140,6 +140,7 @@ public class ConsultaMiConvenio {
 		queryUtil.select("SCP.ID_ESTATUS_CONVENIO AS idEstatusConvenio",
 				// "RPF.ID_ESTATUS AS estatusRenovacion",
 				"IF(SCP.ID_TIPO_PREVISION=1, 'Plan Nuevo', 'Plan Anterior') AS previsionFuneraria",
+				"SCP.ID_TIPO_PREVISION AS tipoPrevision",
 				"DATE_FORMAT(SCP.FEC_ALTA , '%d-%m-%Y') AS fecContratacion",
 				"IF(SCP.IND_RENOVACION=false, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d-%m-%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d-%m-%Y')) AS fecVigencia",
 				"PAQ.MON_PRECIO AS cuotaRecuperacion",
@@ -207,10 +208,8 @@ public class ConsultaMiConvenio {
 		return query;
 	}
 
-
 	public String consultarCurpRfc(String curp) {
 
-		
 		SelectQueryUtil selectQueryUtilCurp = new SelectQueryUtil();
 		selectQueryUtilCurp
 				.select("SP.ID_PERSONA as idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss",
@@ -227,7 +226,5 @@ public class ConsultaMiConvenio {
 		return query;
 
 	}
-
-
 
 }
