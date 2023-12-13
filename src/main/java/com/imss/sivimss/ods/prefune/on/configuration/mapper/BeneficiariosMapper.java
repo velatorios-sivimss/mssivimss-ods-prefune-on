@@ -165,8 +165,8 @@ public interface BeneficiariosMapper {
 			" p.REF_CORREO AS correo, " +
 			" p.TIP_PERSONA AS tipoPersona, " +
 			" e.DES_ESTADO AS estado " +
-			" FROM svc_contratante c " +
-			" JOIN svc_persona p ON p.ID_PERSONA = c.ID_PERSONA " +
+			" FROM SVC_CONTRATANTE c " +
+			" JOIN SVC_PERSONA p ON p.ID_PERSONA = c.ID_PERSONA " +
 			" LEFT JOIN svc_estado e ON e.ID_ESTADO= p.ID_ESTADO " +
 			" WHERE c.ID_CONTRATANTE=  #{in.idContratante} ")
 	public Map<String, Object> datosPersonalesContratante(@Param("in") AgregarBeneficiarioDTO persona);
