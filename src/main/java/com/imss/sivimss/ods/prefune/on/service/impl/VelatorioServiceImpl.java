@@ -179,8 +179,13 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService{
 	@Override
 	public Response<Object> consultarCodigoPostal(String codigoPostal, Authentication authentication)
 			throws IOException {
-		Response<Object>response=providerRestTemplate.consumirServicioExternoGet(urlSepomex+"/"+codigoPostal);
-		return MensajeResponseUtil.mensajeResponseExterno(response, CODIGO_POSTAL_NO_EXISTE, SERVICIO_SEPOMEX_NO_DISPONIBLE	);
+		try {
+			Response<Object>response=providerRestTemplate.consumirServicioExternoGet(urlSepomex+"/"+codigoPostal);
+		    return MensajeResponseUtil.mensajeResponseExterno(response, CODIGO_POSTAL_NO_EXISTE, SERVICIO_SEPOMEX_NO_DISPONIBLE	);
+		} catch (Exception e) {
+			return new Response<>(true, 200,CODIGO_POSTAL_NO_EXISTE);
+		}
+		
 	}
 
 
