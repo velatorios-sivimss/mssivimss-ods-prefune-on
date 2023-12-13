@@ -3,10 +3,8 @@ package com.imss.sivimss.ods.prefune.on.service.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.apache.ibatis.session.SqlSession;
@@ -15,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -25,10 +24,11 @@ import com.imss.sivimss.ods.prefune.on.model.response.MapaVelatoriosResponse;
 import com.imss.sivimss.ods.prefune.on.service.CatalogosService;
 import com.imss.sivimss.ods.prefune.on.service.VelatorioService;
 import com.imss.sivimss.ods.prefune.on.service.beans.Catalogos;
-import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
 import com.imss.sivimss.ods.prefune.on.service.beans.MapaVelatorio;
 import com.imss.sivimss.ods.prefune.on.utils.AppConstantes;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
+import com.imss.sivimss.ods.prefune.on.utils.MensajeResponseUtil;
+import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
 
 @Service
@@ -58,6 +58,16 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService{
 	private List<Map<String, Object>> resultServiciosCatalogo = new ArrayList<>();
 	
 	private int i;
+	
+	private static final String CODIGO_POSTAL_NO_EXISTE = "185"; // El codigo postal no existe.
+	
+	private static final String SERVICIO_SEPOMEX_NO_DISPONIBLE = "181"; // El servicio de SEPOMEX no esta disponible.
+	
+	@Value("${endpoints.sepomex}")
+	private String urlSepomex;
+	
+	@Autowired
+	private ProviderServiceRestTemplate providerRestTemplate;
 	
 	@Override
 	public Response<Object> consultarServiciosVelatorios(Authentication authentication) throws IOException {
@@ -147,6 +157,13 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService{
 					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
 			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
 		}
+	}
+
+	@Override
+	public Response<Object> consultarCodigoPostal(String codigoPostal, Authentication authentication)
+			throws IOException {
+		Response<Object>response=providerRestTemplate.consumirServicioExternoGet(urlSepomex+"/"+codigoPostal);
+		return MensajeResponseUtil.mensajeResponseExterno(response, CODIGO_POSTAL_NO_EXISTE, SERVICIO_SEPOMEX_NO_DISPONIBLE	);
 	}
 
 
