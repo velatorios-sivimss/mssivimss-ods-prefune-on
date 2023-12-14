@@ -200,4 +200,23 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService 
 
 	}
 
+	@Override
+	public Response<Object> consultarPais(Authentication authentication) throws IOException {
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			Consultas consultas = sqlSession.getMapper(Consultas.class);
+			resultServiciosCatalogo = consultas.selectNativeQuery(catalogos.consultarPaises());
+
+			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
+		} catch (Exception e) {
+			log.info(ERROR, e.getCause().getMessage());
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+					authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO,
+					Arrays.asList());
+		}
+	}
+
 }

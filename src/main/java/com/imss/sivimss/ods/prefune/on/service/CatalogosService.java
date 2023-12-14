@@ -16,4 +16,6 @@ public interface CatalogosService {
 
 	Response<Object>consultarCodigoPostal(String codigoPostal,Authentication authentication) throws IOException;
 	
+	Response<Object>consultarPais(Authentication authentication) throws IOException;
+	
 }
