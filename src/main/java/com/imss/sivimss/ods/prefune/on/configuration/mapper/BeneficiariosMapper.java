@@ -151,14 +151,15 @@ public interface BeneficiariosMapper {
 
 	@Select(value = "SELECT c.ID_CONTRATANTE AS idContratante,  " +
 			" c.ID_PERSONA AS idPersona, c.ID_DOMICILIO AS idDomicilio, " +
-			" p.CVE_RFC AS rfc, p.CVE_CURP AS curp, p.CVE_NSS AS nss,  " +
+			" ifnull(p.CVE_RFC,'') AS rfc, p.CVE_CURP AS curp, p.CVE_NSS AS nss,  " +
 			" p.NOM_PERSONA AS nombre, p.NOM_PRIMER_APELLIDO AS primerApellido, " +
 			" p.NOM_SEGUNDO_APELLIDO AS segundoApellido, " +
+			" ifnull(c.CVE_MATRICULA,'') as matricula," +
 			" p.NUM_SEXO AS idSexo,  " +
 			" case when p.NUM_SEXO = 1 then 'Mujer' " +
 			" when p.NUM_SEXO = 2 then 'Hombre' " +
 			" ELSE 'Otro' END sexo, " +
-			" p.REF_OTRO_SEXO AS otroSexo,  " +
+			" ifnull(p.REF_OTRO_SEXO,'') AS otroSexo,  " +
 			" DATE_FORMAT(p.FEC_NAC,'%d-%m-%Y') AS fechaNacimiento, " +
 			" p.ID_ESTADO AS idEstado, " +
 			" p.REF_TELEFONO AS telefono, " +
