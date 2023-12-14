@@ -122,5 +122,17 @@ public class Catalogos {
 
     return query;
   }
+  
+  public String consultarPaises() {
+	    SelectQueryUtil selectQueryUtil = new SelectQueryUtil();
+	    selectQueryUtil.select("SP.ID_PAIS AS value", "SP.DES_PAIS AS label")
+	        .from("SVC_PAIS SP ")
+	        .orderBy("SP.DES_PAIS ASC ");
+
+	    query = selectQueryUtil.build();
+	    log.info("consultarPaises: {}", query);
+
+	    return query;
+	  }
 
 }
