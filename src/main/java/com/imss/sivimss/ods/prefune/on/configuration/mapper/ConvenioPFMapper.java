@@ -1,9 +1,13 @@
 package com.imss.sivimss.ods.prefune.on.configuration.mapper;
 
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 
 public interface ConvenioPFMapper {
@@ -139,5 +143,10 @@ public interface ConvenioPFMapper {
 			" ) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idValidaDocumento", keyColumn = "ID_VALIDACION_DOCUMENTO")
 	public int agregaDocumentacion(@Param("datos") AgregarConvenioPersonaDTO datos);
+
+	@Select(value = "SELECT DES_FOLIO AS folio " +
+			"FROM SVT_CONVENIO_PF " +
+			"WHERE ID_CONVENIO_PF = #{datos.idConvenioPF}")
+	public Map<String, Object> folioConvenio(@Param("datos") AgregarConvenioPersonaDTO datos);
 
 }

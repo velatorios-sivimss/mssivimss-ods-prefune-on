@@ -513,13 +513,20 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 			try {
 				convenio.agregarConvenioPF(datos);
-
 				convenio.agregarDomicilio(datos);
-
 				convenio.agregarContratante(datos);
-
 				convenio.agregarContratoConvenioPaquete(datos);
 				convenio.agregaDocumentacion(datos);
+				ObjectMapper objMapper = new ObjectMapper();
+				Object datosConsulta;
+				String json;
+				JsonNode datosJson;
+
+				datosConsulta = convenio.folioConvenio(datos);
+				json = new ObjectMapper().writeValueAsString(datosConsulta);
+				datosJson = objMapper.readTree(json);
+				String folio = datosJson.get("folio").asText();
+				datos.setFolio(folio);
 
 			} catch (Exception e) {
 				session.rollback();
@@ -530,7 +537,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						authentication);
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
-			// session.commit();
+			session.commit();
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
