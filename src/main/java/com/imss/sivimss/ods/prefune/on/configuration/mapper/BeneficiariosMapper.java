@@ -93,7 +93,13 @@ public interface BeneficiariosMapper {
 			+ "IND_ACTA_NACIMIENTO  = #{in.validaActa},"
 			+ "REF_UBICACION_ACTA_NACIMIENTO=#{in.nombreActa},"
 			+ "REF_DOCUMENTO_BENEFICIARIO=#{in.documento} "
-			+ "WHERE ID_CONTRATANTE_BENEFICIARIOS = #{in.idContratante} "
+			+ "WHERE ID_CONTRATANTE_BENEFICIARIOS = (SELECT cb.ID_CONTRATANTE_BENEFICIARIOS \r\n" + //
+			"from SVT_CONTRATANTE_BENEFICIARIOS cb\r\n" + //
+			"WHERE cb.ID_CONTRA_PAQ_CONVENIO_PF= (\r\n" + //
+			"SELECT pc.ID_CONTRA_PAQ_CONVENIO_PF \r\n" + //
+			"FROM SVT_CONVENIO_PF pf\r\n" + //
+			"join SVT_CONTRA_PAQ_CONVENIO_PF pc ON pc.ID_CONVENIO_PF=pf.ID_CONVENIO_PF\r\n" + //
+			"WHERE pf.ID_CONVENIO_PF = #{in.idConvenio})) "
 			+ " AND ID_PERSONA = #{in.idPersona}")
 	public int actualizarContratanteDocumento2(@Param("in") AgregarBeneficiarioDTO persona);
 

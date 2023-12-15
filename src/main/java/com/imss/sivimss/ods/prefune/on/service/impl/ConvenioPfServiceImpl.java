@@ -353,13 +353,17 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					datosJson = objMapper.readTree(json);
 					Integer validaExistencia = datosJson.get("noPersona").asInt();
 					Integer estatusBeneficiario = datosJson.get("estatus").asInt();
+
+					actualizarBeneficiarioDTO.setCorreo(datos.getCorreo());
+					actualizarBeneficiarioDTO.setTelefono(datos.getTelefono());
+					actualizarBeneficiarioDTO.setIdPersona(datos.getIdPersona());
 					if (validaExistencia > 0 && estatusBeneficiario == 1)
 						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.BENEFICIARIO_REGISTRADO,
 								null);
-					else if (validaExistencia == 0 || estatusBeneficiario < 0) {
-						actualizarBeneficiarioDTO.setCorreo(datos.getCorreo());
-						actualizarBeneficiarioDTO.setTelefono(datos.getTelefono());
-						actualizarBeneficiarioDTO.setIdPersona(datos.getIdPersona());
+					else if (validaExistencia == 0 && estatusBeneficiario > 0) {
+
+						validaBeneficiarioAsociado = true;
+					} else if (validaExistencia == 0 && estatusBeneficiario == -1) {
 						validaBeneficiarioAsociado = true;
 					} else {
 						validaBeneficiarioAsociado = false;
@@ -388,6 +392,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					log.info("se agrega beneficiario");
 
 				} else {
+					log.info("datos {}", datos.getIdContratanteBeneficiarios());
+					log.info("datos {}", datos.getIdPersona());
 					// se actualzia el registro si estaba inactivo
 					log.info("actualizando beneficiario");
 					mapperQuery.actualizarContratanteDocumento2(datos);
