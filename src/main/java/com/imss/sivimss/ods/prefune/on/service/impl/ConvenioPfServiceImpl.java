@@ -278,9 +278,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			try {
 				datos.setIdUsuario(idUsuario);
 				if (datos.isActualizaArchivo())
-					mapperQuery.actualizarContratante(datos);
-
-				mapperQuery.actualizarContratanteDocumento(datos);
+					mapperQuery.actualizarContratanteDocumento(datos);
 				mapperQuery.actualizarPersona(datos);
 
 			} catch (Exception e) {
@@ -358,10 +356,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					if (validaExistencia > 0 && estatusBeneficiario == 1)
 						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.BENEFICIARIO_REGISTRADO,
 								null);
-					else if (validaExistencia > 0 && estatusBeneficiario == 0) {
+					else if (validaExistencia == 0 || estatusBeneficiario < 0) {
 						actualizarBeneficiarioDTO.setCorreo(datos.getCorreo());
 						actualizarBeneficiarioDTO.setTelefono(datos.getTelefono());
 						actualizarBeneficiarioDTO.setIdPersona(datos.getIdPersona());
+						validaBeneficiarioAsociado = true;
+					} else {
 						validaBeneficiarioAsociado = false;
 					}
 

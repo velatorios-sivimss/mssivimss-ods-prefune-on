@@ -35,19 +35,6 @@ public interface BeneficiariosMapper {
 			+ " AND ID_PERSONA = #{in.idPersona}")
 	public int actualizarContratanteDocumento(@Param("in") ActualizarBeneficiarioDTO persona);
 
-	@Update(value = ""
-			+ "UPDATE SVT_CONTRATANTE_BENEFICIARIOS  "
-			+ "SET  "
-			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
-			+ "IND_INE_BENEFICIARIO = #{in.validaIne} ,"
-			+ "REF_UBICACION_INE_BENEFICIARIO = #{in.nombreIne}, "
-			+ "IND_ACTA_NACIMIENTO  = #{in.validaActa}, "
-			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ,"
-			+ "REF_UBICACION_ACTA_NACIMIENTO=#{in.nombreActa} "
-			+ "WHERE ID_CONTRATANTE_BENEFICIARIOS = #{in.idContratante} "
-			+ "AND ID_PERSONA = #{in.idPersona} ")
-	public int actualizarContratante(@Param("in") ActualizarBeneficiarioDTO persona);
-
 	@Select(value = "SELECT COUNT(b.ID_CONTRATANTE_BENEFICIARIOS) AS existe " +
 			" FROM SVT_CONTRATANTE_BENEFICIARIOS b " +
 			" JOIN SVC_PERSONA sp ON sp.ID_PERSONA= b.ID_PERSONA" +
