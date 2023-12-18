@@ -33,9 +33,11 @@ import com.imss.sivimss.ods.prefune.on.configuration.mapper.BeneficiariosMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioPFMapper;
+import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioPFMapperEmpresa;
 import com.imss.sivimss.ods.prefune.on.model.entity.ConvenioEntityMyBatis;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
@@ -341,7 +343,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 
 			try {
-				// Object personaExiste;
+
 				ObjectMapper objMapper = new ObjectMapper();
 				Object personaAsociada;
 				String json;
@@ -381,7 +383,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					// se inserta el registro
 					log.info("insertando persona");
 					mapperQuery.insertaPersona(datos);
-					log.info("se agrega persona");
+					log.info("persona agregada");
 
 				}
 
@@ -389,15 +391,14 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					// se agregar nuevo registro en contratante beneficiario
 					log.info("insertando beneficiario");
 					mapperQuery.insertaBeneficiarioContratante(datos);
-					log.info("se agrega beneficiario");
+					log.info("beneficiario agregado");
 
 				} else {
-					log.info("datos {}", datos.getIdContratanteBeneficiarios());
-					log.info("datos {}", datos.getIdPersona());
+
 					// se actualzia el registro si estaba inactivo
 					log.info("actualizando beneficiario");
 					mapperQuery.actualizarContratanteDocumento2(datos);
-					log.info("se actuliza beneficiario");
+					log.info("finalizando actualizacion beneficiario");
 				}
 
 			} catch (Exception e) {
@@ -458,8 +459,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			try {
 
 				datos.setIdUsuario(idUsuario);
+				log.info("desactivando beneficiario");
 				mapperQuery.desactivarBeneficiario(datos);
-
+				log.info("beneficiario desactivado");
 			} catch (Exception e) {
 				session.rollback();
 				log.info("{}", e.getMessage());
@@ -489,8 +491,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				AgregarBeneficiarioDTO contratante = new AgregarBeneficiarioDTO();
 				contratante.setIdContratante(idContratante);
 				contratante.setIdVelatorio(idVelatorio);
-				System.out.println(idVelatorio);
+				log.info("buscando datos personales contratante");
 				datosGenerales = mapperQuery.datosPersonalesContratante(contratante);
+				log.info("finalizando busqueda de datos personales contratante");
 
 			} catch (Exception e) {
 				session.rollback();
@@ -518,11 +521,21 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
 
 			try {
+				log.info("agregando convenio por persona");
 				convenio.agregarConvenioPF(datos);
+				log.info("finalizando convenio por persona");
+				log.info("agregando domicolio por persona");
 				convenio.agregarDomicilio(datos);
+				log.info("finalizando domiclio por persona");
+				log.info("agregando contratante por persona");
 				convenio.agregarContratante(datos);
+				log.info("finalizando contratante por persona");
+				log.info("agregando convenio paquete  por persona");
 				convenio.agregarContratoConvenioPaquete(datos);
+				log.info("finalizando convenio paquete por persona");
+				log.info("agregando documentacion convenio por persona");
 				convenio.agregaDocumentacion(datos);
+				log.info("finalizando documentacion convenio por persona");
 				ObjectMapper objMapper = new ObjectMapper();
 				Object datosConsulta;
 				String json;
@@ -549,6 +562,52 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
 				datos);
 
+	}
+
+	public Response<Object> altaPlanPFEmpresa(AgregarConvenioEmpresaDTO datos, Authentication authentication)
+			throws IOException {
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		Integer idUsuario = 1;
+		datos.setIdUsuario(idUsuario);
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ConvenioPFMapperEmpresa convenio = session.getMapper(ConvenioPFMapperEmpresa.class);
+
+			try {
+				log.info("agregando convenio por empresa");
+				convenio.agregarConvenioPFEmpresa(datos);
+				log.info("finaliza insercion por  empresa");
+				log.info("agregando domicilio por empresa");
+				convenio.agregarDomicilio(datos);
+				log.info("finaliza domicilio por empresa");
+				log.info("agregando datos por empresa");
+				convenio.agregarEmpresaConvenioPF(datos);
+				log.info("fianlizando datos por empresa");
+
+				ObjectMapper objMapper = new ObjectMapper();
+				Object datosConsulta;
+				String json;
+				JsonNode datosJson;
+
+				datosConsulta = convenio.folioConvenio(datos);
+				json = new ObjectMapper().writeValueAsString(datosConsulta);
+				datosJson = objMapper.readTree(json);
+				String folio = datosJson.get("folio").asText();
+				datos.setFolio(folio);
+
+			} catch (Exception e) {
+				session.rollback();
+				log.info("{}", e.getMessage());
+				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+						this.getClass().getPackage().toString(),
+						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+						authentication);
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+			}
+			// session.commit();
+		}
+
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
+				datos);
 	}
 
 }

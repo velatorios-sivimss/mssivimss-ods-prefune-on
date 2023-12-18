@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
@@ -190,6 +191,18 @@ public class ConvenioPfController {
 						HttpStatus.valueOf(response.getCodigo())));
 	}
 
+	@PostMapping("/alta-plan-pf/empresa")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackAltaPlanEmpresa")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackAltaPlanEmpresa")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> altaPlanPFEmpresa(@RequestBody AgregarConvenioEmpresaDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.altaPlanPFEmpresa(request, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
+	}
 	/*
 	 * 
 	 * FallBack
@@ -315,6 +328,18 @@ public class ConvenioPfController {
 
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackAltaPlanPersona(@RequestBody AgregarConvenioPersonaDTO request,
+			Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<Object> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), UPDATE, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackAltaPlanEmpresa(@RequestBody AgregarConvenioEmpresaDTO request,
 			Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<Object> response = providerRestTemplate.respuestaProvider(e.getMessage());

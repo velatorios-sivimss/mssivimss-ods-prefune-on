@@ -16,6 +16,7 @@ import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.PersonaMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioPFMapper;
+import com.imss.sivimss.ods.prefune.on.configuration.mapper.ConvenioPFMapperEmpresa;
 
 @Service
 public class MyBatisConfig {
@@ -46,6 +47,7 @@ public class MyBatisConfig {
 		configuration.addMapper(ConvenioMapper.class);
 		configuration.addMapper(BeneficiariosMapper.class);
 		configuration.addMapper(ConvenioPFMapper.class);
+		configuration.addMapper(ConvenioPFMapperEmpresa.class);
 
 		SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
 
