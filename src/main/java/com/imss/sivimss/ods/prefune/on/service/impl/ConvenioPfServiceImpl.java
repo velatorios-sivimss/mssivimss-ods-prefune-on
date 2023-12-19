@@ -696,8 +696,6 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 								null);
 
 				}
-				// buscar si la persona ya fue agregada y esta inactiva
-				// si regresa 1 se actualiza el registro en caso contrario sigue le flujo normal
 
 				log.info("agregando domicilio por persona");
 				convenio.agregarDomicilio(datos);
