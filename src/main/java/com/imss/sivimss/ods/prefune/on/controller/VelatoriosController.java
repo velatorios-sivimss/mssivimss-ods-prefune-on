@@ -106,6 +106,16 @@ public class VelatoriosController {
 
 	}
 	
+	@GetMapping("consultar/estados")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object>consultarEstado(Authentication authentication) throws IOException{
+		Response<Object>response=catalogosService.consultarEstado(authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+
+	}
 	
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsulta(Authentication authentication,

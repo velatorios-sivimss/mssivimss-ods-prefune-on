@@ -18,4 +18,6 @@ public interface CatalogosService {
 	
 	Response<Object>consultarPais(Authentication authentication) throws IOException;
 	
+	Response<Object>consultarEstado(Authentication authentication) throws IOException;
+	
 }
