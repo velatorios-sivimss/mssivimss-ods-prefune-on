@@ -681,7 +681,23 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			try {
 				if (datos.getIdPersona() == 0) {
 					convenio.agregarPersona(datos);
+				} else {
+					ObjectMapper objMapper = new ObjectMapper();
+					Object datosConsulta;
+					String json;
+					JsonNode datosJson;
+
+					datosConsulta = convenio.personaAgregada(datos);
+					json = new ObjectMapper().writeValueAsString(datosConsulta);
+					datosJson = objMapper.readTree(json);
+					Integer total = datosJson.get("totalPersona").asInt();
+					if (total > 0)
+						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.PERSONA_REGISTRADA_ANTERIOR,
+								null);
+
 				}
+				// buscar si la persona ya fue agregada y esta inactiva
+				// si regresa 1 se actualiza el registro en caso contrario sigue le flujo normal
 
 				log.info("agregando domicilio por persona");
 				convenio.agregarDomicilio(datos);
@@ -705,7 +721,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						authentication);
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
-			// session.commit();
+			session.commit();
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,

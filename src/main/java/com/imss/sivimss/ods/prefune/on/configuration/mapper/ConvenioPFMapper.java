@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 
 public interface ConvenioPFMapper {
@@ -177,4 +176,13 @@ public interface ConvenioPFMapper {
 			" CURRENT_DATE())")
 	@Options(useGeneratedKeys = true, keyProperty = "out.idPersona", keyColumn = "ID_PERSONA")
 	public int agregarPersona(@Param("out") AgregarConvenioPersonaDTO persona);
+
+	@Select(value = "SELECT  COUNT( cp.ID_CONVENIO_PF) as totalPersona " +
+			"FROM SVT_CONTRA_PAQ_CONVENIO_PF  cp " +
+			"join SVC_CONTRATANTE c ON c.ID_CONTRATANTE = cp.ID_CONTRATANTE " +
+			"WHERE cp.ID_CONVENIO_PF = #{datos.idConvenioPF} " +
+			"AND c.ID_PERSONA = #{datos.idPersona} " +
+			"AND c.IND_ACTIVO = 1 ")
+	public Map<String, Object> personaAgregada(@Param("datos") AgregarConvenioPersonaDTO datos);
+
 }
