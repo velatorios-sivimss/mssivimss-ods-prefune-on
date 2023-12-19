@@ -135,5 +135,18 @@ public class Catalogos {
 
         return query;
     }
+    
+    public String consultarEstado() {
+        SelectQueryUtil selectQueryUtil = new SelectQueryUtil();
+        selectQueryUtil.select("SP.ID_ESTADO AS value", "SP.DES_ESTADO AS label")
+                .from("SVC_ESTADO SP ")
+                .where("ifnull(SP.DES_ESTADO,'') <> ''")
+                .orderBy("SP.DES_ESTADO ASC ");
+
+        query = selectQueryUtil.build();
+        log.info("consultarEstado: {}", query);
+
+        return query;
+    }
 
 }
