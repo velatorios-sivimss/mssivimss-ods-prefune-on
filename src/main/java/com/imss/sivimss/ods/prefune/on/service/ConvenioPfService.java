@@ -46,5 +46,8 @@ public interface ConvenioPfService {
 
 	public Response<Object> altaPlanPFEmpresa(AgregarConvenioEmpresaDTO datos, Authentication authentication)
 			throws IOException;
+	
+	public Response<Object> consultaPlanPFEmpresa(Integer idConvenio, Authentication authentication)
+			throws IOException;
 
 }
