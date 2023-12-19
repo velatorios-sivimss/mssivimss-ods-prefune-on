@@ -43,6 +43,8 @@ import com.imss.sivimss.ods.prefune.on.model.request.ConvenioRequest;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.response.BusquedaInformacionReporteResponse;
+import com.imss.sivimss.ods.prefune.on.model.response.ConvenioEmpresaResponse;
+import com.imss.sivimss.ods.prefune.on.model.response.DatosEmpresaResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.RenapoResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
@@ -88,6 +90,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	private final String ERROR = "error: {}";
 
 	private List<Map<String, Object>> resultServiciosCatalogo = new ArrayList<>();
+	
+	private DatosEmpresaResponse empresaResponse;
 
 	private static final String PERIODO_RENOVACION = "periodoRenovacion";
 	private static final String PATTERN = "dd-MM-yyyy";
@@ -608,6 +612,60 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
 				datos);
+	}
+
+	@Override
+	public Response<Object> consultaPlanPFEmpresa(Integer idConvenio, Authentication authentication)
+			throws IOException {
+		List<Map<String, Object>> resultDatosEmpresa = new ArrayList<>();
+		List<Map<String, Object>> resultDatosPersonaEmpresa = new ArrayList<>();
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		ConvenioEmpresaResponse convenioEmpresaResponse= new ConvenioEmpresaResponse();
+		List<DatosEmpresaResponse> datosEmpresaResponse= new ArrayList<>();
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+		
+			try {
+
+				Consultas consultas = session.getMapper(Consultas.class);
+				resultDatosEmpresa = consultas.selectNativeQuery(miConvenio.consultarDatosConvenioEmpresa(idConvenio));
+				resultDatosPersonaEmpresa = consultas.selectNativeQuery(miConvenio.consultarDatosConvenioEmpresaPersona(idConvenio));
+				datosEmpresaResponse=Arrays.asList(mapper.map(resultDatosEmpresa, DatosEmpresaResponse[].class));
+				datosEmpresaResponse.stream().forEach(r->{
+					 empresaResponse= DatosEmpresaResponse.builder()
+								.idConvenio(r.getIdConvenio())
+								.idEmpresa(r.getIdEmpresa())
+								.nombre(r.getNombre())
+								.razonSocial(r.getRazonSocial())
+								.rfc(r.getRfc())
+								.idPais(r.getIdPais())
+								.cp(r.getCp())
+								.calle(r.getCalle())
+								.colonia(r.getColonia())
+								.municipio(r.getMunicipio())
+								.estado(r.getEstado())
+								.numInterior(r.getNumInterior())
+								.numExterior(r.getNumExterior())
+								.telefono(r.getTelefono())
+								.correo(r.getCorreo())
+								.build();
+				});
+				convenioEmpresaResponse.setDatosEmpresaResponse(empresaResponse);
+				convenioEmpresaResponse.setPersonasEmpresa(resultDatosPersonaEmpresa);
+
+				return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioEmpresaResponse);
+				
+			} catch (Exception e) {
+				session.rollback();
+				log.info("{}", e.getMessage());
+				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+						this.getClass().getPackage().toString(),
+						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+						authentication);
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+			}
+
+		}
+	
 	}
 
 }
