@@ -105,6 +105,25 @@ public interface ConvenioPFMapperEmpresa {
 
 	// se terminan los datos por empresa
 
+	@Insert(value = "INSERT INTO SVC_CONTRATANTE  " +
+			" (  " +
+			" ID_PERSONA, " +
+			" CVE_MATRICULA, " +
+			" ID_DOMICILIO, " +
+			" FEC_ALTA, " +
+			" ID_USUARIO_ALTA, " +
+			" IND_ACTIVO) " +
+			" VALUES ( " +
+			" #{datos.idPersona}, " +
+			" #{datos.cveMatricula}, " +
+			" #{datos.idDomicilio}, " +
+			" CURRENT_DATE(), " +
+			" #{datos.idUsuario}, " +
+			" 1 " +
+			" )  ")
+	@Options(useGeneratedKeys = true, keyProperty = "datos.idContratante", keyColumn = "ID_CONTRATANTE")
+	public int agregarContratante(@Param("datos") AgregarConvenioEmpresaDTO datos);
+
 	@Insert(value = "INSERT INTO SVT_CONTRA_PAQ_CONVENIO_PF  " +
 			" (ID_CONTRATANTE,   " +
 			" ID_CONVENIO_PF,  " +

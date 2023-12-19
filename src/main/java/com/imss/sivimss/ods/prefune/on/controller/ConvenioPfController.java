@@ -203,7 +203,7 @@ public class ConvenioPfController {
 				.supplyAsync(() -> new ResponseEntity<>(response,
 						HttpStatus.valueOf(response.getCodigo())));
 	}
-	
+
 	@GetMapping("/empresa-convenio/{idConvenio}")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
@@ -214,7 +214,20 @@ public class ConvenioPfController {
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
-	
+
+	@PostMapping("/alta-persona-empresa")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackAltaPlanPersona")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackAltaPlanPersona")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> altaPersonaPFEmpresa(@RequestBody AgregarConvenioPersonaDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.altaPersonaPFEmpresa(request, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
+	}
+
 	/*
 	 * 
 	 * FallBack

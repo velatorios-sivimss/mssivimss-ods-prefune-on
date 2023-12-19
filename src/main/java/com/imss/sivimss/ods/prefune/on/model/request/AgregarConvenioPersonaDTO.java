@@ -17,7 +17,7 @@ public class AgregarConvenioPersonaDTO {
     private Integer idContratante;
     private Integer idEnfermedad;
     private String otraEnfermedad;
-    private String idPersona;
+    private Integer idPersona;
     private String cveMatricula;
     private Integer idDomicilio;
     private String calle;
@@ -37,5 +37,14 @@ public class AgregarConvenioPersonaDTO {
     private String archivoIne;
     private String archivoCurp;
     private String archivoRfc;
+    private Integer idPais;
+    private String rfc;
+    private String curp;
+    private String nombre;
+    private String primerApellido;
+    private String segundoApellido;
+    private String fechaNacimiento;
+    private String telefono;
+    private String correo;
 
 }

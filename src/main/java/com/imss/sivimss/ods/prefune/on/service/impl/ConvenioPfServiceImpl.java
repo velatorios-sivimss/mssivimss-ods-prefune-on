@@ -90,7 +90,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	private final String ERROR = "error: {}";
 
 	private List<Map<String, Object>> resultServiciosCatalogo = new ArrayList<>();
-	
+
 	private DatosEmpresaResponse empresaResponse;
 
 	private static final String PERIODO_RENOVACION = "periodoRenovacion";
@@ -528,7 +528,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				log.info("agregando convenio por persona");
 				convenio.agregarConvenioPF(datos);
 				log.info("finalizando convenio por persona");
-				log.info("agregando domicolio por persona");
+				log.info("agregando domicilio por persona");
 				convenio.agregarDomicilio(datos);
 				log.info("finalizando domiclio por persona");
 				log.info("agregando contratante por persona");
@@ -607,7 +607,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						authentication);
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
-			// session.commit();
+			session.commit();
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
@@ -620,40 +620,41 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		List<Map<String, Object>> resultDatosEmpresa = new ArrayList<>();
 		List<Map<String, Object>> resultDatosPersonaEmpresa = new ArrayList<>();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		ConvenioEmpresaResponse convenioEmpresaResponse= new ConvenioEmpresaResponse();
-		List<DatosEmpresaResponse> datosEmpresaResponse= new ArrayList<>();
+		ConvenioEmpresaResponse convenioEmpresaResponse = new ConvenioEmpresaResponse();
+		List<DatosEmpresaResponse> datosEmpresaResponse = new ArrayList<>();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-		
+
 			try {
 
 				Consultas consultas = session.getMapper(Consultas.class);
 				resultDatosEmpresa = consultas.selectNativeQuery(miConvenio.consultarDatosConvenioEmpresa(idConvenio));
-				resultDatosPersonaEmpresa = consultas.selectNativeQuery(miConvenio.consultarDatosConvenioEmpresaPersona(idConvenio));
-				datosEmpresaResponse=Arrays.asList(mapper.map(resultDatosEmpresa, DatosEmpresaResponse[].class));
-				datosEmpresaResponse.stream().forEach(r->{
-					 empresaResponse= DatosEmpresaResponse.builder()
-								.idConvenio(r.getIdConvenio())
-								.idEmpresa(r.getIdEmpresa())
-								.nombre(r.getNombre())
-								.razonSocial(r.getRazonSocial())
-								.rfc(r.getRfc())
-								.idPais(r.getIdPais())
-								.cp(r.getCp())
-								.calle(r.getCalle())
-								.colonia(r.getColonia())
-								.municipio(r.getMunicipio())
-								.estado(r.getEstado())
-								.numInterior(r.getNumInterior())
-								.numExterior(r.getNumExterior())
-								.telefono(r.getTelefono())
-								.correo(r.getCorreo())
-								.build();
+				resultDatosPersonaEmpresa = consultas
+						.selectNativeQuery(miConvenio.consultarDatosConvenioEmpresaPersona(idConvenio));
+				datosEmpresaResponse = Arrays.asList(mapper.map(resultDatosEmpresa, DatosEmpresaResponse[].class));
+				datosEmpresaResponse.stream().forEach(r -> {
+					empresaResponse = DatosEmpresaResponse.builder()
+							.idConvenio(r.getIdConvenio())
+							.idEmpresa(r.getIdEmpresa())
+							.nombre(r.getNombre())
+							.razonSocial(r.getRazonSocial())
+							.rfc(r.getRfc())
+							.idPais(r.getIdPais())
+							.cp(r.getCp())
+							.calle(r.getCalle())
+							.colonia(r.getColonia())
+							.municipio(r.getMunicipio())
+							.estado(r.getEstado())
+							.numInterior(r.getNumInterior())
+							.numExterior(r.getNumExterior())
+							.telefono(r.getTelefono())
+							.correo(r.getCorreo())
+							.build();
 				});
 				convenioEmpresaResponse.setDatosEmpresaResponse(empresaResponse);
 				convenioEmpresaResponse.setPersonasEmpresa(resultDatosPersonaEmpresa);
 
 				return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioEmpresaResponse);
-				
+
 			} catch (Exception e) {
 				session.rollback();
 				log.info("{}", e.getMessage());
@@ -665,7 +666,51 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			}
 
 		}
-	
+
+	}
+
+	public Response<Object> altaPersonaPFEmpresa(AgregarConvenioPersonaDTO datos, Authentication authentication)
+			throws IOException {
+
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		Integer idUsuario = 1;
+		datos.setIdUsuario(idUsuario);
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
+
+			try {
+				if (datos.getIdPersona() == 0) {
+					convenio.agregarPersona(datos);
+				}
+
+				log.info("agregando domicilio por persona");
+				convenio.agregarDomicilio(datos);
+				log.info("finalizando domiclio por persona");
+				log.info("agregando contratante por persona");
+				convenio.agregarContratante(datos);
+				log.info("finalizando contratante por persona");
+				log.info("agregando convenio paquete  por persona");
+				convenio.agregarContratoConvenioPaquete(datos);
+				log.info("finalizando convenio paquete por persona");
+				log.info("agregando documentacion convenio por persona");
+				convenio.agregaDocumentacion(datos);
+				log.info("finalizando documentacion convenio por persona");
+
+			} catch (Exception e) {
+				session.rollback();
+				log.info("{}", e.getMessage());
+				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+						this.getClass().getPackage().toString(),
+						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+						authentication);
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+			}
+			// session.commit();
+		}
+
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
+				datos);
+
 	}
 
 }

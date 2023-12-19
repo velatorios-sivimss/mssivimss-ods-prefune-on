@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 
 public interface ConvenioPFMapper {
@@ -147,4 +149,32 @@ public interface ConvenioPFMapper {
 			"WHERE ID_CONVENIO_PF = #{datos.idConvenioPF}")
 	public Map<String, Object> folioConvenio(@Param("datos") AgregarConvenioPersonaDTO datos);
 
+	@Insert(value = "INSERT INTO SVC_PERSONA  " +
+			"( " +
+			"CVE_RFC," +
+			"CVE_CURP, " +
+			"NOM_PERSONA," +
+			"NOM_PRIMER_APELLIDO," +
+			"NOM_SEGUNDO_APELLIDO," +
+			"FEC_NAC, " +
+			"ID_PAIS, " +
+			"REF_TELEFONO, " +
+			"REF_CORREO, " +
+			"ID_USUARIO_ALTA," +
+			"FEC_ALTA) " +
+			" VALUES " +
+			"( " +
+			"#{out.rfc}," +
+			"#{out.curp}, " +
+			"#{out.nombre}, " +
+			"#{out.primerApellido}, " +
+			"#{out.segundoApellido}, " +
+			"#{out.fechaNacimiento}, " +
+			"#{out.idPais}, " +
+			"#{out.telefono}, " +
+			"#{out.correo}, " +
+			"#{out.idUsuario}, " +
+			" CURRENT_DATE())")
+	@Options(useGeneratedKeys = true, keyProperty = "out.idPersona", keyColumn = "ID_PERSONA")
+	public int agregarPersona(@Param("out") AgregarConvenioPersonaDTO persona);
 }
