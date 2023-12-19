@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
-import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 
 public interface ConvenioPFMapperEmpresa {
 
@@ -124,7 +123,7 @@ public interface ConvenioPFMapperEmpresa {
 			"CURRENT_DATE()  " +
 			")  ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idContratoConvenioPaquete", keyColumn = "ID_CONTRA_PAQ_CONVENIO_PF")
-	public int agregarContratoConvenioPaquete(@Param("datos") AgregarConvenioPersonaDTO datos);
+	public int agregarContratoConvenioPaquete(@Param("datos") AgregarConvenioEmpresaDTO datos);
 
 	@Insert(value = "INSERT INTO SVC_VALIDA_DOCS_CONVENIO_PF " +
 			" (" +
@@ -157,6 +156,6 @@ public interface ConvenioPFMapperEmpresa {
 			" CURRENT_DATE()" +
 			" ) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idValidaDocumento", keyColumn = "ID_VALIDACION_DOCUMENTO")
-	public int agregaDocumentacion(@Param("datos") AgregarConvenioPersonaDTO datos);
+	public int agregaDocumentacion(@Param("datos") AgregarConvenioEmpresaDTO datos);
 
 }
