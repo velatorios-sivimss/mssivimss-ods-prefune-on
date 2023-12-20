@@ -84,6 +84,7 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
             datosPdf.put("folio", resultFolio.get(0).get("DES_FOLIO").toString());
             datosPdf.put("planPF", "Prevision Funeraria Plan Nuevo");
             datosPdf.put("directoraFideicomiso", "Dra. Cristinne Leo Martel");
+            datosPdf.put("imgFirmaDigital", resultFolio.get(0).get("firmaFideicomiso").toString());
 			
 			return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
 	                authentication);
@@ -102,13 +103,20 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
 
 	@Override
 	public Response<?> generarHojaAfilicion(PdfDto pdfDto, Authentication authentication) throws Throwable {
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory(); 
 		Map<String, Object> datosPdf = new HashMap<>();
-		try {
+		try (SqlSession sqlSession=sqlSessionFactory.openSession()) {
+			List<Map<String, Object>> resultFolio = new ArrayList<>();
+			//	List<BusquedaInformacionReporteResponse>infoReporte= new ArrayList<>();
+				ConvenioMapper consultas= sqlSession.getMapper(ConvenioMapper.class);
+			  String query = renConvenio.obtenerFolio(pdfDto.getIdConvenio()); 
+			  resultFolio=consultas.selectNativeQuery(query);
 	            datosPdf.put("rutaNombreReporte", hojaAfiliacion);
 	            datosPdf.put("tipoReporte", "pdf");
 	            datosPdf.put("idConvenio", Integer.parseInt(pdfDto.getIdConvenio()));
 	            datosPdf.put("tipoConvenio", "Previsión Funeraria Plan Anterior");
-	            datosPdf.put("nombreFibeso", " ");
+	            datosPdf.put("nombreFibeso", "Dra. Cristinne Leo Martel");
+	            datosPdf.put("imgFirmaDigital", resultFolio.get(0).get("firmaFideicomiso").toString());
 				
 				return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
 		                authentication);
@@ -144,7 +152,9 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
             datosPdf.put("costoConvenio", costo);
             datosPdf.put("version", "1.0.0");
             datosPdf.put("letraCosto", costoLetra.toUpperCase() +" PESOS 00/100 M/N");
-            datosPdf.put("nomFibeso", " ");
+            datosPdf.put("nomFibeso", "Dra. Cristinne Leo Martel");
+            datosPdf.put("imgFirmaDigital", resultCuota.get(0).get("firmaFideicomiso").toString());
+            datosPdf.put("selloRenovacion", resultCuota.get(0).get("selloRenovacion").toString());
 			
 			return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
 	                authentication);
