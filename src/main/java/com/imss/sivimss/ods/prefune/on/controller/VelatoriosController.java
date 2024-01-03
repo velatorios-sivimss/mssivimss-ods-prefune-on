@@ -38,8 +38,7 @@ public class VelatoriosController {
 	private final LogUtil logUtil;
 	
 	private static final String CONSULTA = "consulta";
-	private static final String INSERT = "insert";
-	private static final String UPDATE = "update";
+	
 	
 	@GetMapping("mapa/velatorios")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
@@ -85,6 +84,38 @@ public class VelatoriosController {
 
 	}
 	
+	@GetMapping("/consultar/codigo-postal/{dato}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPostal")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPostal")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> obtenerCodigoPostal(@PathVariable(required = true) String dato, Authentication authentication)
+			throws IOException {
+		Response<Object> response = catalogosService.consultarCodigoPostal(dato, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo().intValue())));
+	}
+	
+	@GetMapping("consultar/paises")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object>consultarPaises(Authentication authentication) throws IOException{
+		Response<Object>response=catalogosService.consultarPais(authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+
+	}
+	
+	@GetMapping("consultar/estados")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object>consultarEstado(Authentication authentication) throws IOException{
+		Response<Object>response=catalogosService.consultarEstado(authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+
+	}
 	
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsulta(Authentication authentication,
@@ -99,6 +130,17 @@ public class VelatoriosController {
 	
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsulta(@PathVariable(required = true) Integer idVelatorio, Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackConsultaPostal(@PathVariable(required = true) String dato, Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),

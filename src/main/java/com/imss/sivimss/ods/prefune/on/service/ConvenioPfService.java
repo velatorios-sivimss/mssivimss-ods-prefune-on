@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
@@ -24,12 +26,31 @@ public interface ConvenioPfService {
 
 	public Response<Object> generarPDF(PdfDto request, Authentication authentication) throws IOException;
 
-	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO request, Authentication authentication);
+	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
+			throws IOException;
 
-	public Response<Object>consultarCurpRfc(@RequestBody JsonNode datos,Authentication authentication) throws IOException;
+	public Response<Object> consultarCurpRfc(@RequestBody JsonNode datos, Authentication authentication)
+			throws IOException;
 
+	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO datos, Authentication authentication)
+			throws IOException;
 
-	public Response<Object> altaBeneficiario(AgregarBeneficiarioDTO request, Authentication authentication)
+	public Response<Object> desactivarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
+			throws IOException;
+
+	public Response<Object> consultaGeneralConvenio(Integer idVelatorio, Authentication authentication)
+			throws IOException;
+
+	public Response<Object> altaPlanPFPersona(AgregarConvenioPersonaDTO datos, Authentication authentication)
+			throws IOException;
+
+	public Response<Object> altaPlanPFEmpresa(AgregarConvenioEmpresaDTO datos, Authentication authentication)
+			throws IOException;
+
+	public Response<Object> consultaPlanPFEmpresa(Integer idConvenio, Authentication authentication)
+			throws IOException;
+
+	public Response<Object> altaPersonaPFEmpresa(AgregarConvenioPersonaDTO datos, Authentication authentication)
 			throws IOException;
 
 }

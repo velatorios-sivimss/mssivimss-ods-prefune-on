@@ -23,11 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
-import com.imss.sivimss.ods.prefune.on.utils.DatosRequest;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
@@ -117,7 +118,7 @@ public class ConvenioPfController {
 	@Retry(name = "msflujo", fallbackMethod = "fallbackActualizarBeneficiario")
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object> actualizarBeneficiario(@RequestBody ActualizarBeneficiarioDTO request,
-			Authentication authentication) {
+			Authentication authentication) throws IOException {
 
 		Response<Object> response = convenioPfService.actualizarBeneficiario(request, authentication);
 
@@ -125,14 +126,15 @@ public class ConvenioPfController {
 				.supplyAsync(() -> new ResponseEntity<>(response,
 						HttpStatus.valueOf(response.getCodigo())));
 	}
-	
+
 	@PostMapping("/validar-curp-rfc")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaCurpRfc")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaCurpRfc")
 	@TimeLimiter(name = "msflujo")
-	public CompletableFuture<Object>consultarCatalogoEmpresa(@RequestBody JsonNode curpRfc, Authentication authentication) throws IOException{
-		
-		Response<Object>response=convenioPfService.consultarCurpRfc(curpRfc, authentication);
+	public CompletableFuture<Object> consultarCatalogoEmpresa(@RequestBody JsonNode curpRfc,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.consultarCurpRfc(curpRfc, authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 
@@ -146,6 +148,81 @@ public class ConvenioPfController {
 			Authentication authentication) throws IOException {
 
 		Response<Object> response = convenioPfService.altaBeneficiario(request, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@PostMapping("/desactivar-beneficiario")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackActualizarBeneficiario")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackActualizarBeneficiario")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> desactivarBeneficiario(@RequestBody ActualizarBeneficiarioDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.desactivarBeneficiario(request, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@GetMapping("/datos-generales-contratante/{idVelatorio}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackDatosGeneralesUsuario")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackDatosGeneralesUsuario")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> datosGeneralesUsuario(@PathVariable(required = true) Integer idVelatorio,
+			Authentication authentication) throws IOException {
+		Response<Object> response = convenioPfService.consultaGeneralConvenio(idVelatorio, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@PostMapping("/alta-plan-pf/persona")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackAltaPlanPersona")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackAltaPlanPersona")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> altaPlanPFPersona(@RequestBody AgregarConvenioPersonaDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.altaPlanPFPersona(request, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@PostMapping("/alta-plan-pf/empresa")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackAltaPlanEmpresa")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackAltaPlanEmpresa")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> altaPlanPFEmpresa(@RequestBody AgregarConvenioEmpresaDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.altaPlanPFEmpresa(request, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response,
+						HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@GetMapping("/empresa-convenio/{idConvenio}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsulta")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> consultaDetalleEmpresaConvenio(@PathVariable(required = true) Integer idConvenio,
+			Authentication authentication) throws IOException {
+		Response<Object> response = convenioPfService.consultaPlanPFEmpresa(idConvenio, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@PostMapping("/alta-persona-empresa")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackAltaPlanPersona")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackAltaPlanPersona")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> altaPersonaPFEmpresa(@RequestBody AgregarConvenioPersonaDTO request,
+			Authentication authentication) throws IOException {
+
+		Response<Object> response = convenioPfService.altaPersonaPFEmpresa(request, authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response,
 						HttpStatus.valueOf(response.getCodigo())));
@@ -257,6 +334,42 @@ public class ConvenioPfController {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
 				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackDatosGeneralesUsuario(Integer idVelatorio,
+			Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackAltaPlanPersona(@RequestBody AgregarConvenioPersonaDTO request,
+			Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<Object> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), UPDATE, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackAltaPlanEmpresa(@RequestBody AgregarConvenioEmpresaDTO request,
+			Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<Object> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), UPDATE, authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));

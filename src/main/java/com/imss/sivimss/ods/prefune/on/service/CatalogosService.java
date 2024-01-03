@@ -13,5 +13,11 @@ public interface CatalogosService {
 	Response<Object>consultarCatalogoPromotores(Authentication authentication) throws IOException;
 
 	Response<Object>consultarCatalogoPaquete(Integer idVelatorio,Authentication authentication) throws IOException;
+
+	Response<Object>consultarCodigoPostal(String codigoPostal,Authentication authentication) throws IOException;
+	
+	Response<Object>consultarPais(Authentication authentication) throws IOException;
+	
+	Response<Object>consultarEstado(Authentication authentication) throws IOException;
 	
 }
