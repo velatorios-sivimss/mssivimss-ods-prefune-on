@@ -27,7 +27,7 @@ public interface ConvenioPFMapper {
 			"( " +
 			"SELECT CONCAT( " +
 			"LEFT(v.DES_VELATORIO, 3),'-', LPAD(( " +
-			"SELECT COUNT(SP.ID_CONVENIO_PF +1) " +
+			"SELECT COUNT(SP.ID_CONVENIO_PF) + 1 " +
 			"FROM SVT_CONVENIO_PF SP),6,'0'))  " +
 			"FROM SVC_VELATORIO v " +
 			"JOIN SVT_PAQUETE p ON p.ID_PAQUETE = #{datos.idPaquete} " +
