@@ -39,7 +39,7 @@ public interface ConvenioPFMapperEmpresa {
 			"1, " +
 			"0, " +
 			"#{datos.idPromotor}, " +
-			"1, " +
+			"5, " +
 			"#{datos.idUsuario}, " +
 			" CURRENT_DATE()) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idConvenioPF", keyColumn = "ID_CONVENIO_PF")

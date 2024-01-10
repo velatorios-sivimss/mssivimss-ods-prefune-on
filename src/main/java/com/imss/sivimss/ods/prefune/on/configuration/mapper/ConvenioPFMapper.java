@@ -40,7 +40,7 @@ public interface ConvenioPFMapper {
 			"1, " +
 			"#{datos.idTipoContratacion}, " +
 			"#{datos.idPromotor}, " +
-			"1, " +
+			"5, " +
 			"#{datos.idUsuario}, " +
 			" CURRENT_DATE()) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idConvenioPF", keyColumn = "ID_CONVENIO_PF")
