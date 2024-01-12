@@ -485,7 +485,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> consultaGeneralConvenio(Integer idVelatorio, Authentication authentication)
 			throws IOException {
-		Integer idContratante = 111;
+		Integer idContratante = 54;
 		Map<String, Object> datosGenerales = new HashMap<>();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
