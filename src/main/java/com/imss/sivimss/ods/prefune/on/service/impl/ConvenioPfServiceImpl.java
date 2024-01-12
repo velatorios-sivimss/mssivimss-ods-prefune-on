@@ -521,6 +521,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		Integer idUsuario = 1;
 		datos.setIdUsuario(idUsuario);
+		Integer idContratante = 36;
+		datos.setIdContratante(idContratante);
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
 
@@ -532,7 +534,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				convenio.agregarDomicilio(datos);
 				log.info("finalizando domiclio por persona");
 				log.info("agregando contratante por persona");
-				convenio.agregarContratante(datos);
+				// convenio.agregarContratante(datos);
 				log.info("finalizando contratante por persona");
 				log.info("agregando convenio paquete  por persona");
 				convenio.agregarContratoConvenioPaquete(datos);
