@@ -6,7 +6,9 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
+import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 
 public interface ConvenioPFMapper {
@@ -71,6 +73,21 @@ public interface ConvenioPFMapper {
 			" )  ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idDomicilio", keyColumn = "ID_DOMICILIO")
 	public int agregarDomicilio(@Param("datos") AgregarConvenioPersonaDTO datos);
+
+	@Update(value = ""
+			+ "UPDATE SVT_DOMICILIO  "
+			+ "SET  "
+			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ," +
+			" REF_CALLE = #{in.calle} , " +
+			" NUM_EXTERIOR= #{in.noExterior} , " +
+			" NUM_INTERIOR = #{in.noInterior} , " +
+			" REF_CP = #{in.cp} ,  " +
+			" REF_COLONIA = #{in.colonia} , " +
+			" REF_MUNICIPIO = #{in.municipio} ,  " +
+			" REF_ESTADO = #{in.estado}   "
+			+ " WHERE ID_DOMICILIO = #{in.idDomicilio} ")
+	public int updateDomicilio(@Param("in") AgregarConvenioPersonaDTO persona);
 
 	@Insert(value = "INSERT INTO SVC_CONTRATANTE  " +
 			" (  " +

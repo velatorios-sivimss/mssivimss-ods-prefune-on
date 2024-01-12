@@ -530,12 +530,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				log.info("agregando convenio por persona");
 				convenio.agregarConvenioPF(datos);
 				log.info("finalizando convenio por persona");
-				log.info("agregando domicilio por persona");
-				convenio.agregarDomicilio(datos);
-				log.info("finalizando domiclio por persona");
-				log.info("agregando contratante por persona");
+				// log.info("agregando domicilio por persona");
+				convenio.updateDomicilio(datos);
+				// log.info("finalizando domiclio por persona");
+				// log.info("agregando contratante por persona");
 				// convenio.agregarContratante(datos);
-				log.info("finalizando contratante por persona");
+				// log.info("finalizando contratante por persona");
 				log.info("agregando convenio paquete  por persona");
 				convenio.agregarContratoConvenioPaquete(datos);
 				log.info("finalizando convenio paquete por persona");
