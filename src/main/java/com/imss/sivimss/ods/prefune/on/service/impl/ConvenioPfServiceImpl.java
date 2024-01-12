@@ -521,7 +521,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		Integer idUsuario = 1;
 		datos.setIdUsuario(idUsuario);
-		Integer idContratante = 36;
+		Integer idContratante = 54;
 		datos.setIdContratante(idContratante);
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
