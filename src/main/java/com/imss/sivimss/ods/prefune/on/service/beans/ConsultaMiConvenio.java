@@ -265,6 +265,7 @@ public class ConsultaMiConvenio {
 				.select("SC.ID_CONTRATANTE AS idContratante", 
 						"IFNULL(SC.CVE_MATRICULA,'') AS matricula", 
 						"IFNULL(SPE.CVE_RFC,'') AS rfc",
+					        "IFNULL(SPE.CVE_CURP,'') AS curp",
 						"SPE.NOM_PERSONA AS nombre",
 						"SPE.NOM_PRIMER_APELLIDO AS primerApellido",
 						"SPE.NOM_SEGUNDO_APELLIDO AS segundoApellido")
