@@ -215,7 +215,7 @@ public interface ConvenioPFMapper {
 			" NUM_SEXO = #{in.sexo} , " +
 			" REF_OTRO_SEXO= #{in.otroSexo} , " +
 			" REF_TELEFONO = #{in.telefono} , " +
-			" REF_CORREO = #{in.correo} ,  " +
+			" REF_CORREO = #{in.correo}   " +
 			" WHERE ID_PERSONA = #{in.idDomicilio} ")
 	public int actualizarPersona(@Param("in") AgregarConvenioPersonaDTO persona);
 }
