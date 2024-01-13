@@ -693,9 +693,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					json = new ObjectMapper().writeValueAsString(datosConsulta);
 					datosJson = objMapper.readTree(json);
 					Integer total = datosJson.get("totalPersona").asInt();
+
 					if (total > 0)
 						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.PERSONA_REGISTRADA_ANTERIOR,
 								null);
+
+					convenio.actualizarPersona(datos);
 
 				}
 
