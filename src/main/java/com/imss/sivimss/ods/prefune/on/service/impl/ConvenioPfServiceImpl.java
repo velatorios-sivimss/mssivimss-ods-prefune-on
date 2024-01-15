@@ -650,6 +650,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 							.numExterior(r.getNumExterior())
 							.telefono(r.getTelefono())
 							.correo(r.getCorreo())
+							.idPromotor(r.getIdPromotor())
 							.build();
 				});
 				convenioEmpresaResponse.setDatosEmpresaResponse(empresaResponse);
