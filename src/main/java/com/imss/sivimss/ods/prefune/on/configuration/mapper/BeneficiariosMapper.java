@@ -159,6 +159,7 @@ public interface BeneficiariosMapper {
 			" p.REF_CORREO AS correo, " +
 			" p.TIP_PERSONA AS tipoPersona, " +
 			" e.DES_ESTADO AS estado ," +
+			" c.ID_DOMICILIO AS idDomicilio," +
 			"(SELECT d.DES_DELEGACION FROM SVC_VELATORIO v " +
 			"JOIN SVC_DELEGACION d ON d.ID_DELEGACION= v.ID_DELEGACION " +
 			"WHERE v.ID_VELATORIO = #{in.idVelatorio}) AS delegacion ," +

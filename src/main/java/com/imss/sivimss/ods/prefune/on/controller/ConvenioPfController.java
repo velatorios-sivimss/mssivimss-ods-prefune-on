@@ -60,7 +60,7 @@ public class ConvenioPfController {
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object> consultaMiConvenio(@Validated @RequestBody Paginado paginado,
 			Authentication authentication) throws IOException {
-		Response<Object> response = convenioPfService.consultaMiConvenio(paginado, 121, authentication);
+		Response<Object> response = convenioPfService.consultaMiConvenio(paginado, 54, authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 

@@ -485,7 +485,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> consultaGeneralConvenio(Integer idVelatorio, Authentication authentication)
 			throws IOException {
-		Integer idContratante = 111;
+		Integer idContratante = 54;
 		Map<String, Object> datosGenerales = new HashMap<>();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -521,6 +521,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		Integer idUsuario = 1;
 		datos.setIdUsuario(idUsuario);
+		Integer idContratante = 54;
+		datos.setIdContratante(idContratante);
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
 
@@ -528,12 +530,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				log.info("agregando convenio por persona");
 				convenio.agregarConvenioPF(datos);
 				log.info("finalizando convenio por persona");
-				log.info("agregando domicilio por persona");
-				convenio.agregarDomicilio(datos);
-				log.info("finalizando domiclio por persona");
-				log.info("agregando contratante por persona");
-				convenio.agregarContratante(datos);
-				log.info("finalizando contratante por persona");
+				// log.info("agregando domicilio por persona");
+				convenio.updateDomicilio(datos);
+				// log.info("finalizando domiclio por persona");
+				// log.info("agregando contratante por persona");
+				// convenio.agregarContratante(datos);
+				// log.info("finalizando contratante por persona");
 				log.info("agregando convenio paquete  por persona");
 				convenio.agregarContratoConvenioPaquete(datos);
 				log.info("finalizando convenio paquete por persona");
@@ -648,6 +650,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 							.numExterior(r.getNumExterior())
 							.telefono(r.getTelefono())
 							.correo(r.getCorreo())
+							.idPromotor(r.getIdPromotor())
 							.build();
 				});
 				convenioEmpresaResponse.setDatosEmpresaResponse(empresaResponse);
@@ -691,9 +694,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					json = new ObjectMapper().writeValueAsString(datosConsulta);
 					datosJson = objMapper.readTree(json);
 					Integer total = datosJson.get("totalPersona").asInt();
+
 					if (total > 0)
 						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.PERSONA_REGISTRADA_ANTERIOR,
 								null);
+
+					convenio.actualizarPersona(datos);
 
 				}
 

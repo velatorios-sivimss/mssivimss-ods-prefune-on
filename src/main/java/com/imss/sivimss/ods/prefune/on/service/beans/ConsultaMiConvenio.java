@@ -227,7 +227,7 @@ public class ConsultaMiConvenio {
 		return query;
 
 	}
-	
+
 	public String consultarDatosConvenioEmpresa(Integer idConvenio) {
 
 		SelectQueryUtil selectQueryUtilCurp = new SelectQueryUtil();
@@ -246,24 +246,25 @@ public class ConsultaMiConvenio {
 						"SD.NUM_INTERIOR AS numInterior",
 						"SD.NUM_EXTERIOR AS numExterior",
 						"SCPE.REF_TELEFONO AS telefono",
+						"SCP.ID_PROMOTOR AS idPromotor",
 						"SCPE.REF_CORREO AS correo")
 				.from("SVT_CONVENIO_PF SCP")
 				.innerJoin("SVT_EMPRESA_CONVENIO_PF SCPE", "SCP.ID_CONVENIO_PF = SCPE.ID_CONVENIO_PF")
 				.innerJoin("SVT_DOMICILIO SD", "SCPE.ID_DOMICILIO = SD.ID_DOMICILIO")
-				.where("SCPE.ID_CONVENIO_PF = "+idConvenio);
+				.where("SCPE.ID_CONVENIO_PF = " + idConvenio);
 		query = selectQueryUtilCurp.build();
 		log.info(query);
 
 		return query;
 
 	}
-	
+
 	public String consultarDatosConvenioEmpresaPersona(Integer idConvenio) {
 
 		SelectQueryUtil selectQueryUtilCurp = new SelectQueryUtil();
 		selectQueryUtilCurp
-				.select("SC.ID_CONTRATANTE AS idContratante", 
-						"IFNULL(SC.CVE_MATRICULA,'') AS matricula", 
+				.select("SC.ID_CONTRATANTE AS idContratante",
+						"IFNULL(SC.CVE_MATRICULA,'') AS matricula",
 						"IFNULL(SPE.CVE_RFC,'') AS rfc",
 						"IFNULL(SPE.CVE_CURP,'') AS curp",
 						"SPE.NOM_PERSONA AS nombre",
@@ -275,7 +276,7 @@ public class ConsultaMiConvenio {
 				.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPCP ", "SCPCP.ID_CONVENIO_PF = SCP.ID_CONVENIO_PF ")
 				.innerJoin("SVC_CONTRATANTE SC", "SC.ID_CONTRATANTE = SCPCP.ID_CONTRATANTE ")
 				.innerJoin("SVC_PERSONA SPE", "SC.ID_PERSONA = SPE.ID_PERSONA  ")
-				.where("SCPE.ID_CONVENIO_PF  = "+idConvenio);
+				.where("SCPE.ID_CONVENIO_PF  = " + idConvenio);
 		query = selectQueryUtilCurp.build();
 		log.info(query);
 
