@@ -283,12 +283,13 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
-		Integer idUsuario = 1;
+	
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 			try {
-				datos.setIdUsuario(idUsuario);
+				datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 				if (datos.isActualizaArchivo())
 					mapperQuery.actualizarContratanteDocumento(datos);
 				mapperQuery.actualizarPersona(datos);
@@ -345,8 +346,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		Integer idUsuario = 1;
-		datos.setIdUsuario(idUsuario);
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 		Boolean validaBeneficiarioAsociado = true;
 		ActualizarBeneficiarioDTO actualizarBeneficiarioDTO = new ActualizarBeneficiarioDTO();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -462,13 +463,14 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> desactivarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
-		Integer idUsuario = 1;
+		
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 			try {
 
-				datos.setIdUsuario(idUsuario);
+				datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 				log.info("desactivando beneficiario");
 				mapperQuery.desactivarBeneficiario(datos);
 				log.info("beneficiario desactivado");
@@ -526,11 +528,11 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		Integer idUsuario = 1;
-		datos.setIdUsuario(idUsuario);
-		
+				
 		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
 		datos.setIdContratante(Integer.parseInt(usuario.getIdContratante()));
+		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
+		
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
 
@@ -581,8 +583,10 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	public Response<Object> altaPlanPFEmpresa(AgregarConvenioEmpresaDTO datos, Authentication authentication)
 			throws IOException {
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		Integer idUsuario = 1;
-		datos.setIdUsuario(idUsuario);
+		
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
+		
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapperEmpresa convenio = session.getMapper(ConvenioPFMapperEmpresa.class);
 
@@ -684,8 +688,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		Integer idUsuario = 1;
-		datos.setIdUsuario(idUsuario);
+	
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
 
