@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
 import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.service.HistorialOrdenService;
+import com.imss.sivimss.ods.prefune.on.service.beans.Usuario;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
@@ -41,14 +43,16 @@ public class HistorialServicioOrdenesController {
 	private static final String CONSULTA = "consulta";
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
-	
+	private Gson gson= new Gson();
+
 	
 	@PostMapping("/contratante")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object>consultarOrdenes(@Validated @RequestBody Paginado paginado, Authentication authentication)throws  IOException{
-		Response<Object>response=historialOrdenService.consultarOrdenes(paginado,104, authentication);
+		Usuario usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		Response<Object>response=historialOrdenService.consultarOrdenes(paginado,Integer.parseInt(usuario.getIdContratante()), authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 	}
