@@ -166,7 +166,7 @@ public interface BeneficiariosMapper {
 			" DATE_FORMAT(DATE_ADD( CURDATE(), INTERVAL 1 DAY),'%d-%m-%Y') AS fecha " +
 			" FROM SVC_CONTRATANTE c " +
 			" JOIN SVC_PERSONA p ON p.ID_PERSONA = c.ID_PERSONA " +
-			" LEFT JOIN svc_estado e ON e.ID_ESTADO= p.ID_ESTADO " +
+			" LEFT JOIN SVC_ESTADO e ON e.ID_ESTADO= p.ID_ESTADO " +
 			" WHERE c.ID_CONTRATANTE=  #{in.idContratante} ")
 	public Map<String, Object> datosPersonalesContratante(@Param("in") AgregarBeneficiarioDTO persona);
 
