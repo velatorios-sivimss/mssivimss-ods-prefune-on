@@ -2,7 +2,7 @@ server:
   port: 8001
   servlet:
     contextPath: /${spring.application.name}/v1
-spring: 
+spring:
   application:
     name: mssivimss-ods-prefune-on
   mvc:
@@ -17,17 +17,17 @@ spring:
     driverClassName: org.mariadb.jdbc.Driver
     url: jdbc:mysql://10.102.44.18:3306/SIVIBDDS?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=America/Mexico_City #jdbc:mysql://10.102.44.18:3306/SIVIBDDS
     username: SIVI_USER #pmsoluciones
-    password: 51V1_US3R #Tr1357.* 
+    password: 51V1_US3R #Tr1357.*
     timeBetweenEvictionRunsMillis: 1000
     testWhileIdle: true
     validationQuery: SELECT 1
     hikari:
-       max-lifetime: 1800000
-       idle-timeout: 600000
-       connection-timeout: 30000
-       auto-commit: false
-       maximum-pool-size: 7
-       minimum-idle: 10
+      max-lifetime: 1800000
+      idle-timeout: 600000
+      connection-timeout: 30000
+      auto-commit: false
+      maximum-pool-size: 7
+      minimum-idle: 10
 
   main:
     allow-circular-references: true
@@ -51,12 +51,12 @@ logging:
     root: info
     org.springframework.web: info
     org.hibernate: error
-
+    com.imss.sivimss.ods.prefune.on.configuration.mapper: info
 
 endpoints:
   ms-reportes: http://localhost:8088/mssivimss-reportes-jasp/v1/generales/generar-reporte
-  renapo: "http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/externos/renapo/curp"
-  sepomex: "http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/domicilios/asentamientos/codigoPostal"
+  renapo: 'http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/externos/renapo/curp'
+  sepomex: 'http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/domicilios/asentamientos/codigoPostal'
 
 reporte:
   convenio-nuevo-pf: reportes/plantilla/ANEXO5_CONVENIO_PF_NUEVO.jrxml
@@ -79,25 +79,25 @@ resilience4j.circuitbreaker:
   circuitBreakerAspectOrder: 1
   instances:
     msflujo:
-        automaticTransitionFromOpenToHalfOpenEnabled: 'true'
-        failureRateThreshold: '50'
-        slidingWindowType: COUNT_BASED
-        event-consumer-buffer-size: '10'
-        registerHealthIndicator: 'true'
-        waitDurationInOpenState: 5s
-        permittedNumberOfCallsInHalfOpenState: '3'
-        slidingWindowSize: '5'
+      automaticTransitionFromOpenToHalfOpenEnabled: 'true'
+      failureRateThreshold: '50'
+      slidingWindowType: COUNT_BASED
+      event-consumer-buffer-size: '10'
+      registerHealthIndicator: 'true'
+      waitDurationInOpenState: 5s
+      permittedNumberOfCallsInHalfOpenState: '3'
+      slidingWindowSize: '5'
 resilience4j.retry:
   retryAspectOrder: 2
   instances:
     msflujo:
-           maxAttempts: 3
-           waitDuration: 5s
+      maxAttempts: 3
+      waitDuration: 5s
 resilience4j.timelimiter:
   timeLimiterAspectOrder: 3
   instances:
     msflujo:
-        timeout-duration: 3s
+      timeout-duration: 3s
 
 ruta-log: 'C:/Users/opimentel/Documents/logs/Arquetipo/'
 enviroment: Develop
