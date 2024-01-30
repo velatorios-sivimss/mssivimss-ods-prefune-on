@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -449,6 +450,16 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					.primerApellido(jsonRespuesta.get("apellido1").asText())
 					.segundoApellido(jsonRespuesta.get("apellido2").asText()).correo("")
 					.build();
+			String [] fechaTemp=rp.getFechaNacimiento().split("/");
+			StringBuilder fecha=new StringBuilder();
+			for (int i = fechaTemp.length-1; i >= 0; i--) {
+				fecha.append(fechaTemp[i]);
+				if (i!=0) {
+					fecha.append("-");
+				}
+				
+			}
+			rp.setFechaNacimiento(fecha.toString());
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, Arrays.asList(rp));
 		} catch (Exception e) {
 			return new Response<>(true, 200, AppConstantes.ERROR_CONSULTAR_RENAPO, e.getMessage());
