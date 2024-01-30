@@ -97,9 +97,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	private static final String PERIODO_RENOVACION = "periodoRenovacion";
 	private static final String PATTERN = "dd-MM-yyyy";
-	
-	private Gson gson= new Gson();
-	
+
+	private Gson gson = new Gson();
+
 	private Usuario usuario;
 
 	@Override
@@ -283,8 +283,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
-	
-		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+
+		usuario = gson.fromJson((String) authentication.getPrincipal(), Usuario.class);
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
@@ -346,7 +346,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		usuario = gson.fromJson((String) authentication.getPrincipal(), Usuario.class);
 		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 		Boolean validaBeneficiarioAsociado = true;
 		ActualizarBeneficiarioDTO actualizarBeneficiarioDTO = new ActualizarBeneficiarioDTO();
@@ -394,6 +394,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					// se inserta el registro
 					log.info("insertando persona");
 					mapperQuery.insertaPersona(datos);
+					validaBeneficiarioAsociado = true;
 					log.info("persona agregada");
 
 				}
@@ -463,9 +464,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> desactivarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
-		
+
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		usuario = gson.fromJson((String) authentication.getPrincipal(), Usuario.class);
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 			try {
@@ -493,8 +494,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> consultaGeneralConvenio(Integer idVelatorio, Authentication authentication)
 			throws IOException {
-		
-		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+
+		usuario = gson.fromJson((String) authentication.getPrincipal(), Usuario.class);
 		Map<String, Object> datosGenerales = new HashMap<>();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -528,11 +529,11 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-				
-		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+
+		usuario = gson.fromJson((String) authentication.getPrincipal(), Usuario.class);
 		datos.setIdContratante(Integer.parseInt(usuario.getIdContratante()));
 		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
-		
+
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
 
@@ -583,10 +584,10 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	public Response<Object> altaPlanPFEmpresa(AgregarConvenioEmpresaDTO datos, Authentication authentication)
 			throws IOException {
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		
-		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+
+		usuario = gson.fromJson((String) authentication.getPrincipal(), Usuario.class);
 		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
-		
+
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapperEmpresa convenio = session.getMapper(ConvenioPFMapperEmpresa.class);
 
@@ -688,8 +689,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-	
-		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+
+		usuario = gson.fromJson((String) authentication.getPrincipal(), Usuario.class);
 		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
