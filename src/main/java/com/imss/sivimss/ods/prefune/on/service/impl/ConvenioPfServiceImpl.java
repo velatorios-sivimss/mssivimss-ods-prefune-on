@@ -439,12 +439,15 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					.consumirServicioExternoGet(urlRenapo + "/" + curp.replace("\"", ""));
 			JsonNode jsonRespuesta = objectMapper.readTree(respuestaRenapo.getDatos().toString());
 			RenapoResponse rp = null;
-			rp = RenapoResponse.builder().curp(jsonRespuesta.get("curp").asText()).rfc("").nss("").idPais("")
+			rp = RenapoResponse.builder()
+					.curp(jsonRespuesta.get("curp").asText())
+					.rfc("").nss("").idPais("")
 					.idEstado("").desEstado(jsonRespuesta.get("desEntidadNac").asText())
 					.fechaNacimiento(jsonRespuesta.get("fechNac").asText())
-					.sexo(tipoSexo(jsonRespuesta.get("sexo").asText())).nomPersona(jsonRespuesta.get("nombre").asText())
+					.sexo(tipoSexo(jsonRespuesta.get("sexo").asText()))
+					.nomPersona(jsonRespuesta.get("nombre").asText())
 					.primerApellido(jsonRespuesta.get("apellido1").asText())
-					.segundoApellido(jsonRespuesta.get("apellido2").asText()).correo(jsonRespuesta.get("").asText())
+					.segundoApellido(jsonRespuesta.get("apellido2").asText()).correo("")
 					.build();
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, Arrays.asList(rp));
 		} catch (Exception e) {
