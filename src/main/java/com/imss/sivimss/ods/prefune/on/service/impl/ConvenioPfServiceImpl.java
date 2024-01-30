@@ -388,6 +388,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					// se hace una actualizacion decorreo y telefono de la persona
 					log.info("actualizando persona");
 					mapperQuery.actualizarPersona(actualizarBeneficiarioDTO);
+					validaBeneficiarioAsociado = true;
 					log.info("correo y telefono de persona actualizado");
 
 				} else {
