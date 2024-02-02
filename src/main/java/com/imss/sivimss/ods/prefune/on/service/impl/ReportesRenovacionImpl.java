@@ -68,7 +68,10 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
 	private static final String FIRMA_FIDEICOMISO = "firmaFideicomiso";
-	private static final String NOMBRE_FIBESO = "nombreFibeso";
+	private static final String RUTA = "rutaNombreReporte";
+	private static final String TIPO_REPORTE = "rutaNombreReporte";
+	private static final String NOMBRE_FIBESO = "pdf";
+	private static final String IMG_FIRMA = "imgFirmaDigital";
 	private static final String ERROR = "Error, {}";
 	
 	@Override
@@ -82,12 +85,12 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
 		  String query = renConvenio.obtenerFolio(pdfDto.getIdConvenio()); 
 		  resultFolio=consultas.selectNativeQuery(query);
 		
-            datosPdf.put("rutaNombreReporte", renovacionPlanNuevo);
-            datosPdf.put("tipoReporte", "pdf");
+            datosPdf.put(RUTA, renovacionPlanNuevo);
+            datosPdf.put(TIPO_REPORTE, "pdf");
             datosPdf.put("folio", resultFolio.get(0).get("DES_FOLIO").toString());
             datosPdf.put("planPF", "Prevision Funeraria Plan Nuevo");
             datosPdf.put("directoraFideicomiso", resultFolio.get(0).get(NOMBRE_FIBESO).toString());
-            datosPdf.put("imgFirmaDigital", resultFolio.get(0).get(FIRMA_FIDEICOMISO).toString());
+            datosPdf.put(IMG_FIRMA, resultFolio.get(0).get(FIRMA_FIDEICOMISO).toString());
 			
 			return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
 	                authentication);
@@ -114,12 +117,12 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
 				ConvenioMapper consultas= sqlSession.getMapper(ConvenioMapper.class);
 			  String query = renConvenio.obtenerFolio(pdfDto.getIdConvenio()); 
 			  resultFolio=consultas.selectNativeQuery(query);
-	            datosPdf.put("rutaNombreReporte", hojaAfiliacion);
-	            datosPdf.put("tipoReporte", "pdf");
+	            datosPdf.put(RUTA, hojaAfiliacion);
+	            datosPdf.put(TIPO_REPORTE, "pdf");
 	            datosPdf.put("idConvenio", Integer.parseInt(pdfDto.getIdConvenio()));
 	            datosPdf.put("tipoConvenio", "Previsión Funeraria Plan Anterior");
 	            datosPdf.put(NOMBRE_FIBESO, resultFolio.get(0).get(NOMBRE_FIBESO).toString());
-	            datosPdf.put("imgFirmaDigital", resultFolio.get(0).get(FIRMA_FIDEICOMISO).toString());
+	            datosPdf.put(IMG_FIRMA, resultFolio.get(0).get(FIRMA_FIDEICOMISO).toString());
 				
 				return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
 		                authentication);
@@ -149,14 +152,14 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
 		                                       
 		  RuleBasedNumberFormat rule = new RuleBasedNumberFormat(new Locale("es-ES"), RuleBasedNumberFormat.SPELLOUT);
 			String costoLetra = rule.format(costo);
-            datosPdf.put("rutaNombreReporte", renovacionPlanAnterior);
-            datosPdf.put("tipoReporte", "pdf");
+            datosPdf.put(RUTA, renovacionPlanAnterior);
+            datosPdf.put(TIPO_REPORTE, "pdf");
             datosPdf.put("idConvenio", Integer.parseInt(pdfDto.getIdConvenio()));
             datosPdf.put("costoConvenio", costo);
             datosPdf.put("version", "1.0.0");
             datosPdf.put("letraCosto", costoLetra.toUpperCase() +" PESOS 00/100 M/N");
             datosPdf.put("nomFibeso", resultCuota.get(0).get(NOMBRE_FIBESO).toString());
-            datosPdf.put("imgFirmaDigital", resultCuota.get(0).get(FIRMA_FIDEICOMISO).toString());
+            datosPdf.put(IMG_FIRMA, resultCuota.get(0).get(FIRMA_FIDEICOMISO).toString());
             datosPdf.put("selloRenovacion", resultCuota.get(0).get("selloRenovacion").toString());
 			
 			return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
