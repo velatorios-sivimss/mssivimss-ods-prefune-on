@@ -67,6 +67,9 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
 	private static final String CONSULTA = "consulta";
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
+	private static final String FIRMA_FIDEICOMISO = "firmaFideicomiso";
+	private static final String NOMBRE_FIBESO = "nombreFibeso";
+	private static final String ERROR = "Error, {}";
 	
 	@Override
 	public Response<Object> generarDoc(PdfDto pdfDto, Authentication authentication) throws Throwable {
@@ -83,13 +86,13 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
             datosPdf.put("tipoReporte", "pdf");
             datosPdf.put("folio", resultFolio.get(0).get("DES_FOLIO").toString());
             datosPdf.put("planPF", "Prevision Funeraria Plan Nuevo");
-            datosPdf.put("directoraFideicomiso", "Dra. Cristinne Leo Martel");
-            datosPdf.put("imgFirmaDigital", resultFolio.get(0).get("firmaFideicomiso").toString());
+            datosPdf.put("directoraFideicomiso", resultFolio.get(0).get(NOMBRE_FIBESO).toString());
+            datosPdf.put("imgFirmaDigital", resultFolio.get(0).get(FIRMA_FIDEICOMISO).toString());
 			
 			return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
 	                authentication);
 		} catch (Exception e) {
-			log.info("ERROR {}",e.getCause().getMessage());
+			log.info(ERROR,e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
 					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
@@ -115,13 +118,13 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
 	            datosPdf.put("tipoReporte", "pdf");
 	            datosPdf.put("idConvenio", Integer.parseInt(pdfDto.getIdConvenio()));
 	            datosPdf.put("tipoConvenio", "Previsión Funeraria Plan Anterior");
-	            datosPdf.put("nombreFibeso", "Dra. Cristinne Leo Martel");
-	            datosPdf.put("imgFirmaDigital", resultFolio.get(0).get("firmaFideicomiso").toString());
+	            datosPdf.put(NOMBRE_FIBESO, resultFolio.get(0).get(NOMBRE_FIBESO).toString());
+	            datosPdf.put("imgFirmaDigital", resultFolio.get(0).get(FIRMA_FIDEICOMISO).toString());
 				
 				return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
 		                authentication);
 			} catch (Exception e) {
-				log.info("ERROR {}",e.getCause().getMessage());
+				log.info(ERROR,e.getCause().getMessage());
 				logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 						this.getClass().getPackage().toString(),
 						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
@@ -152,14 +155,14 @@ public class ReportesRenovacionImpl implements ReportesRenovacionService {
             datosPdf.put("costoConvenio", costo);
             datosPdf.put("version", "1.0.0");
             datosPdf.put("letraCosto", costoLetra.toUpperCase() +" PESOS 00/100 M/N");
-            datosPdf.put("nomFibeso", "Dra. Cristinne Leo Martel");
-            datosPdf.put("imgFirmaDigital", resultCuota.get(0).get("firmaFideicomiso").toString());
+            datosPdf.put("nomFibeso", resultCuota.get(0).get(NOMBRE_FIBESO).toString());
+            datosPdf.put("imgFirmaDigital", resultCuota.get(0).get(FIRMA_FIDEICOMISO).toString());
             datosPdf.put("selloRenovacion", resultCuota.get(0).get("selloRenovacion").toString());
 			
 			return providerRestTemplate.consumirServicioReportes(datosPdf, urlReportes,
 	                authentication);
 		} catch (Exception e) {
-			log.info("ERROR {}",e.getCause().getMessage());
+			log.info(ERROR,e.getCause().getMessage());
 			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
 					this.getClass().getPackage().toString(),
 					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA, authentication);
