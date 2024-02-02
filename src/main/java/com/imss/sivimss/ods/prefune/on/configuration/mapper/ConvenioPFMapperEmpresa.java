@@ -27,8 +27,9 @@ public interface ConvenioPFMapperEmpresa {
 			"( " +
 			"SELECT CONCAT( " +
 			"LEFT(v.DES_VELATORIO, 3),'-', LPAD(( " +
-			"SELECT COUNT(SP.ID_CONVENIO_PF +1) " +
-			"FROM SVT_CONVENIO_PF SP),6,'0'))  " +
+			"SELECT COUNT(SP.ID_CONVENIO_PF ) + 1 " +
+			"FROM SVT_CONVENIO_PF SP" +
+			" WHERE SP.ID_VELATORIO = #{datos.idVelatorio}),6,'0'))  " +
 			"FROM SVC_VELATORIO v " +
 			"WHERE v.ID_VELATORIO = #{datos.idVelatorio}), " +
 			"(SELECT DATE_ADD( CURDATE(), INTERVAL 1 DAY)), " +
@@ -38,7 +39,7 @@ public interface ConvenioPFMapperEmpresa {
 			"1, " +
 			"0, " +
 			"#{datos.idPromotor}, " +
-			"1, " +
+			"5, " +
 			"#{datos.idUsuario}, " +
 			" CURRENT_DATE()) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idConvenioPF", keyColumn = "ID_CONVENIO_PF")

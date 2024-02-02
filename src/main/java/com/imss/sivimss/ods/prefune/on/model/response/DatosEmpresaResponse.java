@@ -28,5 +28,6 @@ public class DatosEmpresaResponse {
 	private String numExterior;
 	private String telefono;
 	private String correo;
-	
+	private Integer idPromotor;
+
 }

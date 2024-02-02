@@ -46,5 +46,7 @@ public class AgregarConvenioPersonaDTO {
     private String fechaNacimiento;
     private String telefono;
     private String correo;
+    private Integer sexo;
+    private String otroSexo;
 
 }

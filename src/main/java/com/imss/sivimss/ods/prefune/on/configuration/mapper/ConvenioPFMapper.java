@@ -6,8 +6,9 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
-import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
+import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioPersonaDTO;
 
 public interface ConvenioPFMapper {
@@ -28,8 +29,9 @@ public interface ConvenioPFMapper {
 			"( " +
 			"SELECT CONCAT( " +
 			"LEFT(v.DES_VELATORIO, 3),'-', LPAD(( " +
-			"SELECT COUNT(SP.ID_CONVENIO_PF +1) " +
-			"FROM SVT_CONVENIO_PF SP),6,'0'))  " +
+			"SELECT COUNT(SP.ID_CONVENIO_PF) + 1 " +
+			"FROM SVT_CONVENIO_PF SP" +
+			" WHERE SP.ID_VELATORIO = #{datos.idVelatorio}),6,'0'))  " +
 			"FROM SVC_VELATORIO v " +
 			"JOIN SVT_PAQUETE p ON p.ID_PAQUETE = #{datos.idPaquete} " +
 			"WHERE v.ID_VELATORIO = #{datos.idVelatorio}), " +
@@ -40,7 +42,7 @@ public interface ConvenioPFMapper {
 			"1, " +
 			"#{datos.idTipoContratacion}, " +
 			"#{datos.idPromotor}, " +
-			"1, " +
+			"5, " +
 			"#{datos.idUsuario}, " +
 			" CURRENT_DATE()) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idConvenioPF", keyColumn = "ID_CONVENIO_PF")
@@ -71,6 +73,21 @@ public interface ConvenioPFMapper {
 			" )  ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idDomicilio", keyColumn = "ID_DOMICILIO")
 	public int agregarDomicilio(@Param("datos") AgregarConvenioPersonaDTO datos);
+
+	@Update(value = ""
+			+ "UPDATE SVT_DOMICILIO  "
+			+ "SET  "
+			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ," +
+			" REF_CALLE = #{in.calle} , " +
+			" NUM_EXTERIOR= #{in.noExterior} , " +
+			" NUM_INTERIOR = #{in.noInterior} , " +
+			" REF_CP = #{in.cp} ,  " +
+			" REF_COLONIA = #{in.colonia} , " +
+			" REF_MUNICIPIO = #{in.municipio} ,  " +
+			" REF_ESTADO = #{in.estado}   "
+			+ " WHERE ID_DOMICILIO = #{in.idDomicilio} ")
+	public int updateDomicilio(@Param("in") AgregarConvenioPersonaDTO persona);
 
 	@Insert(value = "INSERT INTO SVC_CONTRATANTE  " +
 			" (  " +
@@ -161,6 +178,8 @@ public interface ConvenioPFMapper {
 			"REF_TELEFONO, " +
 			"REF_CORREO, " +
 			"ID_USUARIO_ALTA," +
+			" NUM_SEXO , " +
+			" REF_OTRO_SEXO,  " +
 			"FEC_ALTA) " +
 			" VALUES " +
 			"( " +
@@ -174,7 +193,29 @@ public interface ConvenioPFMapper {
 			"#{out.telefono}, " +
 			"#{out.correo}, " +
 			"#{out.idUsuario}, " +
+			"#{in.sexo} , " +
+			"#{in.otroSexo} ," +
 			" CURRENT_DATE())")
 	@Options(useGeneratedKeys = true, keyProperty = "out.idPersona", keyColumn = "ID_PERSONA")
 	public int agregarPersona(@Param("out") AgregarConvenioPersonaDTO persona);
+
+	@Select(value = "SELECT  COUNT( cp.ID_CONVENIO_PF) as totalPersona " +
+			"FROM SVT_CONTRA_PAQ_CONVENIO_PF  cp " +
+			"join SVC_CONTRATANTE c ON c.ID_CONTRATANTE = cp.ID_CONTRATANTE " +
+			"WHERE cp.ID_CONVENIO_PF = #{datos.idConvenioPF} " +
+			"AND c.ID_PERSONA = #{datos.idPersona} " +
+			"AND c.IND_ACTIVO = 1 ")
+	public Map<String, Object> personaAgregada(@Param("datos") AgregarConvenioPersonaDTO datos);
+
+	@Update(value = ""
+			+ "UPDATE SVC_PERSONA  "
+			+ "SET  "
+			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "CVE_RFC = #{in.rfc} ," +
+			" NUM_SEXO = #{in.sexo} , " +
+			" REF_OTRO_SEXO= #{in.otroSexo} , " +
+			" REF_TELEFONO = #{in.telefono} , " +
+			" REF_CORREO = #{in.correo}   " +
+			" WHERE ID_PERSONA = #{in.idPersona} ")
+	public int actualizarPersona(@Param("in") AgregarConvenioPersonaDTO persona);
 }

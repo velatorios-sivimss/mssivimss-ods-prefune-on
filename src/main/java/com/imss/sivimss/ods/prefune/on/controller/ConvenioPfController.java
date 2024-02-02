@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.Gson;
 import com.imss.sivimss.ods.prefune.on.model.request.ActualizarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarBeneficiarioDTO;
 import com.imss.sivimss.ods.prefune.on.model.request.AgregarConvenioEmpresaDTO;
@@ -29,6 +30,7 @@ import com.imss.sivimss.ods.prefune.on.model.request.Paginado;
 import com.imss.sivimss.ods.prefune.on.model.request.PdfDto;
 import com.imss.sivimss.ods.prefune.on.model.request.PersonaNombres;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
+import com.imss.sivimss.ods.prefune.on.service.beans.Usuario;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
@@ -53,14 +55,17 @@ public class ConvenioPfController {
 	private static final String CONSULTA = "consulta";
 	private static final String INSERT = "insert";
 	private static final String UPDATE = "update";
-
+	private Gson gson= new Gson();
+	
 	@PostMapping("/mis-convenios")
 	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPaginada")
 	@TimeLimiter(name = "msflujo")
 	public CompletableFuture<Object> consultaMiConvenio(@Validated @RequestBody Paginado paginado,
 			Authentication authentication) throws IOException {
-		Response<Object> response = convenioPfService.consultaMiConvenio(paginado, 121, authentication);
+		
+		Usuario usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		Response<Object> response = convenioPfService.consultaMiConvenio(paginado, Integer.parseInt(usuario.getIdContratante()), authentication);
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
 

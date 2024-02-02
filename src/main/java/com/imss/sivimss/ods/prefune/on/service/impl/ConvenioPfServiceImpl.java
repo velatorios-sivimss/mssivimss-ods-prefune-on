@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.imss.sivimss.ods.prefune.on.configuration.MyBatisConfig;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.BeneficiariosMapper;
 import com.imss.sivimss.ods.prefune.on.configuration.mapper.Consultas;
@@ -49,6 +50,7 @@ import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.RenapoResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
+import com.imss.sivimss.ods.prefune.on.service.beans.Usuario;
 import com.imss.sivimss.ods.prefune.on.utils.AppConstantes;
 import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.PaginadoUtil;
@@ -95,6 +97,10 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	private static final String PERIODO_RENOVACION = "periodoRenovacion";
 	private static final String PATTERN = "dd-MM-yyyy";
+	
+	private Gson gson= new Gson();
+	
+	private Usuario usuario;
 
 	@Override
 	public Response<Object> consultaMiConvenio(Paginado paginado, Integer idContratante, Authentication authentication)
@@ -277,12 +283,13 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> actualizarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
-		Integer idUsuario = 1;
+	
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 			try {
-				datos.setIdUsuario(idUsuario);
+				datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 				if (datos.isActualizaArchivo())
 					mapperQuery.actualizarContratanteDocumento(datos);
 				mapperQuery.actualizarPersona(datos);
@@ -339,8 +346,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		Integer idUsuario = 1;
-		datos.setIdUsuario(idUsuario);
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 		Boolean validaBeneficiarioAsociado = true;
 		ActualizarBeneficiarioDTO actualizarBeneficiarioDTO = new ActualizarBeneficiarioDTO();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -456,13 +463,14 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> desactivarBeneficiario(ActualizarBeneficiarioDTO datos, Authentication authentication)
 			throws IOException {
-		Integer idUsuario = 1;
+		
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			BeneficiariosMapper mapperQuery = session.getMapper(BeneficiariosMapper.class);
 			try {
 
-				datos.setIdUsuario(idUsuario);
+				datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 				log.info("desactivando beneficiario");
 				mapperQuery.desactivarBeneficiario(datos);
 				log.info("beneficiario desactivado");
@@ -485,7 +493,8 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 	public Response<Object> consultaGeneralConvenio(Integer idVelatorio, Authentication authentication)
 			throws IOException {
-		Integer idContratante = 111;
+		
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
 		Map<String, Object> datosGenerales = new HashMap<>();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -493,7 +502,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			try {
 
 				AgregarBeneficiarioDTO contratante = new AgregarBeneficiarioDTO();
-				contratante.setIdContratante(idContratante);
+				contratante.setIdContratante(Integer.parseInt(usuario.getIdContratante()));
 				contratante.setIdVelatorio(idVelatorio);
 				log.info("buscando datos personales contratante");
 				datosGenerales = mapperQuery.datosPersonalesContratante(contratante);
@@ -519,8 +528,11 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		Integer idUsuario = 1;
-		datos.setIdUsuario(idUsuario);
+				
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		datos.setIdContratante(Integer.parseInt(usuario.getIdContratante()));
+		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
+		
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
 
@@ -528,12 +540,12 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				log.info("agregando convenio por persona");
 				convenio.agregarConvenioPF(datos);
 				log.info("finalizando convenio por persona");
-				log.info("agregando domicilio por persona");
-				convenio.agregarDomicilio(datos);
-				log.info("finalizando domiclio por persona");
-				log.info("agregando contratante por persona");
-				convenio.agregarContratante(datos);
-				log.info("finalizando contratante por persona");
+				// log.info("agregando domicilio por persona");
+				convenio.updateDomicilio(datos);
+				// log.info("finalizando domiclio por persona");
+				// log.info("agregando contratante por persona");
+				// convenio.agregarContratante(datos);
+				// log.info("finalizando contratante por persona");
 				log.info("agregando convenio paquete  por persona");
 				convenio.agregarContratoConvenioPaquete(datos);
 				log.info("finalizando convenio paquete por persona");
@@ -571,8 +583,10 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 	public Response<Object> altaPlanPFEmpresa(AgregarConvenioEmpresaDTO datos, Authentication authentication)
 			throws IOException {
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		Integer idUsuario = 1;
-		datos.setIdUsuario(idUsuario);
+		
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
+		
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapperEmpresa convenio = session.getMapper(ConvenioPFMapperEmpresa.class);
 
@@ -648,6 +662,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 							.numExterior(r.getNumExterior())
 							.telefono(r.getTelefono())
 							.correo(r.getCorreo())
+							.idPromotor(r.getIdPromotor())
 							.build();
 				});
 				convenioEmpresaResponse.setDatosEmpresaResponse(empresaResponse);
@@ -673,14 +688,32 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			throws IOException {
 
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
-		Integer idUsuario = 1;
-		datos.setIdUsuario(idUsuario);
+	
+		usuario= gson.fromJson((String)authentication.getPrincipal(), Usuario.class);
+		datos.setIdUsuario(Integer.parseInt(usuario.getIdUsuario()));
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			ConvenioPFMapper convenio = session.getMapper(ConvenioPFMapper.class);
 
 			try {
 				if (datos.getIdPersona() == 0) {
 					convenio.agregarPersona(datos);
+				} else {
+					ObjectMapper objMapper = new ObjectMapper();
+					Object datosConsulta;
+					String json;
+					JsonNode datosJson;
+
+					datosConsulta = convenio.personaAgregada(datos);
+					json = new ObjectMapper().writeValueAsString(datosConsulta);
+					datosJson = objMapper.readTree(json);
+					Integer total = datosJson.get("totalPersona").asInt();
+
+					if (total > 0)
+						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.PERSONA_REGISTRADA_ANTERIOR,
+								null);
+
+					convenio.actualizarPersona(datos);
+
 				}
 
 				log.info("agregando domicilio por persona");
@@ -705,7 +738,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						authentication);
 				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
 			}
-			// session.commit();
+			session.commit();
 		}
 
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
