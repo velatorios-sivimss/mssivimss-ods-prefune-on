@@ -14,6 +14,7 @@ public class AppConstantes {
 	public static final String CIRCUITBREAKER = "186"; // El servicio no responde, no permite más llamadas.
 	public static final String EXITO = "Exito";
 	public static final String OCURRIO_ERROR_GENERICO = "187";// Ocurrio un error al procesar tu solicitud.
+	public static final String OCURRIO_ERROR_GUARDAR = "5";// Ocurrio un error al procesar tu solicitud.
 	public static final String BAD_REQUEST_MENSAJE = "Datos incorrectos.";
 	public static final String HISTORIAL_ORDENES_MENSAJE = "116";// MSG116 Aún no cuentas con una Orden de servicio
 																	// (ODS) generada. Puedes acudir a tu Velatorio más
@@ -42,6 +43,9 @@ public class AppConstantes {
 	public static final String BENEFICIARIO_REGISTRADO = "802";// El beneficiario ya fue registrado con anterioridad,
 																// ingrese un beneficiario diferente
 	public static final String PERSONA_REGISTRADA_ANTERIOR = "803";
+	
+	public static final String NUMERO_SEGURIDAD_SOCIAL_NO_EXISTE = "188"; // El Numero de Seguridad Social no existe.
+	public static final String SERVICIO_NO_DISPONIBLE = "189"; // El servicio de Consulta de NSS no esta disponible.
 
 	private AppConstantes() {
 

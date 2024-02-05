@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -273,7 +272,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 
 				log.info("error: {}", e.getCause().getMessage());
 				return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(),
-						AppConstantes.OCURRIO_ERROR_GENERICO, Arrays.asList());
+						AppConstantes.OCURRIO_ERROR_GUARDAR, Arrays.asList());
 			}
 			session.commit();
 
@@ -302,7 +301,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						this.getClass().getPackage().toString(),
 						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
 						authentication);
-				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GUARDAR, e.getMessage());
 			}
 
 			session.commit();
@@ -422,7 +421,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						this.getClass().getPackage().toString(),
 						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
 						authentication);
-				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GUARDAR, e.getMessage());
 			}
 			session.commit();
 		}
@@ -497,7 +496,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						this.getClass().getPackage().toString(),
 						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
 						authentication);
-				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GUARDAR, e.getMessage());
 			}
 
 			session.commit();
@@ -586,7 +585,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						this.getClass().getPackage().toString(),
 						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
 						authentication);
-				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GUARDAR, e.getMessage());
 			}
 			session.commit();
 		}
@@ -635,7 +634,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						this.getClass().getPackage().toString(),
 						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
 						authentication);
-				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GUARDAR, e.getMessage());
 			}
 			session.commit();
 		}
@@ -752,7 +751,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 						this.getClass().getPackage().toString(),
 						AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
 						authentication);
-				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GENERICO, e.getMessage());
+				return new Response<>(true, 200, AppConstantes.OCURRIO_ERROR_GUARDAR, e.getMessage());
 			}
 			session.commit();
 		}

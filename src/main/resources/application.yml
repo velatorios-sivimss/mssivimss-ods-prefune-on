@@ -57,6 +57,7 @@ endpoints:
   ms-reportes: http://localhost:8088/mssivimss-reportes-jasp/v1/generales/generar-reporte
   renapo: 'http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/externos/renapo/curp'
   sepomex: 'http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/domicilios/asentamientos/codigoPostal'
+  nss: 'http://serviciosdigitalesinterno-stage.imss.gob.mx/serviciosDigitales-rest/v1/personas/asegurado'
 
 reporte:
   convenio-nuevo-pf: reportes/plantilla/ANEXO5_CONVENIO_PF_NUEVO.jrxml

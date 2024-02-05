@@ -117,6 +117,17 @@ public class VelatoriosController {
 
 	}
 	
+	@GetMapping("/consultar/matricula/{dato}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaNss")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaNss")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> obtenerNss(@PathVariable(required = true) String dato, Authentication authentication)
+			throws IOException {
+		Response<Object> response = catalogosService.consultarNss(dato, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo().intValue())));
+	}
+	
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsulta(Authentication authentication,
 			CallNotPermittedException e) throws IOException {
@@ -141,6 +152,17 @@ public class VelatoriosController {
 	
 	@SuppressWarnings("unused")
 	private CompletableFuture<Object> fallbackConsultaPostal(@PathVariable(required = true) String dato, Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackConsultaNss(@PathVariable(required = true) String dato, Authentication authentication,
 			CallNotPermittedException e) throws IOException {
 		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),

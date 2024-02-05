@@ -66,6 +66,9 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService 
 
 	@Value("${endpoints.sepomex}")
 	private String urlSepomex;
+	
+	@Value("${endpoints.nss}")
+	private String nss;
 
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
@@ -235,6 +238,19 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService 
 					authentication);
 			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO,
 					Arrays.asList());
+		}
+	}
+
+	@Override
+	public Response<Object> consultarNss(String matricula, Authentication authentication) throws IOException {
+		try {
+			Response<Object> response = providerRestTemplate
+					.consumirServicioExternoGet(nss + "/" + matricula);
+			return MensajeResponseUtil.mensajeResponseExterno(response, 
+					AppConstantes.NUMERO_SEGURIDAD_SOCIAL_NO_EXISTE, AppConstantes.SERVICIO_NO_DISPONIBLE);
+
+		} catch (Exception e) {
+			return new Response<>(true, 200, CODIGO_POSTAL_NO_EXISTE);
 		}
 	}
 
