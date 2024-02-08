@@ -284,4 +284,90 @@ public class ConsultaMiConvenio {
 
 	}
 
+	public String consultarDatosGenealesPersonaEmpresa(Integer idConvenio,Integer idContratante) {
+		SelectQueryUtil selectQueryUtil = new SelectQueryUtil();
+		SelectQueryUtil selectQueryUtilBeneficiarios = new SelectQueryUtil();
+
+		selectQueryUtilBeneficiarios.select("COUNT(SCBE.ID_PERSONA) ")
+				.from("SVT_CONTRA_PAQ_CONVENIO_PF SCPAC ")
+				.innerJoin("SVT_CONTRATANTE_BENEFICIARIOS SCBE",
+						"SCPAC.ID_CONTRA_PAQ_CONVENIO_PF = SCBE.ID_CONTRA_PAQ_CONVENIO_PF ")
+				.where("SCPAC.ID_CONVENIO_PF = ".concat(idConvenio.toString()).concat(" AND SCPAC.ID_CONTRATANTE="+idContratante). concat(" AND SCBE.IND_ACTIVO =1 "));
+
+		selectQueryUtil.select("SCP.ID_CONVENIO_PF AS idConvenio",
+				"SC.ID_CONTRATANTE AS idContratante",
+				"IFNULL(SC.CVE_MATRICULA,'') AS matricula",
+				"IFNULL(SP.CVE_RFC,'') AS rfc",
+				"IFNULL(SP.CVE_CURP,'') AS curp",
+				"SP.NOM_PERSONA AS nombreAfiliado",
+				"SP.NOM_PRIMER_APELLIDO AS primerApellido",
+				"SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
+				" CASE SP.NUM_SEXO " +
+						" WHEN 1 THEN 'FEMENINO' " +
+						" WHEN 2 THEN 'MASCULINO' " +
+						" ELSE IFNULL(SP.REF_OTRO_SEXO,'')" +
+						" END " +
+						" AS sexo",
+				"IFNULL(SP.FEC_NAC,'') AS fechaNacimiento",
+				"IFNULL(SP.ID_ESTADO,'') AS lugarNacimiento",
+				"IFNULL(SD.REF_CP,'') AS cp",
+				"IFNULL(SD.REF_COLONIA,'') AS colonia",
+				"IFNULL(SD.REF_MUNICIPIO,'') AS municpio",
+				"IFNULL(SD.REF_ESTADO,'') AS estadoDomiclio",
+				"IFNULL(SD.REF_CALLE,'') AS calle",
+				"IFNULL(SD.NUM_EXTERIOR,'') AS numExterior",
+				"IFNULL(SD.NUM_INTERIOR,'') AS numInterior",
+				"IFNULL(SP.REF_CORREO,'') AS correo",
+				"IFNULL(SCPA.IND_ENFERMEDAD_PREXISTENTE,'') AS enfermedad",
+				"IFNULL(SCPA.REF_OTRA_ENFERMEDAD,'') AS otroEnfermedad",
+				"IFNULL(SP.REF_TELEFONO,'') AS telefono",
+				"(".concat(selectQueryUtilBeneficiarios.build()).concat(") AS totalBeneficiarios"))
+				.from("SVT_CONVENIO_PF SCP")
+				.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF ")
+				.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPA", "SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF ")
+				.innerJoin("SVC_CONTRATANTE SC ", "SCPA.ID_CONTRATANTE = SC.ID_CONTRATANTE ")
+				.innerJoin("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
+				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
+				.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = SCP.ID_VELATORIO")
+				.where("SCP.ID_CONVENIO_PF = " + idConvenio).and(" SC.ID_CONTRATANTE = " + idContratante);
+
+		query = selectQueryUtil.build();
+		log.info("consultarDatosGeneales: {}", query);
+		return query;
+	}
+
+	
+	public String consultarBeneficiariosPersonaEmpresaConvenio(Integer idConvenio,Integer idContratante) {
+		SelectQueryUtil selectQueryUtil = new SelectQueryUtil();
+		selectQueryUtil.select(
+				"SCB.ID_CONTRATANTE_BENEFICIARIOS AS idContratanteBeneficiarios",
+				"SCB.ID_PERSONA AS idPersona",
+				"SP.NOM_PERSONA AS nombreAfiliado",
+				"SP.NOM_PRIMER_APELLIDO AS primerApellido",
+				"SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
+				"SP.CVE_RFC AS rfc",
+				"SP.CVE_CURP AS curp",
+				"SCB.ID_PARENTESCO AS idParentesco",
+				"SPAC.DES_PARENTESCO AS parentesco",
+				"SV.DES_VELATORIO AS velatorio",
+				"DATE_FORMAT(SP.FEC_NAC,'%d-%m-%Y') AS fechaNacimiento",
+				"TIMESTAMPDIFF(YEAR, SP.FEC_NAC, CURDATE())  AS edad",
+				"SP.REF_CORREO AS correo",
+				"SP.REF_TELEFONO AS telefono",
+				"IFNULL(SCB.REF_UBICACION_ACTA_NACIMIENTO,'') AS actaNacimiento",
+				"IFNULL(SCB.REF_UBICACION_INE_BENEFICIARIO,'') AS ine")
+				.from("SVT_CONVENIO_PF SCP ")
+				.innerJoin("SVC_VELATORIO SV", "SCP.ID_VELATORIO = SV.ID_VELATORIO ")
+				.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF ")
+				.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPA ", "SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF")
+				.innerJoin("SVT_CONTRATANTE_BENEFICIARIOS SCB",
+						"SCPA.ID_CONTRA_PAQ_CONVENIO_PF = SCB.ID_CONTRA_PAQ_CONVENIO_PF")
+				.innerJoin("SVC_PARENTESCO SPAC", "SCB.ID_PARENTESCO = SPAC.ID_PARENTESCO ")
+				.innerJoin("SVC_PERSONA SP", "SCB.ID_PERSONA = SP.ID_PERSONA ")
+				.where("SCP.ID_CONVENIO_PF =".concat(idConvenio.toString()).concat(" AND SCPA.ID_CONTRATANTE = "+idContratante).concat(" AND SCB.IND_ACTIVO =1 "));
+		query = selectQueryUtil.build();
+		log.info("consultarBeneficiariosConvenio: {}", query);
+		return query;
+	}
+
 }

@@ -232,6 +232,18 @@ public class ConvenioPfController {
 				.supplyAsync(() -> new ResponseEntity<>(response,
 						HttpStatus.valueOf(response.getCodigo())));
 	}
+	
+	@GetMapping("/empresa-persona-detalle-convenio/{idConvenio}/{idContratante}")
+	@CircuitBreaker(name = "msflujo", fallbackMethod = "fallbackConsultaPersonaEmpresa")
+	@Retry(name = "msflujo", fallbackMethod = "fallbackConsultaPersonaEmpresa")
+	@TimeLimiter(name = "msflujo")
+	public CompletableFuture<Object> consultaEmpresaPersonaDetalleConvenio(@PathVariable(required = true) Integer idConvenio,
+			@PathVariable(required = true) Integer idContratante,
+			Authentication authentication) throws IOException {
+		Response<Object> response = convenioPfService.consultaDetallePersonaConvenioEmpresa(idConvenio,idContratante, authentication);
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
 
 	/*
 	 * 
@@ -375,6 +387,18 @@ public class ConvenioPfController {
 		Response<Object> response = providerRestTemplate.respuestaProvider(e.getMessage());
 		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
 				this.getClass().getPackage().toString(), e.getMessage(), UPDATE, authentication);
+
+		return CompletableFuture
+				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));
+	}
+	
+	@SuppressWarnings("unused")
+	private CompletableFuture<Object> fallbackConsultaPersonaEmpresa(@PathVariable Integer idConvenio,@PathVariable Integer idContratante,
+			Authentication authentication,
+			CallNotPermittedException e) throws IOException {
+		Response<?> response = providerRestTemplate.respuestaProvider(e.getMessage());
+		logUtil.crearArchivoLog(Level.INFO.toString(), this.getClass().getSimpleName(),
+				this.getClass().getPackage().toString(), e.getMessage(), CONSULTA, authentication);
 
 		return CompletableFuture
 				.supplyAsync(() -> new ResponseEntity<>(response, HttpStatus.valueOf(response.getCodigo())));

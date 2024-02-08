@@ -47,6 +47,7 @@ import com.imss.sivimss.ods.prefune.on.model.response.BusquedaInformacionReporte
 import com.imss.sivimss.ods.prefune.on.model.response.ConvenioEmpresaResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.DatosEmpresaResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.MiConvenioResponse;
+import com.imss.sivimss.ods.prefune.on.model.response.PersonaEmpresaConvenioResponse;
 import com.imss.sivimss.ods.prefune.on.model.response.RenapoResponse;
 import com.imss.sivimss.ods.prefune.on.service.ConvenioPfService;
 import com.imss.sivimss.ods.prefune.on.service.beans.ConsultaMiConvenio;
@@ -759,6 +760,37 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO,
 				datos);
 
+	}
+
+	@Override
+	public Response<Object> consultaDetallePersonaConvenioEmpresa(Integer idConvenio, Integer idContratante,
+			Authentication authentication) throws IOException {
+		List<Map<String, Object>> resultDatosPersona = new ArrayList<>();
+		List<Map<String, Object>> resultDatosBeneficios = new ArrayList<>();
+		
+		PersonaEmpresaConvenioResponse convenioResponse = new PersonaEmpresaConvenioResponse();
+		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
+
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			Consultas consultas = session.getMapper(Consultas.class);
+			resultDatosPersona = consultas.selectNativeQuery(miConvenio.consultarDatosGenealesPersonaEmpresa(idConvenio,idContratante));
+
+			resultDatosBeneficios = consultas.selectNativeQuery(miConvenio.consultarBeneficiariosPersonaEmpresaConvenio(idConvenio,idContratante));
+			
+		} catch (Exception e) {
+			log.info(ERROR, e.getCause().getMessage());
+
+			logUtil.crearArchivoLog(Level.WARNING.toString(), this.getClass().getSimpleName(),
+					this.getClass().getPackage().toString(),
+					AppConstantes.ERROR_LOG_QUERY + AppConstantes.ERROR_CONSULTAR, AppConstantes.CONSULTA,
+					authentication);
+			return new Response<>(true, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstantes.OCURRIO_ERROR_GENERICO,
+					Arrays.asList());
+		}
+		convenioResponse.setPersona(resultDatosPersona);
+		convenioResponse.setBeneficiarios(resultDatosBeneficios);
+		
+		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioResponse);
 	}
 
 }
