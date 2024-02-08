@@ -193,8 +193,8 @@ public interface ConvenioPFMapper {
 			"#{out.telefono}, " +
 			"#{out.correo}, " +
 			"#{out.idUsuario}, " +
-			"#{in.sexo} , " +
-			"#{in.otroSexo} ," +
+			"#{out.sexo} , " +
+			"#{out.otroSexo} ," +
 			" CURRENT_DATE())")
 	@Options(useGeneratedKeys = true, keyProperty = "out.idPersona", keyColumn = "ID_PERSONA")
 	public int agregarPersona(@Param("out") AgregarConvenioPersonaDTO persona);
