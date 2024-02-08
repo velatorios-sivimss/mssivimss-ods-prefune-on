@@ -321,6 +321,10 @@ public class ConsultaMiConvenio {
 				"IFNULL(SCPA.IND_ENFERMEDAD_PREXISTENTE,'') AS enfermedad",
 				"IFNULL(SCPA.REF_OTRA_ENFERMEDAD,'') AS otroEnfermedad",
 				"IFNULL(SP.REF_TELEFONO,'') AS telefono",
+				"SCPA.ID_PAQUETE AS paquete",
+				"V.DES_VELATORIO AS velatorio",
+				"D.DES_DELEGACION AS delegacion",
+				"IFNULL(SCP.DES_FOLIO,'') AS folioConvenio",
 				"(".concat(selectQueryUtilBeneficiarios.build()).concat(") AS totalBeneficiarios"))
 				.from("SVT_CONVENIO_PF SCP")
 				.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF ")
@@ -329,6 +333,7 @@ public class ConsultaMiConvenio {
 				.innerJoin("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
 				.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = SCP.ID_VELATORIO")
+				.innerJoin("SVC_DELEGACION D", "V.ID_DELEGACION = D.ID_DELEGACION")
 				.where("SCP.ID_CONVENIO_PF = " + idConvenio).and(" SC.ID_CONTRATANTE = " + idContratante);
 
 		query = selectQueryUtil.build();
