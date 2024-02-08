@@ -325,6 +325,7 @@ public class ConsultaMiConvenio {
 				"V.DES_VELATORIO AS velatorio",
 				"D.DES_DELEGACION AS delegacion",
 				"IFNULL(SCP.DES_FOLIO,'') AS folioConvenio",
+				"SCP.FEC_INICIO AS fechaInicio",
 				"(".concat(selectQueryUtilBeneficiarios.build()).concat(") AS totalBeneficiarios"))
 				.from("SVT_CONVENIO_PF SCP")
 				.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF ")
