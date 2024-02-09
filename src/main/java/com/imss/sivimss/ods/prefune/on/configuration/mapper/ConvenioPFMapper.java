@@ -141,6 +141,7 @@ public interface ConvenioPFMapper {
 			" REF_DOC_RFC_AFILIADO, " +
 			" ID_CONVENIO_PF," +
 			" ID_USUARIO_ALTA, " +
+			" ID_CONTRA_PAQ_CONVENIO_PF," +
 			" FEC_ALTA" +
 			" )" +
 			" VALUES " +
@@ -156,6 +157,7 @@ public interface ConvenioPFMapper {
 			" #{datos.archivoRfc}," +
 			" #{datos.idConvenioPF}," +
 			" #{datos.idUsuario}," +
+			" #{datos.idContratoConvenioPaquete}, " +
 			" CURRENT_DATE()" +
 			" ) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idValidaDocumento", keyColumn = "ID_VALIDACION_DOCUMENTO")
