@@ -44,7 +44,7 @@ public class Catalogos {
         SelectQueryUtil selectQueryUtilUnionPaqueteArticulo = new SelectQueryUtil();
 
         selectQueryUtilUnionPaqueteVelatorio
-                .select("SP.ID_PAQUETE", "SP.REF_PAQUETE_NOMBRE", "SP.REF_PAQUETE_DESCRIPCION")
+                .select("SP.ID_PAQUETE", "SP.REF_PAQUETE_NOMBRE", "SP.REF_PAQUETE_DESCRIPCION","SP.MON_PRECIO")
                 .from("SVT_PAQUETE SP")
                 .innerJoin("SVT_PAQUETE_VELATORIO SPV", "SP.ID_PAQUETE=SPV.ID_PAQUETE")
                 .where("SP.IND_ACTIVO = 1")
@@ -52,7 +52,7 @@ public class Catalogos {
                 .and("SPV.ID_VELATORIO = " + idVelatorio);
 
         selectQueryUtilUnionPaqueteRegion
-                .select("SP.ID_PAQUETE", "SP.REF_PAQUETE_NOMBRE", "SP.REF_PAQUETE_DESCRIPCION")
+                .select("SP.ID_PAQUETE", "SP.REF_PAQUETE_NOMBRE", "SP.REF_PAQUETE_DESCRIPCION","SP.MON_PRECIO")
                 .from("SVT_PAQUETE SP")
                 .where("SP.IND_ACTIVO = 1 ")
                 .and("SP.IND_ONLINE = 1")
@@ -86,7 +86,7 @@ public class Catalogos {
 
         selectQueryUtilPaquete
                 .select("PAQUETES.ID_PAQUETE AS idPaquete", "PAQUETES.REF_PAQUETE_NOMBRE AS nomPaquete",
-                        "PAQUETES.REF_PAQUETE_DESCRIPCION AS descPaquete")
+                        "PAQUETES.REF_PAQUETE_DESCRIPCION AS descPaquete","PAQUETES.MON_PRECIO AS costoPaquete")
                 .from("(" + queryPaqueteRegion + ") PAQUETES");
 
         query = selectQueryUtilPaquete.build();
