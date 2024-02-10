@@ -117,7 +117,7 @@ public interface BeneficiariosMapper {
 			" REF_DOCUMENTO_BENEFICIARIO) " +
 			" VALUES " +
 			"( (SELECT DISTINCT ID_CONTRA_PAQ_CONVENIO_PF" +
-			" FROM  SVT_CONTRA_PAQ_CONVENIO_PF  where ID_CONVENIO_PF = #{out.idConvenio} and = #{out.idContratante}  limit 1 ),"
+			" FROM  SVT_CONTRA_PAQ_CONVENIO_PF  where ID_CONVENIO_PF = #{out.idConvenio} and ID_CONTRATANTE = #{out.idContratante}  limit 1 ),"
 			+
 			"#{out.idParentesco}, " +
 			"#{out.idPersona}, " +
