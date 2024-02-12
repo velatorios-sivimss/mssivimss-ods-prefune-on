@@ -28,15 +28,16 @@ public class ConsultaMiConvenio {
 						" end AS ciudadExpedicion",
 				"CASE when SCP.IND_TIPO_CONTRATACION = 0" +
 						" then 0 else 1 end " + " AS tipoContrato",
-				"SCP.ID_TIPO_PREVISION AS tipoPrevision",
+				" SCP.ID_TIPO_PREVISION AS tipoPrevision",
 				"IF(RENO.ID_ESTATUS=2, TRUE, FALSE) AS banderaDocumentos",
+				" SCP.ID_VELATORIO AS idVelatorio",
 				"PA.MON_PRECIO AS precioPaquete")
-				.from("SVT_CONVENIO_PF SCP ")
+				.from(" SVT_CONVENIO_PF SCP ")
 				.innerJoin("SVC_VELATORIO SV ", "SCP.ID_VELATORIO=SV.ID_VELATORIO ")
-				.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF")
-				.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPA", "SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF")
-				.innerJoin("SVC_CONTRATANTE SC", "SCPA.ID_CONTRATANTE = SC.ID_CONTRATANTE")
-				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA =SP.ID_PERSONA")
+				.innerJoin(" SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF")
+				.innerJoin(" SVT_CONTRA_PAQ_CONVENIO_PF SCPA", " SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF")
+				.innerJoin(" SVC_CONTRATANTE SC", "SCPA.ID_CONTRATANTE = SC.ID_CONTRATANTE")
+				.innerJoin(" SVC_PERSONA SP", "SC.ID_PERSONA =SP.ID_PERSONA")
 				.innerJoin("SVT_PAQUETE PA", "PA.ID_PAQUETE =SCPA.ID_PAQUETE")
 				.leftJoin("SVT_RENOVACION_CONVENIO_PF RENO",
 						"SCP.ID_CONVENIO_PF = RENO.ID_CONVENIO_PF AND RENO.ID_ESTATUS = 2 ")
@@ -286,7 +287,7 @@ public class ConsultaMiConvenio {
 
 	}
 
-	public String consultarDatosGenealesPersonaEmpresa(Integer idConvenio,Integer idContratante) {
+	public String consultarDatosGenealesPersonaEmpresa(Integer idConvenio, Integer idContratante) {
 		SelectQueryUtil selectQueryUtil = new SelectQueryUtil();
 		SelectQueryUtil selectQueryUtilBeneficiarios = new SelectQueryUtil();
 
@@ -294,7 +295,8 @@ public class ConsultaMiConvenio {
 				.from("SVT_CONTRA_PAQ_CONVENIO_PF SCPAC ")
 				.innerJoin("SVT_CONTRATANTE_BENEFICIARIOS SCBE",
 						"SCPAC.ID_CONTRA_PAQ_CONVENIO_PF = SCBE.ID_CONTRA_PAQ_CONVENIO_PF ")
-				.where("SCPAC.ID_CONVENIO_PF = ".concat(idConvenio.toString()).concat(" AND SCPAC.ID_CONTRATANTE="+idContratante). concat(" AND SCBE.IND_ACTIVO =1 "));
+				.where("SCPAC.ID_CONVENIO_PF = ".concat(idConvenio.toString())
+						.concat(" AND SCPAC.ID_CONTRATANTE=" + idContratante).concat(" AND SCBE.IND_ACTIVO =1 "));
 
 		selectQueryUtil.select("SCP.ID_CONVENIO_PF AS idConvenio",
 				"SC.ID_CONTRATANTE AS idContratante",
@@ -330,7 +332,7 @@ public class ConsultaMiConvenio {
 				"IFNULL(DATE_FORMAT(SCP.FEC_INICIO,'%d-%m-%Y'),'') AS fechaInicio",
 				"IFNULL(DOC.REF_UBICACION_INE,'') AS docIne",
 				"IFNULL(DOC.REF_UBICACION_CURP,'') AS docCurp",
-			    "IFNULL(DOC.REF_UBICACION_RFC,'') AS docRfc",
+				"IFNULL(DOC.REF_UBICACION_RFC,'') AS docRfc",
 				"(".concat(selectQueryUtilBeneficiarios.build()).concat(") AS totalBeneficiarios"))
 				.from("SVT_CONVENIO_PF SCP")
 				.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF ")
@@ -340,7 +342,8 @@ public class ConsultaMiConvenio {
 				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
 				.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = SCP.ID_VELATORIO")
 				.innerJoin("SVC_DELEGACION D", "V.ID_DELEGACION = D.ID_DELEGACION")
-				.leftJoin("SVC_VALIDA_DOCS_CONVENIO_PF DOC", "SCPA.ID_CONTRA_PAQ_CONVENIO_PF =DOC.ID_CONTRA_PAQ_CONVENIO_PF")
+				.leftJoin("SVC_VALIDA_DOCS_CONVENIO_PF DOC",
+						"SCPA.ID_CONTRA_PAQ_CONVENIO_PF =DOC.ID_CONTRA_PAQ_CONVENIO_PF")
 				.where("SCP.ID_CONVENIO_PF = " + idConvenio).and(" SC.ID_CONTRATANTE = " + idContratante);
 
 		query = selectQueryUtil.build();
@@ -348,8 +351,7 @@ public class ConsultaMiConvenio {
 		return query;
 	}
 
-	
-	public String consultarBeneficiariosPersonaEmpresaConvenio(Integer idConvenio,Integer idContratante) {
+	public String consultarBeneficiariosPersonaEmpresaConvenio(Integer idConvenio, Integer idContratante) {
 		SelectQueryUtil selectQueryUtil = new SelectQueryUtil();
 		selectQueryUtil.select(
 				"SCB.ID_CONTRATANTE_BENEFICIARIOS AS idContratanteBeneficiarios",
@@ -376,7 +378,8 @@ public class ConsultaMiConvenio {
 						"SCPA.ID_CONTRA_PAQ_CONVENIO_PF = SCB.ID_CONTRA_PAQ_CONVENIO_PF")
 				.innerJoin("SVC_PARENTESCO SPAC", "SCB.ID_PARENTESCO = SPAC.ID_PARENTESCO ")
 				.innerJoin("SVC_PERSONA SP", "SCB.ID_PERSONA = SP.ID_PERSONA ")
-				.where("SCP.ID_CONVENIO_PF =".concat(idConvenio.toString()).concat(" AND SCPA.ID_CONTRATANTE = "+idContratante).concat(" AND SCB.IND_ACTIVO =1 "));
+				.where("SCP.ID_CONVENIO_PF =".concat(idConvenio.toString())
+						.concat(" AND SCPA.ID_CONTRATANTE = " + idContratante).concat(" AND SCB.IND_ACTIVO =1 "));
 		query = selectQueryUtil.build();
 		log.info("consultarBeneficiariosConvenio: {}", query);
 		return query;
