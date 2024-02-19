@@ -93,7 +93,7 @@ public class ConsultaMiConvenio {
 				.innerJoin("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
 				.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = SCP.ID_VELATORIO")
-				.innerJoin("SVT_PAGO_LINEA PL", "PL.ID_REGISTRO = SCP.ID_CONVENIO_PF AND PL.ID_FLUJO_PAGOS = 2")
+				.leftJoin("SVT_PAGO_LINEA PL", "PL.ID_REGISTRO = SCP.ID_CONVENIO_PF AND PL.ID_FLUJO_PAGOS = 2")
 				.where("SCP.ID_CONVENIO_PF = " + idConvenio);
 
 		query = selectQueryUtil.build();
