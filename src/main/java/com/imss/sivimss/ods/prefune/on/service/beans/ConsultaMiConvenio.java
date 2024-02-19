@@ -84,7 +84,8 @@ public class ConsultaMiConvenio {
 				"SP.FEC_NAC AS fechaNacimiento",
 				"SCP.ID_TIPO_PREVISION AS tipoPrevision",
 				"SD.REF_ESTADO AS entidadFederativa",
-				"(".concat(selectQueryUtilBeneficiarios.build()).concat(") AS totalBeneficiarios"))
+				"(".concat(selectQueryUtilBeneficiarios.build()).concat(") AS totalBeneficiarios"),
+				"PL.ID_PAGO_LINEA AS idPagoLinea ")
 				.from("SVT_CONVENIO_PF SCP")
 				.innerJoin("SVC_ESTATUS_CONVENIO_PF SECP", "SCP.ID_ESTATUS_CONVENIO = SECP.ID_ESTATUS_CONVENIO_PF ")
 				.innerJoin("SVT_CONTRA_PAQ_CONVENIO_PF SCPA", "SCP.ID_CONVENIO_PF = SCPA.ID_CONVENIO_PF ")
@@ -92,6 +93,7 @@ public class ConsultaMiConvenio {
 				.innerJoin("SVT_DOMICILIO SD", "SC.ID_DOMICILIO = SD.ID_DOMICILIO ")
 				.innerJoin("SVC_PERSONA SP", "SC.ID_PERSONA = SP.ID_PERSONA")
 				.innerJoin("SVC_VELATORIO V", "V.ID_VELATORIO = SCP.ID_VELATORIO")
+				.innerJoin("SVT_PAGO_LINEA PL", "PL.ID_REGISTRO = SCP.ID_CONVENIO_PF AND PL.ID_FLUJO_PAGOS = 2")
 				.where("SCP.ID_CONVENIO_PF = " + idConvenio);
 
 		query = selectQueryUtil.build();
