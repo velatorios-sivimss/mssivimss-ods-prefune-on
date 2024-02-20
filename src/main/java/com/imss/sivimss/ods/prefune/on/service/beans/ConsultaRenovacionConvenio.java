@@ -15,7 +15,8 @@ public class ConsultaRenovacionConvenio {
 	public String obtenerFolio(String idConvenio) {
 		SelectQueryUtil queryUtil= new SelectQueryUtil();
 		queryUtil.select("DES_FOLIO",
-				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'FIRMA_DIRECTORA') AS firmaFideicomiso")
+				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'FIRMA_DIRECTORA') AS firmaFideicomiso",
+				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'NOMBRE FIBESO') AS nombreFibeso")
 		.from("SVT_CONVENIO_PF")
 		.where("ID_CONVENIO_PF ="+idConvenio);
 		query = queryUtil.build();
@@ -27,7 +28,8 @@ public class ConsultaRenovacionConvenio {
 		SelectQueryUtil queryUtil = new SelectQueryUtil();
 		queryUtil.select("PAQ.MON_PRECIO AS costoRecuperacion",
 				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'FIRMA_DIRECTORA') AS firmaFideicomiso",
-				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'SELLO_RENOVACION') AS selloRenovacion")
+				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'SELLO_RENOVACION') AS selloRenovacion",
+				"(SELECT TIP_PARAMETRO FROM SVC_PARAMETRO_SISTEMA WHERE DES_PARAMETRO= 'NOMBRE FIBESO') AS nombreFibeso")
 		.from("SVT_CONVENIO_PF SCP")
 		.join("SVT_RENOVACION_CONVENIO_PF RPF", "SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF")
 		.join("SVT_CONTRA_PAQ_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
