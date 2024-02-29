@@ -7,15 +7,15 @@ import lombok.Setter;
 @Getter
 public class DetalleHistorialServicios {
 
-    public Integer id;
+	private Integer id;
 	
-	public String nombreServicio;
+	private String nombreServicio;
 	
-	public String capilla;
+	private String capilla;
 	
-	public String estatus;
+	private String estatus;
 	
-	public String fecha;
+	private String fecha;
 	
-	public String notas;
+	private String notas;
 }

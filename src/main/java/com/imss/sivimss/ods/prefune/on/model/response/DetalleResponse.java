@@ -10,16 +10,16 @@ import lombok.Setter;
 @Getter
 public class DetalleResponse {
 	
-	public String folio;
+	private String folio;
 	
-	public String estatus;
+	private String estatus;
 	
-	public String nombreContratante;
+	private String nombreContratante;
 	
-	public String nombrefinado;
+	private String nombrefinado;
 	
-	public String fechaAlta;
+	private String fechaAlta;
 	
-	public List<DetalleHistorialServicios> historialDetalle= new ArrayList<>();
+	private List<DetalleHistorialServicios> historialDetalle= new ArrayList<>();
 	
 }
