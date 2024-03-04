@@ -57,6 +57,7 @@ public class Catalogos {
                 .from("SVT_PAQUETE SP")
                 .where("SP.IND_ACTIVO = 1 ")
                 .and("SP.IND_ONLINE = 1")
+                .and("SP.IND_PA = 0")
                 .and("SP.IND_REGION =1");
 
         selectQueryUtilUnionPaqueteServicio.select("SPS.ID_PAQUETE")
