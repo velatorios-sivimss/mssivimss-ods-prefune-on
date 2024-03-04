@@ -49,6 +49,7 @@ public class Catalogos {
                 .innerJoin("SVT_PAQUETE_VELATORIO SPV", "SP.ID_PAQUETE=SPV.ID_PAQUETE")
                 .where("SP.IND_ACTIVO = 1")
                 .and("SP.IND_ONLINE = 1")
+                .and("SP.IND_PA = 0")
                 .and("SPV.ID_VELATORIO = " + idVelatorio);
 
         selectQueryUtilUnionPaqueteRegion
