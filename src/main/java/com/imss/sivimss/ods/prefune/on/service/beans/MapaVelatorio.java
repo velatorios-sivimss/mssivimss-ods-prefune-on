@@ -19,7 +19,8 @@ public class MapaVelatorio {
 		selectQueryUtil.select(
 				"SE.ID_VELATORIO AS idVelatorio",
 				"SE.DES_VELATORIO AS nombreVelatorio",
-				"CONCAT(SD.REF_CALLE,' ',SD.NUM_EXTERIOR,' ',SD.NUM_INTERIOR,' ',SD.REF_CP,' ',SD.REF_COLONIA,' ',SD.REF_MUNICIPIO,' ',SD.REF_ESTADO) AS direccion",
+				"CONCAT(SD.REF_CALLE,', ',SD.NUM_EXTERIOR,'',CASE WHEN SD.NUM_INTERIOR IS NULL OR SD.NUM_INTERIOR =''"
+				+ "THEN ', ' ELSE CONCAT(', ',SD.NUM_INTERIOR,', ') END,'',SD.REF_CP,', ',SD.REF_COLONIA,', ',SD.REF_MUNICIPIO,', ',SD.REF_ESTADO) AS direccion",
 				"SE.NUM_TELEFONO AS telefono",
 				"SE.NUM_LATITUD AS latitud",
 				"SE.NUM_LONGITUD AS longitud")
