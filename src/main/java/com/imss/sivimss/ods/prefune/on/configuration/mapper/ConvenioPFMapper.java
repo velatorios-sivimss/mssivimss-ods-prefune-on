@@ -44,7 +44,7 @@ public interface ConvenioPFMapper {
 			"#{datos.idPromotor}, " +
 			"5, " +
 			"#{datos.idUsuario}, " +
-			" CURRENT_DATE()) ")
+			" CURRENT_TIMESTAMP()) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idConvenioPF", keyColumn = "ID_CONVENIO_PF")
 	public int agregarConvenioPF(@Param("datos") AgregarConvenioPersonaDTO datos);
 
@@ -69,7 +69,7 @@ public interface ConvenioPFMapper {
 			" #{datos.municipio}, " +
 			" #{datos.estado}, " +
 			" #{datos.idUsuario}, " +
-			" CURRENT_DATE() " +
+			" CURRENT_TIMESTAMP() " +
 			" )  ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idDomicilio", keyColumn = "ID_DOMICILIO")
 	public int agregarDomicilio(@Param("datos") AgregarConvenioPersonaDTO datos);
@@ -77,7 +77,7 @@ public interface ConvenioPFMapper {
 	@Update(value = ""
 			+ "UPDATE SVT_DOMICILIO  "
 			+ "SET  "
-			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "FEC_ACTUALIZACION = CURRENT_TIMESTAMP(), "
 			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ," +
 			" REF_CALLE = #{in.calle} , " +
 			" NUM_EXTERIOR= #{in.noExterior} , " +
@@ -101,7 +101,7 @@ public interface ConvenioPFMapper {
 			" #{datos.idPersona}, " +
 			" #{datos.cveMatricula}, " +
 			" #{datos.idDomicilio}, " +
-			" CURRENT_DATE(), " +
+			" CURRENT_TIMESTAMP(), " +
 			" #{datos.idUsuario}, " +
 			" 1 " +
 			" )  ")
@@ -123,7 +123,7 @@ public interface ConvenioPFMapper {
 			"#{datos.otraEnfermedad},  " +
 			"#{datos.idPaquete},  " +
 			"#{datos.idUsuario},  " +
-			"CURRENT_DATE()  " +
+			"CURRENT_TIMESTAMP()  " +
 			")  ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idContratoConvenioPaquete", keyColumn = "ID_CONTRA_PAQ_CONVENIO_PF")
 	public int agregarContratoConvenioPaquete(@Param("datos") AgregarConvenioPersonaDTO datos);
@@ -158,7 +158,7 @@ public interface ConvenioPFMapper {
 			" #{datos.idConvenioPF}," +
 			" #{datos.idUsuario}," +
 			" #{datos.idContratoConvenioPaquete}, " +
-			" CURRENT_DATE()" +
+			" CURRENT_TIMESTAMP()" +
 			" ) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idValidaDocumento", keyColumn = "ID_VALIDACION_DOCUMENTO")
 	public int agregaDocumentacion(@Param("datos") AgregarConvenioPersonaDTO datos);
@@ -197,7 +197,7 @@ public interface ConvenioPFMapper {
 			"#{out.idUsuario}, " +
 			"#{out.sexo} , " +
 			"#{out.otroSexo} ," +
-			" CURRENT_DATE())")
+			" CURRENT_TIMESTAMP())")
 	@Options(useGeneratedKeys = true, keyProperty = "out.idPersona", keyColumn = "ID_PERSONA")
 	public int agregarPersona(@Param("out") AgregarConvenioPersonaDTO persona);
 
@@ -212,7 +212,7 @@ public interface ConvenioPFMapper {
 	@Update(value = ""
 			+ "UPDATE SVC_PERSONA  "
 			+ "SET  "
-			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "FEC_ACTUALIZACION = CURRENT_TIMESTAMP(), "
 			+ "CVE_RFC = #{in.rfc} ," +
 			" NUM_SEXO = #{in.sexo} , " +
 			" REF_OTRO_SEXO= #{in.otroSexo} , " +

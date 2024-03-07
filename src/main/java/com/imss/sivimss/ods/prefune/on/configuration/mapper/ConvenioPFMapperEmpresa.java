@@ -41,7 +41,7 @@ public interface ConvenioPFMapperEmpresa {
 			"#{datos.idPromotor}, " +
 			"5, " +
 			"#{datos.idUsuario}, " +
-			" CURRENT_DATE()) ")
+			" CURRENT_TIMESTAMP()) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idConvenioPF", keyColumn = "ID_CONVENIO_PF")
 	public int agregarConvenioPFEmpresa(@Param("datos") AgregarConvenioEmpresaDTO datos);
 
@@ -66,7 +66,7 @@ public interface ConvenioPFMapperEmpresa {
 			" #{datos.municipio}, " +
 			" #{datos.estado}, " +
 			" #{datos.idUsuario}, " +
-			" CURRENT_DATE() " +
+			" CURRENT_TIMESTAMP() " +
 			" )  ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idDomicilio", keyColumn = "ID_DOMICILIO")
 	public int agregarDomicilio(@Param("datos") AgregarConvenioEmpresaDTO datos);
@@ -94,7 +94,7 @@ public interface ConvenioPFMapperEmpresa {
 			" #{datos.correo}, " +
 			" #{datos.idConvenioPF}, " +
 			" #{datos.idUsuario}, " +
-			" CURRENT_DATE() " +
+			" CURRENT_TIMESTAMP() " +
 			")")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idEmpresaConvenioPF", keyColumn = "ID_EMPRESA_CONVENIO_PF")
 	public int agregarEmpresaConvenioPF(@Param("datos") AgregarConvenioEmpresaDTO datos);
@@ -118,7 +118,7 @@ public interface ConvenioPFMapperEmpresa {
 			" #{datos.idPersona}, " +
 			" #{datos.cveMatricula}, " +
 			" #{datos.idDomicilio}, " +
-			" CURRENT_DATE(), " +
+			" CURRENT_TIMESTAMP(), " +
 			" #{datos.idUsuario}, " +
 			" 1 " +
 			" )  ")
@@ -140,7 +140,7 @@ public interface ConvenioPFMapperEmpresa {
 			"#{datos.otraEnfermedad},  " +
 			"#{datos.idPaquete},  " +
 			"#{datos.idUsuario},  " +
-			"CURRENT_DATE()  " +
+			"CURRENT_TIMESTAMP()  " +
 			")  ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idContratoConvenioPaquete", keyColumn = "ID_CONTRA_PAQ_CONVENIO_PF")
 	public int agregarContratoConvenioPaquete(@Param("datos") AgregarConvenioEmpresaDTO datos);
@@ -173,7 +173,7 @@ public interface ConvenioPFMapperEmpresa {
 			" #{datos.archivoRfc}," +
 			" #{datos.idConvenioPF}," +
 			" #{datos.idUsuario}," +
-			" CURRENT_DATE()" +
+			" CURRENT_TIMESTAMP()" +
 			" ) ")
 	@Options(useGeneratedKeys = true, keyProperty = "datos.idValidaDocumento", keyColumn = "ID_VALIDACION_DOCUMENTO")
 	public int agregaDocumentacion(@Param("datos") AgregarConvenioEmpresaDTO datos);

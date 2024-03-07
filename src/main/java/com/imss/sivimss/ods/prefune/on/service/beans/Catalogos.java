@@ -69,8 +69,8 @@ public class Catalogos {
                 .where("SP.IND_ACTIVO =1 ")
                 .and("SPS.IND_ACTIVO = 1")
                 .and("SP.ID_TIPO_PROVEEDOR =1")
-                .and("SC.FEC_FIN_VIG >= CURRENT_DATE()")
-                .and("SP.FEC_VIGENCIA >= CURRENT_DATE()")
+                .and("SC.FEC_FIN_VIG >= CURRENT_TIMESTAMP()")
+                .and("SP.FEC_VIGENCIA >= CURRENT_TIMESTAMP()")
                 .and("SC.IND_ACTIVO =1");
 
         selectQueryUtilUnionPaqueteArticulo.select("DISTINCT SPA.ID_PAQUETE")

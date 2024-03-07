@@ -24,7 +24,7 @@ public interface BeneficiariosMapper {
 	@Update(value = ""
 			+ "UPDATE SVT_CONTRATANTE_BENEFICIARIOS  "
 			+ "SET  "
-			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "FEC_ACTUALIZACION = CURRENT_TIMESTAMP(), "
 			+ "IND_INE_BENEFICIARIO = #{in.validaIne} ,"
 			+ "REF_UBICACION_INE_BENEFICIARIO = #{in.nombreIne}, "
 			+ "IND_ACTA_NACIMIENTO  = #{in.validaActa},"
@@ -78,14 +78,14 @@ public interface BeneficiariosMapper {
 			"#{out.telefono}, " +
 			"#{out.correo}, " +
 			"#{out.idUsuario}, " +
-			" CURRENT_DATE())")
+			" CURRENT_TIMESTAMP())")
 	@Options(useGeneratedKeys = true, keyProperty = "out.idPersona", keyColumn = "ID_PERSONA")
 	public int insertaPersona(@Param("out") AgregarBeneficiarioDTO persona);
 
 	@Update(value = ""
 			+ "UPDATE SVT_CONTRATANTE_BENEFICIARIOS  "
 			+ "SET  "
-			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "FEC_ACTUALIZACION = CURRENT_TIMESTAMP(), "
 			+ "IND_ACTIVO = 1, "
 			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ,"
 			+ "IND_INE_BENEFICIARIO = #{in.validaIne} ,"
@@ -122,7 +122,7 @@ public interface BeneficiariosMapper {
 			"#{out.idParentesco}, " +
 			"#{out.idPersona}, " +
 			"#{out.idUsuario}, " +
-			"CURRENT_DATE(), " +
+			"CURRENT_TIMESTAMP(), " +
 			"1, " +
 			"#{out.validaIne}, " +
 			"#{out.nombreIne}, " +
@@ -136,7 +136,7 @@ public interface BeneficiariosMapper {
 	@Update(value = ""
 			+ "UPDATE SVT_CONTRATANTE_BENEFICIARIOS  "
 			+ "SET  "
-			+ "FEC_ACTUALIZACION = CURRENT_DATE(), "
+			+ "FEC_ACTUALIZACION = CURRENT_TIMESTAMP(), "
 			+ "ID_USUARIO_MODIFICA = #{in.idUsuario} ,"
 			+ "IND_ACTIVO = 0 "
 			+ "WHERE ID_CONTRATANTE_BENEFICIARIOS = #{in.idContratante} "
