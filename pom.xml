@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.imss</groupId>
-	<artifactId>mssivimss-arquetipo</artifactId>
+	<artifactId>mssivimss-ods-prefune-on</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>mssivimss-arquetipo</name>
-	<description>Ms Arquetipo</description>
+	<name>mssivimss-ods-prefune-on</name>
+	<description>Ms ods prefune</description>
 	<properties>
 		<java.version>1.8</java.version>
 		<lombok.version>1.18.24</lombok.version>
@@ -63,7 +63,13 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>3.0.6</version>
 		</dependency>
-
+		<dependency>
+            <groupId>com.imss</groupId>
+            <artifactId>bitacora</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/bitacora.jar</systemPath>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
