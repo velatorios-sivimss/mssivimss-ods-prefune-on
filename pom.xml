@@ -63,13 +63,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>3.0.6</version>
 		</dependency>
-		<dependency>
-            <groupId>com.imss</groupId>
-            <artifactId>bitacora</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/bitacora.jar</systemPath>
-        </dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -243,7 +237,13 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+		<dependency>
+   <groupId>com.sivimss.bitacora</groupId>
+  <artifactId>sivimssBitacora</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/src/main/resources/sivimssBitacora.jar</systemPath>
+</dependency>
 		<dependency>
     <groupId>com.ibm.icu</groupId>
     <artifactId>icu4j</artifactId>
@@ -319,6 +319,29 @@
 					</execution>
 				</executions>
 			</plugin>
+			 <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>install-external-non-maven-jar</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>a.b</groupId>
+                            <artifactId>my</artifactId>
+                            <version>1.0.0</version>
+                            <file>${project.basedir}/src/main/resources/bitacora.jar</file>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+          
 		</plugins>
 	</build>
 	<dependencyManagement>
