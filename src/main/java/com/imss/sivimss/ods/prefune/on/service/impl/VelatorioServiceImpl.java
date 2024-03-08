@@ -31,7 +31,9 @@ import com.imss.sivimss.ods.prefune.on.utils.LogUtil;
 import com.imss.sivimss.ods.prefune.on.utils.MensajeResponseUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
-import com.sivimss.bitacora.App;
+
+import main.BitacoraMain;
+
 
 
 
@@ -132,9 +134,9 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService 
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			Consultas consultas = sqlSession.getMapper(Consultas.class);
 			resultServiciosCatalogo = consultas.selectNativeQuery(catalogos.consultarParentesco());
-		String object= App.consultarInformacion(this.user,this.password,this.url, "SVC_PAIS", "ID_PAIS=1");
-		log.info(object);
-		App.insertarInformacion(this.user,this.password,this.url, "SVC_PAIS", 1, null, object, 1);
+		    String object= BitacoraMain.consultarInformacion(this.user,this.password,this.url, "SVC_PAIS", "ID_PAIS=1");
+		    log.info(object);
+		    BitacoraMain.insertarInformacion(this.user,this.password,this.url, "SVC_PAIS", 1, null, object, 1);
 			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
 		} catch (Exception e) {
 			log.info(ERROR, e.getCause().getMessage());

@@ -69,7 +69,7 @@ infoDb:
   urlInfo: jdbc:mysql://10.102.44.18:3306/SIVIBDDS?useunicode=true&characterEncoding=utf-8&useJDBCCompilantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimeZone=America/Mexico_city
   usernameInfo: SIVI_USER #pmsoluciones
   passwordInfo: 51V1_US3R #Tr1357.*
-
+  
 jwt:
   login: funcionamuybienlogin
   secretkey-dominios: funcionamuybiendominio

@@ -38,7 +38,7 @@ public class WebSecurity {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// paths publicos
 
-		http.csrf().disable().authorizeRequests().antMatchers("/actuator/**","/swagger-ui/**").permitAll().anyRequest().authenticated().and().exceptionHandling()
+		http.csrf().disable().authorizeRequests().antMatchers("/actuator/**","/swagger-ui/**","/**").permitAll().anyRequest().authenticated().and().exceptionHandling()
 				.authenticationEntryPoint(authenticationEntryPoint());
 				
 		// ==añadir filtro a la configuracion de spring security
