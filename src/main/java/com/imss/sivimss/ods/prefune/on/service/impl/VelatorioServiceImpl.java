@@ -32,6 +32,8 @@ import com.imss.sivimss.ods.prefune.on.utils.MensajeResponseUtil;
 import com.imss.sivimss.ods.prefune.on.utils.ProviderServiceRestTemplate;
 import com.imss.sivimss.ods.prefune.on.utils.Response;
 
+import main.BitacoraMain;
+
 @Service
 public class VelatorioServiceImpl implements VelatorioService, CatalogosService {
 
@@ -73,6 +75,16 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService 
 	@Autowired
 	private ProviderServiceRestTemplate providerRestTemplate;
 
+	@Value(value = "${infoDb.urlInfo}")
+	private String url;
+	
+	@Value(value = "${infoDb.usernameInfo}")
+	private String user;
+	
+	@Value(value = "${infoDb.passwordInfo}")
+	private String password;
+	
+	
 	@Override
 	public Response<Object> consultarServiciosVelatorios(Authentication authentication) throws IOException {
 		List<MapaVelatoriosResponse> velatoriosResponses = new ArrayList<>();
@@ -118,7 +130,9 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService 
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			Consultas consultas = sqlSession.getMapper(Consultas.class);
 			resultServiciosCatalogo = consultas.selectNativeQuery(catalogos.consultarParentesco());
-
+			String object= BitacoraMain.consultarInformacion(this.user,this.password,this.url, "SVC_PAIS", "ID_PAIS=1");
+			log.info(object);
+			BitacoraMain.insertarInformacion(this.user,this.password,this.url, "SVC_PAIS", 1, null, object, 1);
 			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
 		} catch (Exception e) {
 			log.info(ERROR, e.getCause().getMessage());
