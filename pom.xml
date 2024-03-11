@@ -29,12 +29,12 @@
 			<version>3.5.6</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-
 
 
 		<dependency>
@@ -63,16 +63,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>3.0.6</version>
 		</dependency>
-		
-		<!-- 
-		<dependency>
-            <groupId>com.imss</groupId>
-            <artifactId>bitacora</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/bitacora.jar</systemPath>
-        </dependency>
-		 -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -168,7 +159,8 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.9</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -246,32 +238,29 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
-    <groupId>com.ibm.icu</groupId>
-    <artifactId>icu4j</artifactId>
-    <version>69.1</version>
-</dependency>
-
-
-
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>69.1</version>
+		</dependency>
 
 
 		<dependency>
-            <groupId>com.imss.sivimss.ods.prefune.on</groupId>
-            <artifactId>bitacora</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/bitacora.jar</systemPath>
-        </dependency>
+			<groupId>com.imss.sivimss.ods.prefune.on</groupId>
+			<artifactId>bitacora</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/bitacora.jar</systemPath>
+		</dependency>
 
 	</dependencies>
 
-	
+
 	<build>
 		<plugins>
 
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -284,12 +273,12 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory> 
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 							<resources>
 								<resource>
-									<directory>src/main/resources</directory> 
+									<directory>src/main/resources</directory>
 									<includes>
-										<include>bitacora.jar</include> 
+										<include>bitacora.jar</include>
 									</includes>
 								</resource>
 							</resources>
@@ -297,12 +286,12 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-                  <includeSystemScope>true</includeSystemScope>
+					<includeSystemScope>true</includeSystemScope>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
