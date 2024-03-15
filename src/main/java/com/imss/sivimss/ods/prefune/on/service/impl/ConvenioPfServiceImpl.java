@@ -450,14 +450,14 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					.primerApellido(jsonRespuesta.get("apellido1").asText())
 					.segundoApellido(jsonRespuesta.get("apellido2").asText()).correo("")
 					.build();
-			String [] fechaTemp=rp.getFechaNacimiento().split("/");
-			StringBuilder fecha=new StringBuilder();
-			for (int i = fechaTemp.length-1; i >= 0; i--) {
+			String[] fechaTemp = rp.getFechaNacimiento().split("/");
+			StringBuilder fecha = new StringBuilder();
+			for (int i = fechaTemp.length - 1; i >= 0; i--) {
 				fecha.append(fechaTemp[i]);
-				if (i!=0) {
+				if (i != 0) {
 					fecha.append("-");
 				}
-				
+
 			}
 			rp.setFechaNacimiento(fecha.toString());
 			return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, Arrays.asList(rp));
@@ -767,16 +767,18 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			Authentication authentication) throws IOException {
 		List<Map<String, Object>> resultDatosPersona = new ArrayList<>();
 		List<Map<String, Object>> resultDatosBeneficios = new ArrayList<>();
-		
+
 		PersonaEmpresaConvenioResponse convenioResponse = new PersonaEmpresaConvenioResponse();
 		SqlSessionFactory sqlSessionFactory = myBatisConfig.buildqlSessionFactory();
 
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			Consultas consultas = session.getMapper(Consultas.class);
-			resultDatosPersona = consultas.selectNativeQuery(miConvenio.consultarDatosGenealesPersonaEmpresa(idConvenio,idContratante));
+			resultDatosPersona = consultas
+					.selectNativeQuery(miConvenio.consultarDatosGenealesPersonaEmpresa(idConvenio, idContratante));
 
-			resultDatosBeneficios = consultas.selectNativeQuery(miConvenio.consultarBeneficiariosPersonaEmpresaConvenio(idConvenio,idContratante));
-			
+			resultDatosBeneficios = consultas.selectNativeQuery(
+					miConvenio.consultarBeneficiariosPersonaEmpresaConvenio(idConvenio, idContratante));
+
 		} catch (Exception e) {
 			log.info(ERROR, e.getCause().getMessage());
 
@@ -789,7 +791,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 		}
 		convenioResponse.setPersona(resultDatosPersona);
 		convenioResponse.setBeneficiarios(resultDatosBeneficios);
-		
+
 		return new Response<>(false, HttpStatus.OK.value(), AppConstantes.EXITO, convenioResponse);
 	}
 
