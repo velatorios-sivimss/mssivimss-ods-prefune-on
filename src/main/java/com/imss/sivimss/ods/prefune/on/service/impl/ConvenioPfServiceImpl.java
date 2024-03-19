@@ -147,9 +147,9 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 			Integer difDias = Integer.parseInt(resultDatosRenovacion.get(0).get("diferenciaDias").toString());
 			String periodo = formatearFecha(vigenciaFin);
 			Integer dia = obtenerDia(vigenciaFin);
-			resultDatosRenovacion.get(0).put("fecRenovacion", "Del 01-" + periodo + " Al 20-" + periodo);
+			resultDatosRenovacion.get(0).put("rangoRenovacion", "Del 01-" + periodo + " Al 20-" + periodo);
 			if (dia > 20) {
-				resultDatosRenovacion.get(0).put("fecRenovacion", "Del 01-" + periodo + " Al " + vigenciaFin);
+				resultDatosRenovacion.get(0).put("rangoRenovacion", "Del 01-" + periodo + " Al " + vigenciaFin);
 			}
 			if (difDias < 0) {
 				log.info("NO ESTA EN TEMPORADA DE RENOVACION");
