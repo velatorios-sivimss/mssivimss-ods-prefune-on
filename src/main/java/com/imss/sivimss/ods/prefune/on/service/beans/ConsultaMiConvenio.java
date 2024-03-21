@@ -19,7 +19,7 @@ public class ConsultaMiConvenio {
 	public String consultaMiConvenio(Integer idContratante) {
 		SelectQueryUtil selectQueryUtil = new SelectQueryUtil();
 		selectQueryUtil.select("SCP.ID_CONVENIO_PF AS idConvenio", "SCP.DES_FOLIO AS folioConvenio",
-				"SP.CVE_CURP AS curp, CONCAT(SP.NOM_PERSONA,' ',SP.NOM_PRIMER_APELLIDO,' ',SP.NOM_SEGUNDO_APELLIDO) AS nombreAfiliado",
+				"IFNULL(SP.CVE_CURP,'') AS curp, CONCAT(SP.NOM_PERSONA,' ',SP.NOM_PRIMER_APELLIDO,' ',SP.NOM_SEGUNDO_APELLIDO) AS nombreAfiliado",
 				"SCP.ID_ESTATUS_CONVENIO AS idEstatus", "SECP.DES_ESTATUS AS estatus",
 				"DATE_FORMAT(SCP.FEC_ALTA,'%d/%m/%Y') AS fechaExpedicion",
 				"CASE WHEN SCP.IND_TIPO_CONTRATACION = 0" +
@@ -111,8 +111,8 @@ public class ConsultaMiConvenio {
 				"SP.NOM_PERSONA AS nombreAfiliado",
 				"SP.NOM_PRIMER_APELLIDO AS primerApellido",
 				"SP.NOM_SEGUNDO_APELLIDO AS segundoApellido",
-				"SP.CVE_RFC AS rfc",
-				"SP.CVE_CURP AS curp",
+				"IFNULL(SP.CVE_RFC,'') AS rfc",
+				"IFNULL(SP.CVE_CURP,'') AS curp",
 				"SCB.ID_PARENTESCO AS idParentesco",
 				"SPAC.DES_PARENTESCO AS parentesco",
 				"SV.DES_VELATORIO AS velatorio",
@@ -233,7 +233,7 @@ public class ConsultaMiConvenio {
 
 		SelectQueryUtil selectQueryUtilCurp = new SelectQueryUtil();
 		selectQueryUtilCurp
-				.select("SP.ID_PERSONA as idPersona", "SP.CVE_RFC AS rfc", "SP.CVE_CURP AS curp", "SP.CVE_NSS AS nss",
+				.select("SP.ID_PERSONA as idPersona", "IFNULL(SP.CVE_RFC,'') AS rfc", "IFNULL(SP.CVE_CURP,'') AS curp", "SP.CVE_NSS AS nss",
 						"SP.NOM_PERSONA AS nomPersona", "SP.NOM_PRIMER_APELLIDO AS primerApellido",
 						"SP.NOM_SEGUNDO_APELLIDO AS segundoApellido", "SP.NUM_SEXO AS sexo",
 						"IFNULL(SP.REF_OTRO_SEXO,'') AS otroSexo", "SP.FEC_NAC AS fechaNacimiento",
@@ -256,7 +256,7 @@ public class ConsultaMiConvenio {
 						"SCPE.ID_EMPRESA_CONVENIO_PF AS idEmpresa",
 						"SCPE.REF_NOMBRE AS nombre",
 						"SCPE.REF_RAZON_SOCIAL AS razonSocial",
-						"SCPE.CVE_RFC AS rfc",
+						"IFNULL(SCPE.CVE_RFC,'') AS rfc",
 						"SCPE.ID_PAIS AS idPais",
 						"SD.REF_CP AS cp",
 						"SD.REF_CALLE AS calle",
