@@ -18,8 +18,6 @@ public interface BeneficiariosMapper {
 			+ "SET  "
 			+ "FEC_ACTUALIZACION = CURRENT_TIMESTAMP(), "
 			+ "CVE_RFC = #{in.rfc} ," +
-			" NUM_SEXO = #{in.sexo} , " +
-			" REF_OTRO_SEXO= #{in.otroSexo} , " +
 			" REF_TELEFONO = #{in.telefono} , " +
 			" REF_CORREO = #{in.correo}   " +
 			"WHERE ID_PERSONA = #{in.idPersona}")
