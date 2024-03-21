@@ -17,5 +17,6 @@ public class ActualizarBeneficiarioDTO {
     private Integer idContratante;
     private boolean actualizaArchivo;
     private Integer idUsuario;
+    private String rfc;
 
 }
