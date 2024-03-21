@@ -156,6 +156,9 @@ public class ConsultaMiConvenio {
 				"SCP.ID_TIPO_PREVISION AS tipoPrevision",
 				"DATE_FORMAT(SCP.FEC_ALTA , '%d-%m-%Y') AS fecContratacion",
 				"IF(SCP.IND_RENOVACION=false, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d-%m-%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d-%m-%Y')) AS fecVigencia",
+				//SE MODIFICA PERIODO DE RENOVACION
+				"IF(SCP.IND_RENOVACION=false,".concat(getFecRenv("SCP", false))
+				.concat(getFecRenv("RPF", true)) +" AS fecRenovacion",
 				"PAQ.MON_PRECIO AS cuotaRecuperacion",
 				"PAQ.REF_PAQUETE_NOMBRE AS tipoPaquete",
 				// "IF(SCP.IND_RENOVACION=false, ' ', DATE_FORMAT(RPF.FEC_ALTA, '%d-%m-%Y')) AS
@@ -165,13 +168,18 @@ public class ConsultaMiConvenio {
 				"TIMESTAMPDIFF(DAY,IF(SCP.IND_RENOVACION=false, DATE_FORMAT(SCP.FEC_VIGENCIA, '%Y-%m-%01'), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y-%m-%01')), CURDATE()) AS diferenciaDias")
 				.from("SVT_CONVENIO_PF SCP ")
 				.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF",
-						"SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS IN (1,2)  ")
+						"SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS IN (1,2)")
 				.join("SVT_CONTRA_PAQ_CONVENIO_PF SCPC", "SCP.ID_CONVENIO_PF = SCPC.ID_CONVENIO_PF")
 				.join("SVT_PAQUETE PAQ", "SCPC.ID_PAQUETE = PAQ.ID_PAQUETE")
 				.where("SCP.ID_CONVENIO_PF =" + idConvenio);
 		query = queryUtil.build();
 		log.info("consultaRenovacionConvenio: {}", query);
 		return query;
+	}
+
+	private String getFecRenv(String alias, boolean bandera) {
+		return " DATE_FORMAT(DATE_ADD("+alias+".FEC_VIGENCIA, INTERVAL 365 DAY), '%d-%m-%Y')".concat(!bandera ? "," : ")");
+		
 	}
 
 	public String busquedaFolioParaReporte(String idConvenio) {
