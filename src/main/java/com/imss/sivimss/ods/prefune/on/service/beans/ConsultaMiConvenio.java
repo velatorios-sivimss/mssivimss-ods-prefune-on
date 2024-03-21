@@ -68,7 +68,8 @@ public class ConsultaMiConvenio {
 
 		selectQueryUtil.select("SCP.ID_CONVENIO_PF AS idConvenio",
 				"SC.ID_CONTRATANTE AS idContratante",
-				"SP.CVE_CURP AS curp ",
+				"IFNULL(SP.CVE_CURP,'') AS curp ",
+				"IFNULL(SP.CVE_RFC,'') AS rfc ",
 				"SCP.ID_VELATORIO AS idVelatorio",
 				"V.DES_VELATORIO AS velatorio",
 				"SECP.DES_ESTATUS AS estatus",
