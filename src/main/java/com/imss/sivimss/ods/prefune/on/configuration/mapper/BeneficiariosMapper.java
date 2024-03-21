@@ -16,9 +16,13 @@ public interface BeneficiariosMapper {
 	@Update(value = ""
 			+ "UPDATE SVC_PERSONA  "
 			+ "SET  "
-			+ "REF_TELEFONO = #{in.telefono}, "
-			+ "REF_CORREO = #{in.correo} "
-			+ "WHERE ID_PERSONA = #{in.idPersona}")
+			+ "FEC_ACTUALIZACION = CURRENT_TIMESTAMP(), "
+			+ "CVE_RFC = #{in.rfc} ," +
+			" NUM_SEXO = #{in.sexo} , " +
+			" REF_OTRO_SEXO= #{in.otroSexo} , " +
+			" REF_TELEFONO = #{in.telefono} , " +
+			" REF_CORREO = #{in.correo}   " +
+			"WHERE ID_PERSONA = #{in.idPersona}")
 	public int actualizarPersona(@Param("in") ActualizarBeneficiarioDTO persona);
 
 	@Update(value = ""
