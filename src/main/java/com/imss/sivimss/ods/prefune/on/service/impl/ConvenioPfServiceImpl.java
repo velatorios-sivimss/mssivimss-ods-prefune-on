@@ -371,6 +371,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 					actualizarBeneficiarioDTO.setCorreo(datos.getCorreo());
 					actualizarBeneficiarioDTO.setTelefono(datos.getTelefono());
 					actualizarBeneficiarioDTO.setIdPersona(datos.getIdPersona());
+
 					if (validaExistencia > 0 && estatusBeneficiario == 1)
 						return new Response<>(false, HttpStatus.OK.value(), AppConstantes.BENEFICIARIO_REGISTRADO,
 								null);
@@ -388,6 +389,7 @@ public class ConvenioPfServiceImpl implements ConvenioPfService {
 				if ((datos.getIdPersona() == null ? 0 : datos.getIdPersona()) > 0) {
 					// se hace una actualizacion decorreo y telefono de la persona
 					log.info("actualizando persona");
+					actualizarBeneficiarioDTO.setRfc(datos.getRfc());
 					mapperQuery.actualizarPersona(actualizarBeneficiarioDTO);
 					validaBeneficiarioAsociado = true;
 					log.info("correo y telefono de persona actualizado");
