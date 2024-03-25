@@ -134,9 +134,6 @@ public class VelatorioServiceImpl implements VelatorioService, CatalogosService 
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			Consultas consultas = sqlSession.getMapper(Consultas.class);
 			resultServiciosCatalogo = consultas.selectNativeQuery(catalogos.consultarParentesco());
-		    String object= BitacoraMain.consultarInformacion(this.user,this.password,this.url, "SVC_PAIS", "ID_PAIS=1");
-		    log.info(object);
-		    BitacoraMain.insertarInformacion(this.user,this.password,this.url, "SVC_PAIS", 1, null, object, 1);
 			return new Response<>(true, HttpStatus.OK.value(), AppConstantes.EXITO, resultServiciosCatalogo);
 		} catch (Exception e) {
 			log.info(ERROR, e.getCause().getMessage());
