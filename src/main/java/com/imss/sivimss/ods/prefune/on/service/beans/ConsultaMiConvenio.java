@@ -156,15 +156,16 @@ public class ConsultaMiConvenio {
 				"DATE_FORMAT(SCP.FEC_ALTA , '%d-%m-%Y') AS fecContratacion",
 				"IF(SCP.IND_RENOVACION=false, (DATE_FORMAT(SCP.FEC_VIGENCIA, '%d-%m-%Y')), DATE_FORMAT(RPF.FEC_VIGENCIA, '%d-%m-%Y')) AS fecVigencia",
 				//SE MODIFICA PERIODO DE RENOVACION
-				"IF(SCP.IND_RENOVACION=false,".concat(getFecRenv("SCP", false))
-				.concat(getFecRenv("RPF", true)) +" AS fecRenovacion",
+				"IF(SCP.IND_RENOVACION=false,".concat(getFechaRenv("SCP", false))
+				.concat(getFechaRenv("RPF", true)) +" AS fecRenovacion",
 				"PAQ.MON_PRECIO AS cuotaRecuperacion",
 				"PAQ.REF_PAQUETE_NOMBRE AS tipoPaquete",
 				// "IF(SCP.IND_RENOVACION=false, ' ', DATE_FORMAT(RPF.FEC_ALTA, '%d-%m-%Y')) AS
 				// fecRenovacion",
 				"IFNULL((".concat(subQuery) + "), FALSE) AS titularFallecido",
 				"DATE_FORMAT(CURDATE(), '%d-%m-%Y') AS fecActual",
-				"TIMESTAMPDIFF(DAY,IF(SCP.IND_RENOVACION=false, DATE_FORMAT(SCP.FEC_VIGENCIA, '%Y-%m-%01'), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y-%m-%01')), CURDATE()) AS diferenciaDias")
+				"TIMESTAMPDIFF(DAY,IF(SCP.IND_RENOVACION=false, DATE_FORMAT(SCP.FEC_VIGENCIA, '%Y-%m-%01'), DATE_FORMAT(RPF.FEC_VIGENCIA, '%Y-%m-%01')), CURDATE()) AS diferenciaDias",
+				"IF( ID_ESTATUS=1, RPF.ID_RENOVACION_CONVENIO_PF, '') AS idRegistro")
 				.from("SVT_CONVENIO_PF SCP ")
 				.leftJoin("SVT_RENOVACION_CONVENIO_PF RPF",
 						"SCP.ID_CONVENIO_PF=RPF.ID_CONVENIO_PF AND RPF.ID_ESTATUS IN (1,2)")
@@ -176,7 +177,7 @@ public class ConsultaMiConvenio {
 		return query;
 	}
 
-	private String getFecRenv(String alias, boolean bandera) {
+	private String getFechaRenv(String alias, boolean bandera) {
 		return " DATE_FORMAT(DATE_ADD("+alias+".FEC_VIGENCIA, INTERVAL 365 DAY), '%d-%m-%Y')".concat(!bandera ? "," : ")");
 		
 	}
