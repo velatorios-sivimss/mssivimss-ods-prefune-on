@@ -178,7 +178,7 @@ public class ConsultaMiConvenio {
 	}
 
 	private String getFechaRenv(String alias, boolean bandera) {
-		return " DATE_FORMAT(DATE_ADD("+alias+".FEC_VIGENCIA, INTERVAL 365 DAY), '%d-%m-%Y')".concat(!bandera ? "," : ")");
+		return " DATE_FORMAT("+alias+".FEC_VIGENCIA, '%d-%m-%Y')".concat(!bandera ? "," : ")");
 		
 	}
 
