@@ -31,6 +31,7 @@ public class ConsultaMiConvenio {
 				" SCP.ID_TIPO_PREVISION AS tipoPrevision",
 				"IF(RENO.ID_ESTATUS=2, TRUE, FALSE) AS banderaDocumentos",
 				" SCP.ID_VELATORIO AS idVelatorio",
+				" SV.DES_VELATORIO AS nombreVelatorio",
 				"CASE WHEN SPB.IMP_VALOR IS NULL  "
 						+ "	THEN  "
 						+ "	(SELECT SP.MON_PRECIO FROM SVT_PAQUETE SP WHERE SP.ID_PAQUETE=SCPA.ID_PAQUETE)   "
